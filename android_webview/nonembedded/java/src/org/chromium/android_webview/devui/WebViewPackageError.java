@@ -105,7 +105,11 @@ public class WebViewPackageError {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
-            mContext.finishAndRemoveTask();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mContext.finishAndRemoveTask();
+            } else {
+                mContext.finishAffinity();
+            }
         });
 
         // Switching WebView providers is possible from API >= 24.

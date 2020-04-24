@@ -6,5 +6,5 @@
 -->
 
 <resources>
-    <style name="Theme.DevUi.DayNight" parent="@android:style/Theme.Material.Light.DarkActionBar" />
+    <style name="Theme.DevUi.DayNight" parent="@android:style/Theme.Holo.Light.DarkActionBar" />
 </resources>
