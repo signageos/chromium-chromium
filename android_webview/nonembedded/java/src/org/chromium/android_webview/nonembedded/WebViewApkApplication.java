@@ -29,6 +29,7 @@ import org.chromium.base.library_loader.LibraryLoader;
 import org.chromium.base.library_loader.LibraryProcessType;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.metrics.UmaRecorderHolder;
+import org.chromium.base.multidex.ChromiumMultiDexInstaller;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
 import org.chromium.build.BuildConfig;
@@ -96,6 +97,11 @@ public class WebViewApkApplication extends Application {
      */
     public static void maybeInitProcessGlobals() {
         if (isWebViewProcess()) {
+            Context ctx = ContextUtils.getApplicationContext();
+            if (BuildConfig.IS_MULTIDEX_ENABLED) {
+                ChromiumMultiDexInstaller.install(ctx);
+            }
+
             PathUtils.setPrivateDataDirectorySuffix("webview", "WebView");
             CommandLineUtil.initCommandLine();
 
