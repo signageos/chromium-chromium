@@ -17,15 +17,15 @@ import java.util.List;
  * wrapper around NavigationHistory.
  */
 @SuppressWarnings("NoSynchronizedMethodCheck")
-public class WebBackForwardListChromium extends WebBackForwardList {
-    private final List<WebHistoryItemChromium> mHistroryItemList;
+public class WebBackForwardListChromium2 extends WebBackForwardList {
+    private final List<WebHistoryItemChromium2> mHistroryItemList;
     private final int mCurrentIndex;
 
-    /* package */ WebBackForwardListChromium(NavigationHistory navHistory) {
+    /* package */ WebBackForwardListChromium2(NavigationHistory navHistory) {
         mCurrentIndex = navHistory.getCurrentEntryIndex();
-        mHistroryItemList = new ArrayList<WebHistoryItemChromium>(navHistory.getEntryCount());
+        mHistroryItemList = new ArrayList<WebHistoryItemChromium2>(navHistory.getEntryCount());
         for (int i = 0; i < navHistory.getEntryCount(); ++i) {
-            mHistroryItemList.add(new WebHistoryItemChromium(navHistory.getEntryAtIndex(i)));
+            mHistroryItemList.add(new WebHistoryItemChromium2(navHistory.getEntryAtIndex(i)));
         }
     }
 
@@ -70,7 +70,7 @@ public class WebBackForwardListChromium extends WebBackForwardList {
     }
 
     // Clone constructor.
-    private WebBackForwardListChromium(List<WebHistoryItemChromium> list, int currentIndex) {
+    private WebBackForwardListChromium2(List<WebHistoryItemChromium2> list, int currentIndex) {
         mHistroryItemList = list;
         mCurrentIndex = currentIndex;
     }
@@ -79,11 +79,11 @@ public class WebBackForwardListChromium extends WebBackForwardList {
      * See {@link android.webkit.WebBackForwardList#clone}.
      */
     @Override
-    protected synchronized WebBackForwardListChromium clone() {
-        List<WebHistoryItemChromium> list = new ArrayList<WebHistoryItemChromium>(getSize());
+    protected synchronized WebBackForwardListChromium2 clone() {
+        List<WebHistoryItemChromium2> list = new ArrayList<WebHistoryItemChromium2>(getSize());
         for (int i = 0; i < getSize(); ++i) {
             list.add(mHistroryItemList.get(i).clone());
         }
-        return new WebBackForwardListChromium(list, mCurrentIndex);
+        return new WebBackForwardListChromium2(list, mCurrentIndex);
     }
 }

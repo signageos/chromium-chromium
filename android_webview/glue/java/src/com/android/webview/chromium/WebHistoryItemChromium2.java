@@ -14,13 +14,13 @@ import org.chromium.content_public.browser.NavigationEntry;
  * around NavigationEntry
  */
 @SuppressWarnings("deprecation")
-public class WebHistoryItemChromium extends WebHistoryItem {
+public class WebHistoryItemChromium2 extends WebHistoryItem {
     private final String mUrl;
     private final String mOriginalUrl;
     private final String mTitle;
     private final Bitmap mFavicon;
 
-    /* package */ WebHistoryItemChromium(NavigationEntry entry) {
+    /* package */ WebHistoryItemChromium2(NavigationEntry entry) {
         mUrl = entry.getUrl();
         mOriginalUrl = entry.getOriginalUrl();
         mTitle = entry.getTitle();
@@ -69,7 +69,7 @@ public class WebHistoryItemChromium extends WebHistoryItem {
     }
 
     // Clone constructor.
-    private WebHistoryItemChromium(String url, String originalUrl, String title, Bitmap favicon) {
+    private WebHistoryItemChromium2(String url, String originalUrl, String title, Bitmap favicon) {
         mUrl = url;
         mOriginalUrl = originalUrl;
         mTitle = title;
@@ -81,8 +81,8 @@ public class WebHistoryItemChromium extends WebHistoryItem {
      */
     @SuppressWarnings("NoSynchronizedMethodCheck")
     @Override
-    public synchronized WebHistoryItemChromium
+    public synchronized WebHistoryItemChromium2
     clone() {
-        return new WebHistoryItemChromium(mUrl, mOriginalUrl, mTitle, mFavicon);
+        return new WebHistoryItemChromium2(mUrl, mOriginalUrl, mTitle, mFavicon);
     }
 }

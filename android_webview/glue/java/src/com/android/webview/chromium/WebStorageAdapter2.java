@@ -19,12 +19,12 @@ import java.util.Map;
  * chromium internal implementation.
  */
 @SuppressWarnings("deprecation")
-final class WebStorageAdapter extends WebStorage {
-    private final WebViewChromiumFactoryProvider mFactory;
+final class WebStorageAdapter2 extends WebStorage {
+    private final WebViewChromiumFactoryProviderBase mFactory;
     private final AwQuotaManagerBridge mQuotaManagerBridge;
 
-    WebStorageAdapter(
-            WebViewChromiumFactoryProvider factory, AwQuotaManagerBridge quotaManagerBridge) {
+    WebStorageAdapter2(
+            WebViewChromiumFactoryProviderBase factory, AwQuotaManagerBridge quotaManagerBridge) {
         mFactory = factory;
         mQuotaManagerBridge = quotaManagerBridge;
     }

@@ -12,11 +12,15 @@
     public *;
 }
 
+-keep class com.android.webview.chromium.WebViewChromiumFactoryProviderBase {
+    public *;
+}
+
 -keep class * implements android.webkit.WebViewFactoryProvider$Statics {
     *;
 }
 
--keep class com.android.webview.chromium.ContentSettingsAdapter {
+-keep class com.android.webview.chromium.ContentSettingsAdapter2 {
     public *;
 }
 
@@ -24,13 +28,13 @@
     public *;
 }
 
--keep class com.android.webview.chromium.WebViewDatabaseAdapter {
+-keep class com.android.webview.chromium.WebViewDatabaseAdapter2 {
   public *;
 }
 
 # This is the main entry point for APIs. It is kept to make developing with
 # unreleased Android easier.
--keep class com.android.webview.chromium.WebViewChromium {
+-keep class com.android.webview.chromium.WebViewChromium2 {
   public *;
 }
 
