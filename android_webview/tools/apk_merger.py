@@ -255,9 +255,9 @@ def main():
     apksigner_jar = os.path.join(
         os.path.dirname(args.zipalign_path), 'lib', 'apksigner.jar')
     # Official APKs are re-signed anyways, so it is not important to figure out
-    # the correct min_sdk_version. Use 21 since that's the lowest supported
+    # the correct min_sdk_version. Use 19 since that's the lowest supported
     # webview version.
-    min_sdk_version = 21
+    min_sdk_version = 19
     finalize_apk.FinalizeApk(apksigner_jar, args.zipalign_path, tmp_apk,
                              new_apk, args.keystore_path, args.key_password,
                              args.key_name, min_sdk_version)

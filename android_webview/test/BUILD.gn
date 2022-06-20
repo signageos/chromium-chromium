@@ -161,7 +161,7 @@ instrumentation_test_apk("webview_instrumentation_test_apk") {
   apk_name = "WebViewInstrumentationTest"
   apk_under_test = ":webview_instrumentation_apk"
   android_manifest = "../javatests/AndroidManifest.xml"
-  min_sdk_version = 21
+  min_sdk_version = 19
   deps = [
     ":webview_instrumentation_test_utils_java",
     "//android_webview:android_webview_step1_java",
