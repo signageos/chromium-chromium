@@ -455,7 +455,6 @@ class WebViewDelegateFactory {
         private final Method mAttachFunctorMethod;
         private final Method mCallDrawGLFunctionMethod;
         private final Method mDetachFunctorMethod;
-        private final Method mGetAssignedPackageIdentifiersMethod;
         private final Method mAddAssetPathMethod;
         private final Method mCurrentApplicationMethod;
         private final Method mGetStringMethod;
@@ -478,8 +477,6 @@ class WebViewDelegateFactory {
                                                .getMethod("detachFunctor", int.class);
                 mCallDrawGLFunctionMethod = Class.forName("android.view.HardwareCanvas")
                                                     .getMethod("callDrawGLFunction", int.class);
-                mGetAssignedPackageIdentifiersMethod =
-                        AssetManager.class.getMethod("getAssignedPackageIdentifiers");
                 mAddAssetPathMethod = AssetManager.class.getMethod("addAssetPath", String.class);
                 mCurrentApplicationMethod =
                         Class.forName("android.app.ActivityThread").getMethod("currentApplication");
@@ -554,19 +551,23 @@ class WebViewDelegateFactory {
 
         @Override
         public int getPackageId(Resources resources, String packageName) {
-            try {
-                SparseArray packageIdentifiers =
-                        (SparseArray) mGetAssignedPackageIdentifiersMethod.invoke(
-                                resources.getAssets());
-                for (int i = 0; i < packageIdentifiers.size(); i++) {
-                    final String name = (String) packageIdentifiers.valueAt(i);
-
-                    if (packageName.equals(name)) {
-                        return packageIdentifiers.keyAt(i);
+            // Look for matching package by first resource of any type.
+            // This covers both *.webview and *.webview_translations resources.
+            // This package is always zero on Kitkat.
+            for (int packageId = 0x00; packageId <= 0x7f; packageId++) {
+                for (int resType = 0x01; resType <= 0xff; resType++) {
+                    int resId = (packageId << 24) | (resType << 16);
+                    try {
+                        final String resourcePackageName = resources.getResourcePackageName(resId);
+                        if (resourcePackageName.equals(packageName)) {
+                            return packageId;
+                        } else {
+                            // Skip the rest of resources belonging to this package.
+                            break;
+                        }
+                    } catch (Resources.NotFoundException ignore) {
                     }
                 }
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid reflection", e);
             }
             throw new RuntimeException("Package not found: " + packageName);
         }
