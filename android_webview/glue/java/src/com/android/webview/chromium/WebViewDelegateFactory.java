@@ -113,6 +113,18 @@ class WebViewDelegateFactory {
     }
 
     /**
+     * Creates a {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} compatible
+     * with the API 19 version of the framework in which
+     * {@link android.webkit.WebViewDelegate android.webkit.WebViewDelegate} had not yet been
+     * introduced.
+     *
+     * @return the created delegate
+     */
+    static WebViewDelegate createApi19CompatibilityDelegate(PackageInfo loadedPackageInfo) {
+        return new Api19CompatibilityDelegate(loadedPackageInfo);
+    }
+
+    /**
      * A {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} that proxies requests
      * to a {@link android.webkit.WebViewDelegate android.webkit.WebViewDelegate}.
      */
@@ -418,6 +430,179 @@ class WebViewDelegateFactory {
         @Override
         public void drawWebViewFunctor(Canvas canvas, int functor) {
             throw new RuntimeException();
+        }
+    }
+
+    /**
+     * A {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} compatible with the
+     * API 19 version of the framework in which
+     * {@link android.webkit.WebViewDelegate android.webkit.WebViewDelegate} had not yet been
+     * introduced.
+     *
+     * <p>This class implements the
+     * {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} functionality by using
+     * reflection to call into hidden frameworks APIs released in the API-19 version of the
+     * framework.
+     */
+    private static class Api19CompatibilityDelegate implements WebViewDelegate,
+            LoadedPackageInfoOwner {
+        /** Copy of Trace.TRACE_TAG_WEBVIEW */
+        private static final long TRACE_TAG_WEBVIEW = 1L << 4;
+
+        /** Hidden APIs released in the API 19 version of the framework */
+        private final Method mIsTagEnabledMethod;
+        private final Method mAddChangeCallbackMethod;
+        private final Method mGetViewRootImplMethod;
+        private final Method mAttachFunctorMethod;
+        private final Method mCallDrawGLFunctionMethod;
+        private final Method mDetachFunctorMethod;
+        private final Method mCurrentApplicationMethod;
+        private final Method mGetStringMethod;
+
+        private final PackageInfo mLoadedPackageInfo;
+
+        Api19CompatibilityDelegate(PackageInfo loadedPackageInfo) {
+            try {
+                // Important: This reflection essentially defines a snapshot of some hidden APIs
+                // at version 19 of the framework for compatibility reasons, and the reflection
+                // should not be changed even if those hidden APIs change in future releases.
+                mIsTagEnabledMethod = Trace.class.getMethod("isTagEnabled", long.class);
+                mAddChangeCallbackMethod = Class.forName("android.os.SystemProperties")
+                        .getMethod("addChangeCallback", Runnable.class);
+                mGetViewRootImplMethod = View.class.getMethod("getViewRootImpl");
+                mAttachFunctorMethod =
+                        Class.forName("android.view.ViewRootImpl")
+                                .getMethod("attachFunctor", int.class);
+                mDetachFunctorMethod = Class.forName("android.view.ViewRootImpl")
+                                               .getMethod("detachFunctor", int.class);
+                mCallDrawGLFunctionMethod = Class.forName("android.view.HardwareCanvas")
+                                                    .getMethod("callDrawGLFunction", int.class);
+                mCurrentApplicationMethod =
+                        Class.forName("android.app.ActivityThread").getMethod("currentApplication");
+                mGetStringMethod = Class.forName("android.net.http.ErrorStrings")
+                                           .getMethod("getString", int.class, Context.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+            mLoadedPackageInfo = loadedPackageInfo;
+        }
+
+        @Override
+        public void setOnTraceEnabledChangeListener(final OnTraceEnabledChangeListener listener) {
+            try {
+                mAddChangeCallbackMethod.invoke(null, new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onTraceEnabledChange(isTraceTagEnabled());
+                    }
+                });
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public boolean isTraceTagEnabled() {
+            try {
+                return ((Boolean) mIsTagEnabledMethod.invoke(null, TRACE_TAG_WEBVIEW));
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public boolean canInvokeDrawGlFunctor(View containerView) {
+            return false;
+        }
+
+        @Override
+        public void invokeDrawGlFunctor(
+                View containerView, long nativeDrawGLFunctor, boolean waitForCompletion) {
+            throw new RuntimeException("Call not supported");
+        }
+
+        @Override
+        public void callDrawGlFunction(Canvas canvas, long nativeDrawGLFunctor) {
+            try {
+                mCallDrawGLFunctionMethod.invoke(canvas, (int) nativeDrawGLFunctor);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public void callDrawGlFunction(
+                Canvas canvas, long nativeDrawGLFunctor, Runnable releasedRunnable) {
+            throw new RuntimeException("Call not supported");
+        }
+
+        @Override
+        public void detachDrawGlFunctor(View containerView, long nativeDrawGLFunctor) {
+            try {
+                Object viewRootImpl = mGetViewRootImplMethod.invoke(containerView);
+                if (viewRootImpl != null) {
+                    mDetachFunctorMethod.invoke(viewRootImpl, (int) nativeDrawGLFunctor);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public int getPackageId(Resources resources, String packageName) {
+            // Kitkat can't assign dynamic package IDs.
+            return org.chromium.ui.R.style.DropdownPopupWindow >>> 24;
+        }
+
+        @Override
+        public Application getApplication() {
+            try {
+                return (Application) mCurrentApplicationMethod.invoke(null);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public String getErrorString(Context context, int errorCode) {
+            try {
+                return (String) mGetStringMethod.invoke(null, errorCode, context);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public void addWebViewAssetPath(Context context) {
+            try {
+                final int firstStringResId = org.chromium.android_webview.R.string
+                        .class.getFields()[0].getInt(null);
+                context.getResources().getResourceEntryName(firstStringResId);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException("Invalid reflection", e);
+            } catch (Resources.NotFoundException e) {
+                throw new RuntimeException("WebView assets were supposed to be loaded already.");
+            }
+        }
+
+        @Override
+        public boolean isMultiProcessEnabled() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getDataDirectorySuffix() {
+            return null;
+        }
+
+        @Override
+        public void drawWebViewFunctor(Canvas canvas, int functor) {
+            throw new RuntimeException();
+        }
+
+        @Override
+        public PackageInfo getLoadedPackageInfo() {
+            return mLoadedPackageInfo;
         }
     }
 }
