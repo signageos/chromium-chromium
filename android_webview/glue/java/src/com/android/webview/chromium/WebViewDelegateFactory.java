@@ -113,6 +113,18 @@ class WebViewDelegateFactory {
     }
 
     /**
+     * Creates a {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} compatible
+     * with the API 19 version of the framework in which
+     * {@link android.webkit.WebViewDelegate android.webkit.WebViewDelegate} had not yet been
+     * introduced.
+     *
+     * @return the created delegate
+     */
+    static WebViewDelegate createApi19CompatibilityDelegate(PackageInfo loadedPackageInfo) {
+        return new Api19CompatibilityDelegate(loadedPackageInfo);
+    }
+
+    /**
      * A {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} that proxies requests
      * to a {@link android.webkit.WebViewDelegate android.webkit.WebViewDelegate}.
      */
@@ -400,6 +412,194 @@ class WebViewDelegateFactory {
                 // chain, which can return an unexpected AssetManager.
                 mAddAssetPathMethod.invoke(
                         context.getResources().getAssets(), info.applicationInfo.sourceDir);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public boolean isMultiProcessEnabled() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getDataDirectorySuffix() {
+            return null;
+        }
+
+        @Override
+        public void drawWebViewFunctor(Canvas canvas, int functor) {
+            throw new RuntimeException();
+        }
+    }
+
+    /**
+     * A {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} compatible with the
+     * API 19 version of the framework in which
+     * {@link android.webkit.WebViewDelegate android.webkit.WebViewDelegate} had not yet been
+     * introduced.
+     *
+     * <p>This class implements the
+     * {@link WebViewDelegate com.android.webview.chromium.WebViewDelegate} functionality by using
+     * reflection to call into hidden frameworks APIs released in the API-19 version of the
+     * framework.
+     */
+    private static class Api19CompatibilityDelegate implements WebViewDelegate {
+        /** Copy of Trace.TRACE_TAG_WEBVIEW */
+        private static final long TRACE_TAG_WEBVIEW = 1L << 4;
+
+        /** Hidden APIs released in the API 19 version of the framework */
+        private final Method mIsTagEnabledMethod;
+        private final Method mAddChangeCallbackMethod;
+        private final Method mGetViewRootImplMethod;
+        private final Method mAttachFunctorMethod;
+        private final Method mCallDrawGLFunctionMethod;
+        private final Method mDetachFunctorMethod;
+        private final Method mGetAssignedPackageIdentifiersMethod;
+        private final Method mAddAssetPathMethod;
+        private final Method mCurrentApplicationMethod;
+        private final Method mGetStringMethod;
+
+        private final PackageInfo mLoadedPackageInfo;
+
+        Api19CompatibilityDelegate(PackageInfo loadedPackageInfo) {
+            try {
+                // Important: This reflection essentially defines a snapshot of some hidden APIs
+                // at version 19 of the framework for compatibility reasons, and the reflection
+                // should not be changed even if those hidden APIs change in future releases.
+                mIsTagEnabledMethod = Trace.class.getMethod("isTagEnabled", long.class);
+                mAddChangeCallbackMethod = Class.forName("android.os.SystemProperties")
+                                                   .getMethod("addChangeCallback", Runnable.class);
+                mGetViewRootImplMethod = View.class.getMethod("getViewRootImpl");
+                mAttachFunctorMethod =
+                        Class.forName("android.view.ViewRootImpl")
+                                .getMethod("attachFunctor", int.class);
+                mDetachFunctorMethod = Class.forName("android.view.ViewRootImpl")
+                                               .getMethod("detachFunctor", int.class);
+                mCallDrawGLFunctionMethod = Class.forName("android.view.HardwareCanvas")
+                                                    .getMethod("callDrawGLFunction", int.class);
+                mGetAssignedPackageIdentifiersMethod =
+                        AssetManager.class.getMethod("getAssignedPackageIdentifiers");
+                mAddAssetPathMethod = AssetManager.class.getMethod("addAssetPath", String.class);
+                mCurrentApplicationMethod =
+                        Class.forName("android.app.ActivityThread").getMethod("currentApplication");
+                mGetStringMethod = Class.forName("android.net.http.ErrorStrings")
+                                           .getMethod("getString", int.class, Context.class);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+            mLoadedPackageInfo = loadedPackageInfo;
+        }
+
+        @Override
+        public void setOnTraceEnabledChangeListener(final OnTraceEnabledChangeListener listener) {
+            try {
+                mAddChangeCallbackMethod.invoke(null, new Runnable() {
+                    @Override
+                    public void run() {
+                        listener.onTraceEnabledChange(isTraceTagEnabled());
+                    }
+                });
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public boolean isTraceTagEnabled() {
+            try {
+                return ((Boolean) mIsTagEnabledMethod.invoke(null, TRACE_TAG_WEBVIEW));
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public boolean canInvokeDrawGlFunctor(View containerView) {
+            return false;
+        }
+
+        @Override
+        public void invokeDrawGlFunctor(
+                View containerView, long nativeDrawGLFunctor, boolean waitForCompletion) {
+            throw new RuntimeException("Call not supported");
+        }
+
+        @Override
+        public void callDrawGlFunction(Canvas canvas, long nativeDrawGLFunctor) {
+            try {
+                mCallDrawGLFunctionMethod.invoke(canvas, (int) nativeDrawGLFunctor);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public void callDrawGlFunction(
+                Canvas canvas, long nativeDrawGLFunctor, Runnable releasedRunnable) {
+            throw new RuntimeException("Call not supported");
+        }
+
+        @Override
+        public void detachDrawGlFunctor(View containerView, long nativeDrawGLFunctor) {
+            try {
+                Object viewRootImpl = mGetViewRootImplMethod.invoke(containerView);
+                if (viewRootImpl != null) {
+                    mDetachFunctorMethod.invoke(viewRootImpl, (int) nativeDrawGLFunctor);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public int getPackageId(Resources resources, String packageName) {
+            try {
+                SparseArray packageIdentifiers =
+                        (SparseArray) mGetAssignedPackageIdentifiersMethod.invoke(
+                                resources.getAssets());
+                for (int i = 0; i < packageIdentifiers.size(); i++) {
+                    final String name = (String) packageIdentifiers.valueAt(i);
+
+                    if (packageName.equals(name)) {
+                        return packageIdentifiers.keyAt(i);
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+            throw new RuntimeException("Package not found: " + packageName);
+        }
+
+        @Override
+        public Application getApplication() {
+            try {
+                return (Application) mCurrentApplicationMethod.invoke(null);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public String getErrorString(Context context, int errorCode) {
+            try {
+                return (String) mGetStringMethod.invoke(null, errorCode, context);
+            } catch (Exception e) {
+                throw new RuntimeException("Invalid reflection", e);
+            }
+        }
+
+        @Override
+        public void addWebViewAssetPath(Context context) {
+            try {
+                PackageInfo info = mLoadedPackageInfo;
+                // Avoid calling the ContextWrapper.getAssets() proxy
+                // chain, which can return an unexpected AssetManager.
+                mAddAssetPathMethod.invoke(
+                        context.getResources().getAssets(), info.applicationInfo.sourceDir);
+                // TODO makeStringBlocks?
+                // https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/java/android/content/res/AssetManager.java#256
+                // https://android.googlesource.com/platform/frameworks/base/+/lollipop-release/core/java/android/content/res/AssetManager.java#255
             } catch (Exception e) {
                 throw new RuntimeException("Invalid reflection", e);
             }
