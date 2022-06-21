@@ -222,7 +222,13 @@ public class WebViewChromiumFactoryProviderBase implements WebViewFactoryProvide
                 // The package is used to locate the services for copying crash minidumps and
                 // requesting variations seeds. So it must be set before initializing variations and
                 // before a renderer has a chance to crash.
-                packageInfo = WebViewFactory.getLoadedPackageInfo();
+                if (Build.VERSION.SDK_INT >= 21) {
+                    packageInfo = WebViewFactory.getLoadedPackageInfo();
+                } else if (webViewDelegate instanceof LoadedPackageInfoOwner) {
+                    packageInfo = ((LoadedPackageInfoOwner) webViewDelegate).getLoadedPackageInfo();
+                } else {
+                    throw new IllegalStateException();
+                }
             }
             AwBrowserProcess.setWebViewPackageName(packageInfo.packageName);
 

@@ -447,7 +447,8 @@ class WebViewDelegateFactory {
      * reflection to call into hidden frameworks APIs released in the API-19 version of the
      * framework.
      */
-    private static class Api19CompatibilityDelegate implements WebViewDelegate {
+    private static class Api19CompatibilityDelegate implements WebViewDelegate,
+            LoadedPackageInfoOwner {
         /** Copy of Trace.TRACE_TAG_WEBVIEW */
         private static final long TRACE_TAG_WEBVIEW = 1L << 4;
 
@@ -680,6 +681,11 @@ class WebViewDelegateFactory {
         @Override
         public void drawWebViewFunctor(Canvas canvas, int functor) {
             throw new RuntimeException();
+        }
+
+        @Override
+        public PackageInfo getLoadedPackageInfo() {
+            return mLoadedPackageInfo;
         }
     }
 }
