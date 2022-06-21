@@ -17,6 +17,9 @@ import android.view.View;
 
 import org.chromium.android_webview.gfx.AwDrawFnImpl;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
@@ -459,6 +462,12 @@ class WebViewDelegateFactory {
         private final Method mCurrentApplicationMethod;
         private final Method mGetStringMethod;
 
+        private final Method mGetStringBlockCountMethod;
+        private final Method mGetNativeStringBlockMethod;
+        private final Field mStringBlocksField;
+        private final Class<?> mStringBlockClass;
+        private final Constructor<?> mStringBlockCtor;
+
         private final PackageInfo mLoadedPackageInfo;
 
         Api19CompatibilityDelegate(PackageInfo loadedPackageInfo) {
@@ -482,6 +491,19 @@ class WebViewDelegateFactory {
                         Class.forName("android.app.ActivityThread").getMethod("currentApplication");
                 mGetStringMethod = Class.forName("android.net.http.ErrorStrings")
                                            .getMethod("getString", int.class, Context.class);
+
+                mGetStringBlockCountMethod = AssetManager.class
+                        .getDeclaredMethod("getStringBlockCount");
+                mGetStringBlockCountMethod.setAccessible(true);
+                mGetNativeStringBlockMethod = AssetManager.class
+                        .getDeclaredMethod("getNativeStringBlock", int.class);
+                mGetNativeStringBlockMethod.setAccessible(true);
+                mStringBlocksField = AssetManager.class
+                        .getDeclaredField("mStringBlocks");
+                mStringBlocksField.setAccessible(true);
+                mStringBlockClass = Class.forName("android.content.res.StringBlock");
+                mStringBlockCtor = mStringBlockClass.getDeclaredConstructor(int.class, boolean.class);
+                mStringBlockCtor.setAccessible(true);
             } catch (Exception e) {
                 throw new RuntimeException("Invalid reflection", e);
             }
@@ -596,14 +618,53 @@ class WebViewDelegateFactory {
                 PackageInfo info = mLoadedPackageInfo;
                 // Avoid calling the ContextWrapper.getAssets() proxy
                 // chain, which can return an unexpected AssetManager.
-                mAddAssetPathMethod.invoke(
-                        context.getResources().getAssets(), info.applicationInfo.sourceDir);
-                // TODO makeStringBlocks?
-                // https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/java/android/content/res/AssetManager.java#256
-                // https://android.googlesource.com/platform/frameworks/base/+/lollipop-release/core/java/android/content/res/AssetManager.java#255
+                final AssetManager assets = context.getResources().getAssets();
+                synchronized (assets) {
+                    mAddAssetPathMethod.invoke(assets, info.applicationInfo.sourceDir);
+                    makeStringBlocks(assets, getStringBlocks(assets));
+                }
             } catch (Exception e) {
                 throw new RuntimeException("Invalid reflection", e);
             }
+        }
+
+        private Object[] getStringBlocks(AssetManager assets) throws Exception {
+            return (Object[]) mStringBlocksField.get(assets);
+        }
+
+        private void setStringBlocks(AssetManager assets, Object[] stringBlocks) throws Exception {
+            mStringBlocksField.set(assets, stringBlocks);
+        }
+
+        // https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/java/android/content/res/AssetManager.java#256
+        // https://android.googlesource.com/platform/frameworks/base/+/lollipop-release/core/java/android/content/res/AssetManager.java#255
+        private void makeStringBlocks(AssetManager assets, Object[] seed) throws Exception {
+            final int seedNum = (seed != null) ? seed.length : 0;
+            final int num = getStringBlockCount(assets);
+            final Object[] stringBlocks = (Object[]) Array.newInstance(mStringBlockClass, num);
+            for (int i = 0; i < num; i++) {
+                if (i < seedNum) {
+                    stringBlocks[i] = seed[i];
+                } else {
+                    stringBlocks[i] = createStringBlock(getNativeStringBlock(assets, i), true);
+                }
+            }
+            setStringBlocks(assets, stringBlocks);
+        }
+
+        // https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/java/android/content/res/AssetManager.java#712
+        private int getStringBlockCount(AssetManager assets) throws Exception {
+            return (int) mGetStringBlockCountMethod.invoke(assets);
+        }
+
+        // https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/java/android/content/res/AssetManager.java#713
+        private int getNativeStringBlock(AssetManager assets, int block) throws Exception {
+            return (int) mGetNativeStringBlockMethod.invoke(assets, block);
+        }
+
+        // https://android.googlesource.com/platform/frameworks/base/+/kitkat-release/core/java/android/content/res/StringBlock.java#477
+        private Object createStringBlock(int obj, boolean useSparse) throws Exception {
+            return mStringBlockCtor.newInstance(obj, useSparse);
         }
 
         @Override
