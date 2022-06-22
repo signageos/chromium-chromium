@@ -5,13 +5,15 @@
 package org.chromium.base.library_loader;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.SystemClock;
 import android.support.v4.content.ContextCompat;
-import android.system.Os;
+import android.system.ErrnoException;
+import android.system.OsCompat;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -730,17 +732,16 @@ public class LibraryLoader {
      * libraries are loaded because ubsan reads its configuration from $UBSAN_OPTIONS when the
      * native library is loaded.
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static void setEnvForNative() {
-        // The setenv API was added in L. On older versions of Android, we should still see ubsan
-        // reports, but they will not have stack traces.
-        if (BuildConfig.IS_UBSAN && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (BuildConfig.IS_UBSAN) {
             try {
                 // This value is duplicated in build/android/pylib/constants/__init__.py.
-                Os.setenv("UBSAN_OPTIONS",
+                OsCompat.setenv("UBSAN_OPTIONS",
                         "print_stacktrace=1 stack_trace_format='#%n pc %o %m' "
                                 + "handle_segv=0 handle_sigbus=0 handle_sigfpe=0",
                         true);
-            } catch (Exception e) {
+            } catch (ErrnoException e) {
                 Log.w(TAG, "failed to set UBSAN_OPTIONS", e);
             }
         }

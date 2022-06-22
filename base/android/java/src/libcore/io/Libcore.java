@@ -16,5 +16,6 @@
 package libcore.io;
 public final class Libcore {
     private Libcore() { }
-    public static Os os = null;
+    public static final Os os = placeholder();
+    private static native <T> T placeholder();
 }

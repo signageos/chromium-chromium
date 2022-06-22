@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 package android.system;
-import java.io.IOException;
-import java.net.SocketException;
+import android.annotation.TargetApi;
+import android.os.Build;
 import libcore.io.Libcore;
 /**
  * A checked exception thrown when {@link Os} methods fail. This exception contains the native
  * errno value, for comparison against the constants in {@link OsConstants}, should sophisticated
  * callers need to adjust their behavior based on the exact failure.
  */
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public final class ErrnoException extends Exception {
   private final String functionName;
   /**

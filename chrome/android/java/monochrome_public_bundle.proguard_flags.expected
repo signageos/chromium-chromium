@@ -64,10 +64,6 @@
   public boolean requiresSignIn();
 }
 
-# Don't mangle android.system polyfill for Kitkat.
--keep class android.system.* { *; }
--keep class libcore.io.* { *; }
-
 -keepnames class ** { *; }
 
 ################################################################################
@@ -163,6 +159,10 @@
   public int getMinApkVersion();
   public boolean requiresSignIn();
 }
+
+# Don't mangle android.system polyfill for Kitkat.
+-keep class android.system.* { *; }
+-keep class libcore.io.* { *; }
 
 ################################################################################
 # ../../base/android/proguard/chromium_code.flags

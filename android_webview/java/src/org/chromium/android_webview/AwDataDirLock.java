@@ -4,12 +4,13 @@
 
 package org.chromium.android_webview;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Process;
 import android.system.ErrnoException;
-import android.system.Os;
-import android.system.OsConstants;
+import android.system.OsCompat;
+import android.system.OsConstantsCompat;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
@@ -116,6 +117,7 @@ abstract class AwDataDirLock {
         histogram.record(attempts);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static String getLockFailureReason(final RandomAccessFile file) {
         final String baseError = "Using WebView from more than one process at once with the "
                 + "same data directory is not supported. https://crbug.com/558377 : Lock owner ";
@@ -127,17 +129,17 @@ abstract class AwDataDirLock {
             // Check the status of the pid holding the lock by sending it a null signal.
             // This doesn't actually send a signal, just runs the kernel access checks.
             try {
-                Os.kill(pid, 0);
+                OsCompat.kill(pid, 0);
 
                 // No exception means the process exists and has the same uid as us, so is
                 // probably an instance of the same app.
                 return baseError + lockOwner;
             } catch (ErrnoException e) {
-                if (e.errno == OsConstants.ESRCH) {
+                if (e.errno == OsConstantsCompat.ESRCH) {
                     // pid did not exist - the lock should have been released by the kernel,
                     // so this process info is probably wrong.
                     return baseError + lockOwner + " doesn't exist!";
-                } else if (e.errno == OsConstants.EPERM) {
+                } else if (e.errno == OsConstantsCompat.EPERM) {
                     // pid existed but didn't have the same uid as us.
                     // Most likely the pid has just been recycled for a new process
                     return baseError + lockOwner + " pid has been reused!";

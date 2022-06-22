@@ -9,7 +9,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.Environment;
-import android.system.Os;
+import android.system.ErrnoException;
+import android.system.OsCompat;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -77,12 +78,9 @@ public abstract class PathUtils {
 
     @SuppressLint("NewApi")
     private static void chmod(String path, int mode) {
-        // Both Os.chmod and ErrnoException require SDK >= 21. But while Dalvik on < 21 tolerates
-        // Os.chmod, it throws VerifyError for ErrnoException, so catch Exception instead.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
         try {
-            Os.chmod(path, mode);
-        } catch (Exception e) {
+            OsCompat.chmod(path, mode);
+        } catch (ErrnoException e) {
             Log.e(TAG, "Failed to set permissions for path \"" + path + "\"");
         }
     }
