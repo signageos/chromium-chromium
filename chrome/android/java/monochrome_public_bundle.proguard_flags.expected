@@ -64,6 +64,10 @@
   public boolean requiresSignIn();
 }
 
+# Don't mangle android.system polyfill for Kitkat.
+-keep class android.system.* { *; }
+-keep class libcore.io.* { *; }
+
 ################################################################################
 # ../../android_webview/support_library/boundary_interfaces/proguard.flags
 ################################################################################

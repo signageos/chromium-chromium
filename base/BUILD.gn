@@ -3235,6 +3235,12 @@ if (is_android) {
     ]
 
     sources = [
+      "android/java/src/android/system/ErrnoException.java",
+      "android/java/src/android/system/Os.java",
+      "android/java/src/android/system/OsConstants.java",
+      "android/java/src/libcore/io/ErrnoException.java",
+      "android/java/src/libcore/io/Libcore.java",
+      "android/java/src/libcore/io/Os.java",
       "android/java/src/org/chromium/base/ActivityState.java",
       "android/java/src/org/chromium/base/AnimationFrameTimeHistogram.java",
       "android/java/src/org/chromium/base/ApiCompatibilityUtils.java",
