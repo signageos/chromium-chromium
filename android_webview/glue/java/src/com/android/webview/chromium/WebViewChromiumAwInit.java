@@ -356,6 +356,7 @@ public class WebViewChromiumAwInit {
                         + (Looper.getMainLooper().equals(looper) ? "main" : "background")
                         + " looper " + looper);
         ThreadUtils.setUiThread(looper);
+        PlatformThreadUtils.setUiThread(looper);
     }
 
     private void initPlatSupportLibrary() {
@@ -364,7 +365,7 @@ public class WebViewChromiumAwInit {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 AwDrawFnImpl.setDrawFnFunctionTable(DrawFunctor.getDrawFnFunctionTable());
             }
-            DrawGLFunctor.setChromiumAwDrawGLFunction(AwContents.getAwDrawGLFunction());
+            DrawGLFunctorCompat.setChromiumAwDrawGLFunction(AwContents.getAwDrawGLFunction());
             AwContents.setAwDrawSWFunctionTable(GraphicsUtilsCompat.getDrawSWFunctionTable());
             AwContents.setAwDrawGLFunctionTable(GraphicsUtilsCompat.getDrawGLFunctionTable());
         }
