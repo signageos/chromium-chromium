@@ -93,11 +93,11 @@ template("system_webview_apk_or_module_tmpl") {
       }
 
       if (!android_64bit_target_cpu || !_pure_32_bit) {
-        shared_libraries = [ "//android_webview:libwebviewchromium" ]
+        shared_libraries = [ "//android_webview:libwebviewchromium2" ]
         _include_primary_support = true
       }
       if (android_64bit_target_cpu) {
-        secondary_abi_shared_libraries = [ "//android_webview:libwebviewchromium($android_secondary_abi_toolchain)" ]
+        secondary_abi_shared_libraries = [ "//android_webview:libwebviewchromium2($android_secondary_abi_toolchain)" ]
         _include_secondary_support = true
       }
       deps += [ "//third_party/icu:icu_assets" ]

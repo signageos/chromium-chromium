@@ -223,7 +223,7 @@ final class WebViewCompatibilityHelper {
                     }
                     for (String libName : path.list()) {
                         // Make sure we only copy the necessary lib.
-                        if (!libName.equals("libwebviewchromium.so")) {
+                        if (!libName.equals("libwebviewchromium2.so")) {
                             continue;
                         }
                         File oldFile = new File(path, libName);

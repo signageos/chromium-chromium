@@ -208,7 +208,7 @@ if (public_android_sdk) {
 }
 
 # The shared library used by standalone WebView.
-shared_library("libwebviewchromium") {
+shared_library("libwebviewchromium2") {
   deps = [
     "//android_webview/lib",
     "//android_webview/lib:webview_entry_point",
@@ -596,9 +596,9 @@ android_library("android_webview_product_config_java") {
 
 if (enable_resource_whitelist_generation) {
   generate_resource_whitelist("system_webview_pak_whitelist") {
-    deps = [ ":libwebviewchromium" ]
+    deps = [ ":libwebviewchromium2" ]
     inputs =
-        [ "$root_out_dir/lib.unstripped/libwebviewchromium$shlib_extension" ]
+        [ "$root_out_dir/lib.unstripped/libwebviewchromium2$shlib_extension" ]
     output = system_webview_pak_whitelist
   }
 }

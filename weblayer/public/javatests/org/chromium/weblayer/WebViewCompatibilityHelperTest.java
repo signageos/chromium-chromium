@@ -72,7 +72,7 @@ public class WebViewCompatibilityHelperTest {
     @Test
     @SmallTest
     public void testLibsCopied() throws Exception {
-        writeFile(new File(mOriginalLibDir, "libwebviewchromium.so"), "foo");
+        writeFile(new File(mOriginalLibDir, "libwebviewchromium2.so"), "foo");
         writeFile(new File(mOriginalLibDir, "libbar.so"), "bar");
         String[] libraryPaths = new String[] {mOriginalLibDir.toString()};
         ResultHelper helper = new ResultHelper();
@@ -85,7 +85,7 @@ public class WebViewCompatibilityHelperTest {
         File foo = new File(libDir, getExpectedLibFileName());
         Assert.assertEquals(readFile(foo), "foo");
         Assert.assertEquals(classLoader.findLibrary(getExpectedLibName()), foo.toString());
-        // M- will only copy libwebviewchromium.so.
+        // M- will only copy libwebviewchromium2.so.
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             File bar = new File(libDir, "libbar.so");
             Assert.assertEquals(readFile(bar), "bar");
@@ -102,7 +102,7 @@ public class WebViewCompatibilityHelperTest {
     @Test
     @SmallTest
     public void testIoError() throws Exception {
-        writeFile(new File(mOriginalLibDir, "libwebviewchromium.so"), "foo");
+        writeFile(new File(mOriginalLibDir, "libwebviewchromium2.so"), "foo");
         String[] libraryPaths = new String[] {mOriginalLibDir.toString()};
         ResultHelper helper = new ResultHelper();
         DexClassLoader classLoader = (DexClassLoader) new WebViewCompatibilityHelper(
@@ -117,7 +117,7 @@ public class WebViewCompatibilityHelperTest {
     @SmallTest
     public void testMultipleLibDirs() throws Exception {
         writeFile(new File(mOriginalLibDir, "foo/foo"), "foo");
-        writeFile(new File(mOriginalLibDir, "bar/libwebviewchromium.so"), "bar");
+        writeFile(new File(mOriginalLibDir, "bar/libwebviewchromium2.so"), "bar");
         String[] libraryPaths = new String[] {new File(mOriginalLibDir, "foo").toString(),
                 new File(mOriginalLibDir, "bar").toString()};
         ResultHelper helper = new ResultHelper();
@@ -125,7 +125,7 @@ public class WebViewCompatibilityHelperTest {
                 .getWebLayerClassLoader();
         Assert.assertEquals(helper.getResult(), getExpectedCopyResult());
 
-        // M- will only copy libwebviewchromium.so.
+        // M- will only copy libwebviewchromium2.so.
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             Assert.assertFalse(new File(mNewLibDir, "weblayer_private/1/lib0/").exists());
             Assert.assertTrue(
@@ -142,7 +142,7 @@ public class WebViewCompatibilityHelperTest {
     @Test
     @SmallTest
     public void testLibsNotCopiedAgain() throws Exception {
-        writeFile(new File(mOriginalLibDir, "libwebviewchromium.so"), "foo");
+        writeFile(new File(mOriginalLibDir, "libwebviewchromium2.so"), "foo");
         String[] libraryPaths = new String[] {mOriginalLibDir.toString()};
         ResultHelper helper = new ResultHelper();
         new WebViewCompatibilityHelper(libraryPaths, mPackageInfo, mNewLibDir, helper)
@@ -167,7 +167,7 @@ public class WebViewCompatibilityHelperTest {
     @Test
     @SmallTest
     public void testOldLibsDeleted() throws Exception {
-        writeFile(new File(mOriginalLibDir, "libwebviewchromium.so"), "foo");
+        writeFile(new File(mOriginalLibDir, "libwebviewchromium2.so"), "foo");
         String[] libraryPaths = new String[] {mOriginalLibDir.toString()};
         ResultHelper helper = new ResultHelper();
         new WebViewCompatibilityHelper(libraryPaths, mPackageInfo, mNewLibDir, helper)
@@ -181,7 +181,7 @@ public class WebViewCompatibilityHelperTest {
 
         File originalLibDir2 = new File(mTmpDir, "original2");
         originalLibDir2.mkdirs();
-        writeFile(new File(originalLibDir2, "libwebviewchromium.so"), "foo2");
+        writeFile(new File(originalLibDir2, "libwebviewchromium2.so"), "foo2");
         mPackageInfo.versionCode = 2;
         libraryPaths = new String[] {originalLibDir2.toString()};
         helper = new ResultHelper();
