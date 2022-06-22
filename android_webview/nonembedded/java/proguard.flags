@@ -64,3 +64,5 @@
 # Don't mangle android.system polyfill for Kitkat.
 -keep class android.system.* { *; }
 -keep class libcore.io.* { *; }
+
+-keepnames class ** { *; }

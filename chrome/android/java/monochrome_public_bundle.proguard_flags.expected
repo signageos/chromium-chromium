@@ -68,6 +68,8 @@
 -keep class android.system.* { *; }
 -keep class libcore.io.* { *; }
 
+-keepnames class ** { *; }
+
 ################################################################################
 # ../../android_webview/support_library/boundary_interfaces/proguard.flags
 ################################################################################
