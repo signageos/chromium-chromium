@@ -19,6 +19,7 @@ import org.chromium.build.annotations.UsedByReflection;
  * and then drawn and detached from the view tree any number of times (using requestDrawGL and
  * detach respectively).
  */
+@Deprecated
 class DrawGLFunctor implements AwContents.NativeDrawGLFunctor {
     private static final String TAG = DrawGLFunctor.class.getSimpleName();
 
