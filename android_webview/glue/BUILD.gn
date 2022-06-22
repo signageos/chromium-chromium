@@ -45,6 +45,7 @@ android_library("glue_java") {
     "java/src/com/android/webview/chromium/GlueApiHelperForP.java",
     "java/src/com/android/webview/chromium/GlueApiHelperForQ.java",
     "java/src/com/android/webview/chromium/GraphicsUtils.java",
+    "java/src/com/android/webview/chromium/GraphicsUtilsCompat.java",
     "java/src/com/android/webview/chromium/MonochromeLibraryPreloader.java",
     "java/src/com/android/webview/chromium/SafeBrowsingResponseAdapter.java",
     "java/src/com/android/webview/chromium/ServiceWorkerClientAdapter.java",
