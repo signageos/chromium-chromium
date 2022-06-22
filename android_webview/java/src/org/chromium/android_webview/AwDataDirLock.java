@@ -8,8 +8,8 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Process;
 import android.system.ErrnoException;
-import android.system.Os;
-import android.system.OsConstants;
+import android.system.OsCompat;
+import android.system.OsConstantsCompat;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
@@ -136,16 +136,16 @@ abstract class AwDataDirLock {
             // Check the status of the pid holding the lock by sending it a null signal.
             // This doesn't actually send a signal, just runs the kernel access checks.
             try {
-                Os.kill(pid, 0);
+                OsCompat.kill(pid, 0);
 
                 // No exception means the process exists and has the same uid as us, so is
                 // probably an instance of the same app. Leave the message alone.
             } catch (ErrnoException e) {
-                if (e.errno == OsConstants.ESRCH) {
+                if (e.errno == OsConstantsCompat.ESRCH) {
                     // pid did not exist - the lock should have been released by the kernel,
                     // so this process info is probably wrong.
                     error.append(" doesn't exist!");
-                } else if (e.errno == OsConstants.EPERM) {
+                } else if (e.errno == OsConstantsCompat.EPERM) {
                     // pid existed but didn't have the same uid as us.
                     // Most likely the pid has just been recycled for a new process
                     error.append(" pid has been reused!");
