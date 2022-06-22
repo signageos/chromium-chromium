@@ -309,7 +309,19 @@ public class WebViewChromiumFactoryProviderBase implements WebViewFactoryProvide
 
                 try (ScopedSysTraceEvent e2 = ScopedSysTraceEvent.scoped(
                              "WebViewChromiumFactoryProvider.loadGlueLayerPlatSupportLibrary")) {
-                    System.loadLibrary("webviewchromium_plat_support");
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        System.loadLibrary("webviewchromium_plat_support");
+                    } else {
+                        try {
+                            System.loadLibrary("webviewchromium_plat_support");
+                        } catch (UnsatisfiedLinkError e) {
+                            if ("unknown failure".equals(e.getMessage())) {
+                                // W/dalvikvm: Shared lib '/system/lib/libwebviewchromium_plat_support.so' already opened by CL 0x0; can't open in 0x########
+                            } else {
+                                throw e;
+                            }
+                        }
+                    }
                 }
 
                 deleteContentsOnPackageDowngrade(packageInfo);
