@@ -381,8 +381,8 @@ public class WebViewChromiumAwInit {
                 AwDrawFnImpl.setDrawFnFunctionTable(DrawFunctor.getDrawFnFunctionTable());
             }
             DrawGLFunctor.setChromiumAwDrawGLFunction(AwContents.getAwDrawGLFunction());
-            AwContents.setAwDrawSWFunctionTable(GraphicsUtils.getDrawSWFunctionTable());
-            AwContents.setAwDrawGLFunctionTable(GraphicsUtils.getDrawGLFunctionTable());
+            AwContents.setAwDrawSWFunctionTable(GraphicsUtilsCompat.getDrawSWFunctionTable());
+            AwContents.setAwDrawGLFunctionTable(GraphicsUtilsCompat.getDrawGLFunctionTable());
         }
     }
 
