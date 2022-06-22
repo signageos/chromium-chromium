@@ -39,9 +39,9 @@ abstract class JobIntentService extends Service {
     CompatJobEngine mJobImpl;
     WorkEnqueuer mCompatWorkEnqueuer;
     CommandProcessor mCurProcessor;
-    boolean mInterruptIfStopped = false;
-    boolean mStopped = false;
-    boolean mDestroyed = false;
+    boolean mInterruptIfStopped;
+    boolean mStopped;
+    boolean mDestroyed;
 
     final ArrayList<CompatWorkItem> mCompatQueue;
 
@@ -216,9 +216,9 @@ abstract class JobIntentService extends Service {
     /**
      * This is a task to dequeue and process work in the background.
      */
-    final class CommandProcessor extends android.os.AsyncTask<Void, Void, Void> {
+    final class CommandProcessor extends org.chromium.base.task.AsyncTask<Void> {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground() {
             GenericWorkItem work;
 
             if (DEBUG) Log.d(TAG, "Starting to dequeue work...");
@@ -250,6 +250,10 @@ abstract class JobIntentService extends Service {
      * Default empty constructor.
      */
     public JobIntentService() {
+        mInterruptIfStopped = false;
+        mStopped = false;
+        mDestroyed = false;
+
         if (Build.VERSION.SDK_INT >= 26) {
             mCompatQueue = null;
         } else {
@@ -435,7 +439,7 @@ abstract class JobIntentService extends Service {
                 mCompatWorkEnqueuer.serviceProcessingStarted();
             }
             if (DEBUG) Log.d(TAG, "Starting processor: " + mCurProcessor);
-            mCurProcessor.executeOnExecutor(android.os.AsyncTask.THREAD_POOL_EXECUTOR);
+            mCurProcessor.executeOnExecutor(org.chromium.base.task.AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
