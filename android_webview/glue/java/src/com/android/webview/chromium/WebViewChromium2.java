@@ -2534,7 +2534,7 @@ class WebViewChromium2 implements WebViewProvider, WebViewProvider.ScrollDelegat
     private class WebViewNativeDrawFunctorFactory implements AwContents.NativeDrawFunctorFactory {
         @Override
         public AwContents.NativeDrawGLFunctor createGLFunctor(long context) {
-            return new DrawGLFunctor(context, mFactory.getWebViewDelegate());
+            return DrawGLFunctorCompat.create(context, mFactory.getWebViewDelegate());
         }
 
         @Override
