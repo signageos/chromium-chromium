@@ -20,6 +20,7 @@ import org.chromium.base.annotations.JniIgnoreNatives;
  * detach respectively).
  */
 @JniIgnoreNatives
+@Deprecated
 class DrawGLFunctor implements AwContents.NativeDrawGLFunctor {
     private static final String TAG = DrawGLFunctor.class.getSimpleName();
 
