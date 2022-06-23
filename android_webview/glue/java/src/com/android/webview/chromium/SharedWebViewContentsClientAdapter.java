@@ -28,6 +28,9 @@ import org.chromium.base.compat.ApiHelperForN;
 import org.chromium.support_lib_boundary.util.Features;
 import org.chromium.support_lib_callback_glue.SupportLibWebViewContentsClientAdapter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Partial adapter for AwContentsClient methods that may be handled by either glue layer.
  */
@@ -86,6 +89,45 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
     }
 
     /**
+     * @see AwContentsClient#shouldInterceptRequest(java.lang.String)
+     */
+    @Override
+    public AwWebResourceResponse shouldInterceptRequest(AwWebResourceRequest request) {
+        try {
+            TraceEvent.begin("WebViewContentsClientAdapter.shouldInterceptRequest");
+            if (TRACE) Log.i(TAG, "shouldInterceptRequest=" + request.url);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                WebResourceResponse response = mWebViewClient.shouldInterceptRequest(
+                        mWebView, new WebResourceRequestAdapter(request));
+                if (response == null) return null;
+
+                // AwWebResourceResponse should support null headers. b/16332774.
+                Map<String, String> responseHeaders = response.getResponseHeaders();
+                if (responseHeaders == null) responseHeaders = new HashMap<String, String>();
+
+                return new AwWebResourceResponse(
+                        response.getMimeType(),
+                        response.getEncoding(),
+                        response.getData(),
+                        response.getStatusCode(),
+                        response.getReasonPhrase(),
+                        responseHeaders);
+            } else {
+                WebResourceResponse response = mWebViewClient.shouldInterceptRequest(
+                        mWebView, request.url);
+                if (response == null) return null;
+
+                return new AwWebResourceResponse(
+                        response.getMimeType(),
+                        response.getEncoding(),
+                        response.getData());
+            }
+        } finally {
+            TraceEvent.end("WebViewContentsClientAdapter.shouldInterceptRequest");
+        }
+    }
+
+    /**
      * @see AwContentsClient#shouldOverrideUrlLoading(AwContentsClient.AwWebResourceRequest)
      */
     @Override
@@ -94,7 +136,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
             TraceEvent.begin("WebViewContentsClientAdapter.shouldOverrideUrlLoading");
             if (TRACE) Log.i(TAG, "shouldOverrideUrlLoading=" + request.url);
             boolean result;
-            if (mSupportLibClient.isFeatureAvailable(Features.SHOULD_OVERRIDE_WITH_REDIRECTS)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.SHOULD_OVERRIDE_WITH_REDIRECTS)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 result = mSupportLibClient.shouldOverrideUrlLoading(
                         mWebView, new WebResourceRequestAdapter(request));
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -178,7 +221,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                 error.description = mWebViewDelegate.getErrorString(mContext, error.errorCode);
             }
             if (TRACE) Log.i(TAG, "onReceivedError=" + request.url);
-            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_WEB_RESOURCE_ERROR)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_WEB_RESOURCE_ERROR)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 // Note: we must pass AwWebResourceError, since this class was introduced after L.
                 mSupportLibClient.onReceivedError(
                         mWebView, new WebResourceRequestAdapter(request), error);
@@ -196,7 +240,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
             final Callback<AwSafeBrowsingResponse> callback) {
         try {
             TraceEvent.begin("WebViewContentsClientAdapter.onSafeBrowsingHit");
-            if (mSupportLibClient.isFeatureAvailable(Features.SAFE_BROWSING_HIT)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.SAFE_BROWSING_HIT)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mSupportLibClient.onSafeBrowsingHit(
                         mWebView, new WebResourceRequestAdapter(request), threatType, callback);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -217,7 +262,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
         try {
             TraceEvent.begin("WebViewContentsClientAdapter.onReceivedHttpError");
             if (TRACE) Log.i(TAG, "onReceivedHttpError=" + request.url);
-            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_HTTP_ERROR)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_HTTP_ERROR)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 String reasonPhrase = response.getReasonPhrase();
                 if (reasonPhrase == null || reasonPhrase.isEmpty()) {
                     // We cannot pass a null or empty reasonPhrase, because this version of the
