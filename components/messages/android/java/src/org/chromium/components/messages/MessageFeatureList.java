@@ -4,12 +4,15 @@
 
 package org.chromium.components.messages;
 
+import org.chromium.build.annotations.MainDex;
+
 /**
  * Lists base::Features that can be accessed through {@link MessageFeatureMap}.
  *
  * Should be kept in sync with |kFeaturesExposedToJava| in
  * //components/messages/android/messages_feature.cc
  */
+@MainDex
 public abstract class MessageFeatureList {
     public static final String MESSAGES_FOR_ANDROID_STACKING_ANIMATION =
             "MessagesForAndroidStackingAnimation";

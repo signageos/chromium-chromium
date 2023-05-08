@@ -4,12 +4,15 @@
 
 package org.chromium.components.permissions;
 
+import org.chromium.build.annotations.MainDex;
+
 /**
  * Lists base::Features that can be accessed through {@link PermissionsAndroidFeatureMap}.
  *
  * Should be kept in sync with |kFeaturesExposedToJava| in
  * components/permissions/android/permissions_android_feature_map.cc.
  */
+@MainDex
 public abstract class PermissionsAndroidFeatureList {
     public static final String ANDROID_APPROXIMATE_LOCATION_PERMISSION_SUPPORT =
             "AndroidApproximateLocationPermissionSupport";

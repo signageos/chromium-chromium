@@ -7,6 +7,7 @@ package org.chromium.components.page_info;
 import org.chromium.base.Features;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
+import org.chromium.build.annotations.MainDex;
 
 /**
  * Provides an API for querying the status of Page Info features.
@@ -14,6 +15,7 @@ import org.chromium.base.annotations.NativeMethods;
  * TODO(crbug.com/1060097): generate this file.
  */
 @JNINamespace("page_info")
+@MainDex
 public class PageInfoFeatures extends Features {
     public static final String USER_BYPASS_UI_NAME = "UserBypassUI";
     public static final String PAGE_INFO_STORE_INFO_NAME = "PageInfoStoreInfo";

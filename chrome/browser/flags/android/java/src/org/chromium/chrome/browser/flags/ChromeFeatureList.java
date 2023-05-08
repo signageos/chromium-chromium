@@ -6,6 +6,7 @@ package org.chromium.chrome.browser.flags;
 
 import org.chromium.base.FeatureMap;
 import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
+import org.chromium.build.annotations.MainDex;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
  *
  * Chrome-layer {@link CachedFlag}s are instantiated here as well.
  */
+@MainDex
 public abstract class ChromeFeatureList {
     /** Prevent instantiation. */
     private ChromeFeatureList() {}

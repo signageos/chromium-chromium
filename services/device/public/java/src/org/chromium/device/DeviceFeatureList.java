@@ -5,6 +5,7 @@
 package org.chromium.device;
 
 import org.chromium.base.annotations.JNINamespace;
+import org.chromium.build.annotations.MainDex;
 
 /**
  * Lists //services/device features that can be accessed through {@link DeviceFeatureMap}.
@@ -13,6 +14,7 @@ import org.chromium.base.annotations.JNINamespace;
  * //services/device/public/cpp/device_feature_map.cc.
  */
 @JNINamespace("features")
+@MainDex
 public abstract class DeviceFeatureList {
     public static final String GENERIC_SENSOR_EXTRA_CLASSES = "GenericSensorExtraClasses";
     public static final String WEBAUTHN_ANDROID_CRED_MAN = "WebAuthenticationAndroidCredMan";

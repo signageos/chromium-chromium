@@ -9,6 +9,7 @@ import android.os.ParcelFileDescriptor;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
+import org.chromium.build.annotations.MainDex;
 import org.chromium.mojo.system.Core;
 import org.chromium.mojo.system.DataPipe;
 import org.chromium.mojo.system.DataPipe.ConsumerHandle;
@@ -35,6 +36,7 @@ import java.util.List;
  * Implementation of {@link Core}.
  */
 @JNINamespace("mojo::android")
+@MainDex
 public class CoreImpl implements Core {
     /**
      * Discard flag for the |MojoReadData| operation.

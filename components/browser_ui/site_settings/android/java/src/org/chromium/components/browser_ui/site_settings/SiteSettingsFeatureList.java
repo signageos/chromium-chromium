@@ -4,12 +4,15 @@
 
 package org.chromium.components.browser_ui.site_settings;
 
+import org.chromium.build.annotations.MainDex;
+
 /**
  * Lists base::Features that can be accessed through {@link SiteSettingsFeatureMap}.
  *
  * Should be kept in sync with |kFeaturesExposedToJava| in
  * //components/browser_ui/site_settings/android/site_settings_feature_map.cc
  */
+@MainDex
 public abstract class SiteSettingsFeatureList {
     public static final String SITE_DATA_IMPROVEMENTS = "SiteDataImprovements";
 }

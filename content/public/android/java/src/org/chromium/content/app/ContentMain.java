@@ -6,6 +6,7 @@ package org.chromium.content.app;
 
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
+import org.chromium.build.annotations.MainDex;
 
 /**
  * This class is used to initialize all types of process. It corresponds to
@@ -18,6 +19,7 @@ import org.chromium.base.annotations.NativeMethods;
  *
  **/
 @JNINamespace("content")
+@MainDex
 public class ContentMain {
     /**
      * Start the ContentMainRunner in native side.
