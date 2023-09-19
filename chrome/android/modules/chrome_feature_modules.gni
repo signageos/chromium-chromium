@@ -13,8 +13,6 @@ import(
 import("//chrome/android/modules/stack_unwinder/stack_unwinder_module.gni")
 import("//chrome/android/modules/test_dummy/test_dummy_module.gni")
 import("//device/vr/buildflags/buildflags.gni")
-import("//weblayer/variables.gni")
-import("//weblayer/weblayer_module.gni")
 
 if (enable_vr) {
   import("//chrome/android/features/vr/vr_module.gni")
@@ -68,9 +66,3 @@ monochrome_module_descs += [ cablev2_authenticator_module_desc ]
 
 # Modules shipped in Trichrome (Android Q+).
 trichrome_module_descs = monochrome_module_descs
-
-# Add this after we assign trichrome_module_descs, since WebLayer should only be
-# part of Monochrome.
-if (webview_includes_weblayer) {
-  monochrome_module_descs += [ weblayer_module_desc ]
-}

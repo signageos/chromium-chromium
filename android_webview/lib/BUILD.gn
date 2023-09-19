@@ -4,7 +4,6 @@
 
 import("//components/gwp_asan/buildflags/buildflags.gni")
 import("//components/spellcheck/spellcheck_build_features.gni")
-import("//weblayer/variables.gni")
 
 source_set("lib") {
   sources = [
@@ -67,9 +66,4 @@ source_set("webview_entry_point") {
     "//base",
   ]
   sources = [ "webview_entry_point.cc" ]
-
-  if (webview_includes_weblayer) {
-    defines = [ "WEBVIEW_INCLUDES_WEBLAYER" ]
-    deps += [ "//weblayer:weblayer_lib_webview" ]
-  }
 }

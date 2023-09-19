@@ -16,7 +16,6 @@ import("//chrome/common/features.gni")
 import("//chrome/version.gni")
 import("//components/optimization_guide/features.gni")
 import("//device/vr/buildflags/buildflags.gni")
-import("//weblayer/variables.gni")
 import("channel.gni")
 
 default_chrome_public_jinja_variables = [
@@ -497,11 +496,6 @@ template("monochrome_public_common_apk_or_module_tmpl") {
           "org.chromium.chrome.browser",
           webview_product_config_java_package,
         ]
-
-        if (webview_includes_weblayer) {
-          product_config_java_packages +=
-              [ weblayer_product_config_java_package ]
-        }
 
         # Flag whether additional deps and libs should be included for each ABI.
         _include_primary_support = false
