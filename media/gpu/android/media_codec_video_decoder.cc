@@ -227,7 +227,7 @@ MediaCodecVideoDecoder::MediaCodecVideoDecoder(
       device_info_(device_info),
       enable_threaded_texture_mailboxes_(
           gpu_preferences.enable_threaded_texture_mailboxes) {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   surface_chooser_helper_.chooser()->SetClientCallbacks(
       base::Bind(&MediaCodecVideoDecoder::OnSurfaceChosen,
                  weak_factory_.GetWeakPtr()),
@@ -236,13 +236,13 @@ MediaCodecVideoDecoder::MediaCodecVideoDecoder(
 }
 
 MediaCodecVideoDecoder::~MediaCodecVideoDecoder() {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   TRACE_EVENT0("media", "MediaCodecVideoDecoder::~MediaCodecVideoDecoder");
   ReleaseCodec();
 }
 
 void MediaCodecVideoDecoder::Destroy() {
-  DVLOG(1) << __func__;
+  LOG(ERROR) << __func__;
   TRACE_EVENT0("media", "MediaCodecVideoDecoder::Destroy");
 
   // Cancel pending callbacks.
@@ -285,14 +285,14 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
   DCHECK(waiting_cb);
 
   const bool first_init = !decoder_config_.IsValidConfig();
-  DVLOG(1) << (first_init ? "Initializing" : "Reinitializing")
+  LOG(ERROR) << (first_init ? "Initializing" : "Reinitializing")
            << " MCVD with config: " << config.AsHumanReadableString()
            << ", cdm_context = " << cdm_context;
 
   if (!config.IsValidConfig()) {
     MEDIA_LOG(INFO, media_log_) << "Video configuration is not valid: "
                                 << config.AsHumanReadableString();
-    DVLOG(1) << "Invalid configuration.";
+    LOG(ERROR) << "Invalid configuration.";
     BindToCurrentLoop(std::move(init_cb)).Run(false);
     return;
   }
@@ -304,7 +304,7 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
                            ? GetSupportedConfigs()
                            : GetSupportedConfigsInternal(device_info_);
   if (!IsVideoDecoderConfigSupported(configs, config)) {
-    DVLOG(1) << "Unsupported configuration.";
+    LOG(ERROR) << "Unsupported configuration.";
     MEDIA_LOG(INFO, media_log_) << "Video configuration is not valid: "
                                 << config.AsHumanReadableString();
     BindToCurrentLoop(std::move(init_cb)).Run(false);
@@ -313,7 +313,7 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
 
   // Disallow codec changes when reinitializing.
   if (!first_init && decoder_config_.codec() != config.codec()) {
-    DVLOG(1) << "Codec changed: cannot reinitialize";
+    LOG(ERROR) << "Codec changed: cannot reinitialize";
     MEDIA_LOG(INFO, media_log_) << "Cannot change codec during re-init: "
                                 << decoder_config_.AsHumanReadableString()
                                 << " -> " << config.AsHumanReadableString();
@@ -343,7 +343,7 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
   }
 
   if (config.is_encrypted() && media_crypto_.is_null()) {
-    DVLOG(1) << "No MediaCrypto to handle encrypted config";
+    LOG(ERROR) << "No MediaCrypto to handle encrypted config";
     MEDIA_LOG(INFO, media_log_) << "No MediaCrypto to handle encrypted config";
     BindToCurrentLoop(std::move(init_cb)).Run(false);
     return;
@@ -373,7 +373,7 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
 }
 
 void MediaCodecVideoDecoder::SetCdm(CdmContext* cdm_context, InitCB init_cb) {
-  DVLOG(1) << __func__;
+  LOG(ERROR) << __func__;
   DCHECK(cdm_context) << "No CDM provided";
   DCHECK(cdm_context->GetMediaCryptoContext());
 
@@ -390,7 +390,7 @@ void MediaCodecVideoDecoder::OnMediaCryptoReady(
     InitCB init_cb,
     JavaObjectPtr media_crypto,
     bool requires_secure_video_codec) {
-  DVLOG(1) << __func__
+  LOG(ERROR) << __func__
            << ": requires_secure_video_codec = " << requires_secure_video_codec;
 
   DCHECK(state_ == State::kInitializing);
@@ -439,13 +439,13 @@ void MediaCodecVideoDecoder::OnMediaCryptoReady(
 }
 
 void MediaCodecVideoDecoder::OnKeyAdded() {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   waiting_for_key_ = false;
   StartTimerOrPumpCodec();
 }
 
 void MediaCodecVideoDecoder::StartLazyInit() {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   TRACE_EVENT0("media", "MediaCodecVideoDecoder::StartLazyInit");
   lazy_init_pending_ = false;
 
@@ -475,7 +475,7 @@ void MediaCodecVideoDecoder::StartLazyInit() {
 
 void MediaCodecVideoDecoder::OnVideoFrameFactoryInitialized(
     scoped_refptr<gpu::TextureOwner> texture_owner) {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   TRACE_EVENT0("media",
                "MediaCodecVideoDecoder::OnVideoFrameFactoryInitialized");
   if (!texture_owner) {
@@ -502,7 +502,7 @@ void MediaCodecVideoDecoder::OnVideoFrameFactoryInitialized(
 
 void MediaCodecVideoDecoder::OnOverlayInfoChanged(
     const OverlayInfo& overlay_info) {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   DCHECK(device_info_->SupportsOverlaySurfaces());
   DCHECK(!enable_threaded_texture_mailboxes_);
   if (InTerminalState())
@@ -520,7 +520,7 @@ void MediaCodecVideoDecoder::OnOverlayInfoChanged(
 
 void MediaCodecVideoDecoder::OnSurfaceChosen(
     std::unique_ptr<AndroidOverlay> overlay) {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   DCHECK(state_ == State::kInitializing ||
          device_info_->IsSetOutputSurfaceSupported());
   TRACE_EVENT1("media", "MediaCodecVideoDecoder::OnSurfaceChosen", "overlay",
@@ -544,7 +544,7 @@ void MediaCodecVideoDecoder::OnSurfaceChosen(
 }
 
 void MediaCodecVideoDecoder::OnSurfaceDestroyed(AndroidOverlay* overlay) {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   DCHECK_NE(state_, State::kInitializing);
   TRACE_EVENT0("media", "MediaCodecVideoDecoder::OnSurfaceDestroyed");
 
@@ -573,7 +573,7 @@ bool MediaCodecVideoDecoder::SurfaceTransitionPending() {
 }
 
 void MediaCodecVideoDecoder::TransitionToTargetSurface() {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   DCHECK(SurfaceTransitionPending());
   DCHECK(device_info_->IsSetOutputSurfaceSupported());
 
@@ -693,7 +693,7 @@ void MediaCodecVideoDecoder::Decode(scoped_refptr<DecoderBuffer> buffer,
 }
 
 void MediaCodecVideoDecoder::FlushCodec() {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
 
   // If a deferred flush was pending, then it isn't anymore.
   deferred_flush_pending_ = false;
@@ -830,6 +830,7 @@ bool MediaCodecVideoDecoder::QueueInput() {
              : 2))
       << "QueueInput(" << pending_decode.buffer->AsHumanReadableString()
       << ") status=" << static_cast<int>(status);
+  LOG(ERROR) << "QueueInput " << static_cast<int>(status) << '\n';
 
   switch (status) {
     case CodecWrapper::QueueStatus::kOk:
@@ -847,6 +848,7 @@ bool MediaCodecVideoDecoder::QueueInput() {
   }
 
   if (pending_decode.buffer->end_of_stream()) {
+    LOG(ERROR) << "QueueInput EOS" << '\n';
     // The VideoDecoder interface requires that the EOS DecodeCB is called after
     // all decodes before it are delivered, so we have to save it and call it
     // when the EOS is dequeued.
@@ -888,11 +890,11 @@ bool MediaCodecVideoDecoder::DequeueOutput() {
     case CodecWrapper::DequeueStatus::kTryAgainLater:
       return false;
     case CodecWrapper::DequeueStatus::kError:
-      DVLOG(1) << "DequeueOutputBuffer() error";
+      LOG(ERROR) << "DequeueOutputBuffer() error";
       EnterTerminalState(State::kError, "DequeueOutputBuffer failed");
       return false;
   }
-  DVLOG(3) << "DequeueOutputBuffer(): pts="
+  LOG(ERROR) << "DequeueOutputBuffer(): pts="
            << (eos ? "EOS"
                    : std::to_string(presentation_time.InMilliseconds()));
 
@@ -981,7 +983,7 @@ void MediaCodecVideoDecoder::ForwardVideoFrame(
 // 1) no VideoFrames from before the Reset() will be output, and
 // 2) no DecodeCBs (including EOS) from before the Reset() will be run.
 void MediaCodecVideoDecoder::Reset(base::OnceClosure closure) {
-  DVLOG(2) << __func__;
+  LOG(ERROR) << __func__;
   DCHECK(!reset_cb_);
   reset_generation_++;
   reset_cb_ = std::move(closure);
@@ -1055,7 +1057,7 @@ void MediaCodecVideoDecoder::OnCodecDrained() {
 
 void MediaCodecVideoDecoder::EnterTerminalState(State state,
                                                 const char* reason) {
-  DVLOG(2) << __func__ << " " << static_cast<int>(state) << " " << reason;
+  LOG(ERROR) << __func__ << " " << static_cast<int>(state) << " " << reason;
   MEDIA_LOG(INFO, media_log_) << "Entering Terminal State: " << reason;
 
   state_ = state;
