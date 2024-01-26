@@ -4,6 +4,8 @@
 
 #include "media/gpu/android/media_codec_video_decoder.h"
 
+#include <android/api-level.h>
+
 #include <memory>
 
 #include "base/android/build_info.h"
@@ -156,14 +158,28 @@ std::vector<SupportedVideoDecoderConfig> GetSupportedConfigsInternal(
   // support others. Advertise support for all H.264 profiles and let the
   // MediaCodec fail when decoding if it's not actually supported. It's assumed
   // that there is not software fallback for H.264 on Android.
-  supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                 gfx::Size(0, 0), gfx::Size(3840, 2160),
-                                 true,    // allow_encrypted
-                                 false);  // require_encrypted
-  supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                 gfx::Size(0, 0), gfx::Size(2160, 3840),
-                                 true,    // allow_encrypted
-                                 false);  // require_encrypted
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <
+      base::android::SDK_VERSION_LOLLIPOP) {
+    // rk3188 crashes unrecoverably with the following video dimensions: 640x368, 960x544
+    // make sure we only support higher resolutions
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(720, 576), gfx::Size(3840, 2160),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(576, 720), gfx::Size(2160, 3840),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+  } else {
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(0, 0), gfx::Size(3840, 2160),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(0, 0), gfx::Size(2160, 3840),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+  }
 
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
   supported_configs.emplace_back(HEVCPROFILE_MIN, HEVCPROFILE_MAX,
