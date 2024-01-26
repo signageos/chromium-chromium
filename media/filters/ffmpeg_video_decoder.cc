@@ -114,6 +114,12 @@ int FFmpegVideoDecoder::GetVideoBuffer(struct AVCodecContext* codec_context,
   if (ret < 0)
     return ret;
 
+  if (codec_context->codec_id == AV_CODEC_ID_H264) {
+    // Have the software H.264 decoder reject HD videos. Leave those to the platform codec.
+    if ((size.width() >= 1280 && size.height() >= 720) || (size.width() >= 720 && size.height() >= 1280))
+      return AVERROR(EINVAL);
+  }
+
   gfx::Size natural_size;
   if (codec_context->sample_aspect_ratio.num > 0) {
     natural_size = GetNaturalSize(size,
