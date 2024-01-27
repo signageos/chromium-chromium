@@ -36,6 +36,9 @@ void Log(media::MediaLogRecord* event) {
   } else if (event->type == media::MediaLogRecord::Type::kMessage &&
              event->params.HasKey("error")) {
     LOG(ERROR) << "MediaEvent: " << ToJSON(event);
+  } else if (event->type == media::MediaLogRecord::Type::kMessage &&
+             event->params.HasKey("info")) {
+    LOG(INFO) << "MediaEvent: " << ToJSON(event);
   } else if (event->type != media::MediaLogRecord::Type::kMediaPropertyChange) {
     DVLOG(1) << "MediaEvent: " << ToJSON(event);
   }

@@ -5,6 +5,7 @@
 #include "media/gpu/android/media_codec_video_decoder.h"
 
 #include <memory>
+#include <sys/system_properties.h>
 
 #include "base/android/build_info.h"
 #include "base/bind.h"
@@ -156,15 +157,39 @@ std::vector<SupportedVideoDecoderConfig> GetSupportedConfigsInternal(
   // support others. Advertise support for all H.264 profiles and let the
   // MediaCodec fail when decoding if it's not actually supported. It's assumed
   // that there is not software fallback for H.264 on Android.
-  supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                 gfx::Size(0, 0), gfx::Size(3840, 2160),
-                                 true,    // allow_encrypted
-                                 false);  // require_encrypted
-  supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                 gfx::Size(0, 0), gfx::Size(2160, 3840),
-                                 true,    // allow_encrypted
-                                 false);  // require_encrypted
-
+  char property_value[PROP_VALUE_MAX];
+  __system_property_get("ro.board.platform", property_value);
+  std::string ro_board_platform = property_value;
+  LOG(INFO) << "[ro.board.platform]: [" << ro_board_platform << ']';
+  if (ro_board_platform.compare("rk3188") == 0) {
+    // rk3188 OMX.rk.video_decoder.avc crashes with 960x540 and 640x360 video.
+    // We're effectively limited to 240p, 720p, and 1080p.
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(0, 0), gfx::Size(639, 359),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(0, 0), gfx::Size(359, 639),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(961, 541), gfx::Size(3840, 2160),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(541, 961), gfx::Size(2160, 3840),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+  } else {
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(0, 0), gfx::Size(3840, 2160),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                   gfx::Size(0, 0), gfx::Size(2160, 3840),
+                                   true,    // allow_encrypted
+                                   false);  // require_encrypted
+  }
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
   supported_configs.emplace_back(HEVCPROFILE_MIN, HEVCPROFILE_MAX,
                                  gfx::Size(0, 0), gfx::Size(3840, 2160),
