@@ -41,6 +41,17 @@
 
 namespace media {
 namespace {
+#if BUILDFLAG(USE_PROPRIETARY_CODECS)
+const std::string& GetBoardPlatform() {
+  static std::string board_platform = []() {
+    char property_value[PROP_VALUE_MAX];
+    __system_property_get("ro.board.platform", property_value);
+    LOG(INFO) << "[ro.board.platform] : [" << property_value << ']';
+    return std::string(property_value);
+  }();
+  return board_platform;
+}
+#endif
 
 void OutputBufferReleased(bool using_async_api,
                           base::RepeatingClosure pump_cb,
@@ -157,24 +168,14 @@ std::vector<SupportedVideoDecoderConfig> GetSupportedConfigsInternal(
   // support others. Advertise support for all H.264 profiles and let the
   // MediaCodec fail when decoding if it's not actually supported. It's assumed
   // that there is not software fallback for H.264 on Android.
-  char property_value[PROP_VALUE_MAX];
-  __system_property_get("ro.board.platform", property_value);
-  std::string ro_board_platform = property_value;
-  LOG(INFO) << "[ro.board.platform]: [" << ro_board_platform << ']';
-  if (ro_board_platform.compare("rk3188") == 0) {
-    // rk3188 OMX.rk.video_decoder.avc crashes when switching resolutions.
-    // Vimeo auto-picker doesn't work with a single resolution supported.
-    // Outright blacklist the codec.
-  } else {
-    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                   gfx::Size(0, 0), gfx::Size(3840, 2160),
-                                   true,    // allow_encrypted
-                                   false);  // require_encrypted
-    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                   gfx::Size(0, 0), gfx::Size(2160, 3840),
-                                   true,    // allow_encrypted
-                                   false);  // require_encrypted
-  }
+  supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                 gfx::Size(0, 0), gfx::Size(3840, 2160),
+                                 true,    // allow_encrypted
+                                 false);  // require_encrypted
+  supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
+                                 gfx::Size(0, 0), gfx::Size(2160, 3840),
+                                 true,    // allow_encrypted
+                                 false);  // require_encrypted
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
   supported_configs.emplace_back(HEVCPROFILE_MIN, HEVCPROFILE_MAX,
                                  gfx::Size(0, 0), gfx::Size(3840, 2160),
@@ -380,6 +381,21 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
     deferred_reallocation_pending_ = true;
     last_width_ = width;
   }  // else leave |last_width_| unmodified, since we're re-using the codec.
+
+  if (width != last_width_) {
+#if BUILDFLAG(USE_PROPRIETARY_CODECS)
+    if (config.codec() == kCodecH264) {
+      std::string board_platform = GetBoardPlatform();
+      if (board_platform.compare("rk3188") == 0) {
+        // rk3188 OMX.rk.video_decoder.avc crashes when switching resolutions.
+        // Re-allocating the codec works around the problem.
+        deferred_flush_pending_ = true;
+        deferred_reallocation_pending_ = true;
+        last_width_ = width;
+      }
+    }
+#endif
+  }
 }
 
 void MediaCodecVideoDecoder::SetCdm(CdmContext* cdm_context, InitCB init_cb) {
