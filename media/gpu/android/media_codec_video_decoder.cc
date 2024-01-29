@@ -162,24 +162,9 @@ std::vector<SupportedVideoDecoderConfig> GetSupportedConfigsInternal(
   std::string ro_board_platform = property_value;
   LOG(INFO) << "[ro.board.platform]: [" << ro_board_platform << ']';
   if (ro_board_platform.compare("rk3188") == 0) {
-    // rk3188 OMX.rk.video_decoder.avc crashes with 960x540 and 640x360 video.
-    // We're effectively limited to 240p, 720p, and 1080p.
-    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                   gfx::Size(0, 0), gfx::Size(639, 359),
-                                   true,    // allow_encrypted
-                                   false);  // require_encrypted
-    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                   gfx::Size(0, 0), gfx::Size(359, 639),
-                                   true,    // allow_encrypted
-                                   false);  // require_encrypted
-    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                   gfx::Size(961, 541), gfx::Size(3840, 2160),
-                                   true,    // allow_encrypted
-                                   false);  // require_encrypted
-    supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
-                                   gfx::Size(541, 961), gfx::Size(2160, 3840),
-                                   true,    // allow_encrypted
-                                   false);  // require_encrypted
+    // rk3188 OMX.rk.video_decoder.avc crashes when switching resolutions.
+    // Vimeo auto-picker doesn't work with a single resolution supported.
+    // Outright blacklist the codec.
   } else {
     supported_configs.emplace_back(H264PROFILE_MIN, H264PROFILE_MAX,
                                    gfx::Size(0, 0), gfx::Size(3840, 2160),
