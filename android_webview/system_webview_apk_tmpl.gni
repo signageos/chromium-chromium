@@ -46,7 +46,7 @@ template("system_webview_apk_or_module_tmpl") {
       "//android_webview:pak_file_assets",
     ]
 
-    target_sdk_version = android_sdk_version
+    target_sdk_version = 20
     product_config_java_packages = [ webview_product_config_java_package ]
 
     if (webview_includes_weblayer) {
