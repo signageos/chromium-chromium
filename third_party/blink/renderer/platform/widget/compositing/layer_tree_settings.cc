@@ -241,6 +241,7 @@ cc::ManagedMemoryPolicy GetGpuMemoryPolicy(
           std::min(actual.bytes_limit_when_visible,
                    static_cast<size_t>(256 * 1024 * 1024));
     }
+    LOG(INFO) << "ManagedMemoryPolicy.bytes_limit_when_visible = " << (actual.bytes_limit_when_visible / 1024 / 1024) << " MB\n";
     actual.priority_cutoff_when_visible =
         gpu::MemoryAllocation::CUTOFF_ALLOW_EVERYTHING;
   }
