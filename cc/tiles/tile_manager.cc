@@ -818,8 +818,11 @@ TileManager::PrioritizedWorkToSchedule TileManager::AssignGpuMemoryToTiles() {
     // done.
     if (!memory_usage_is_within_limit) {
       if (tile_is_needed_now) {
-        LOG(ERROR) << "WARNING: tile memory limits exceeded, some content may "
-                      "not draw";
+        if (tile_memory_limit.memory_bytes() > 0) {
+          // Don't report error if memory limit is undefined.
+          LOG(ERROR) << "WARNING: tile memory limits exceeded, "
+                        "some content may not draw";
+        }
 
         had_enough_memory_to_schedule_tiles_needed_now = false;
       }
@@ -1804,7 +1807,7 @@ void TileManager::ActivationStateAsValueInto(
   state->SetInteger("soft_memory_limit",
                     global_state_.soft_memory_limit_in_bytes);
   state->SetInteger("hard_memory_limit",
-                    global_state_.soft_memory_limit_in_bytes);
+                    global_state_.hard_memory_limit_in_bytes);
   state->SetInteger("pending_required_for_activation_callback_id",
                     pending_required_for_activation_callback_id_);
   state->SetInteger("current_memory_usage",
