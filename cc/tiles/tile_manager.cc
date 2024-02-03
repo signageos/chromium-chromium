@@ -827,8 +827,11 @@ TileManager::PrioritizedWorkToSchedule TileManager::AssignGpuMemoryToTiles() {
     // done.
     if (!memory_usage_is_within_limit) {
       if (tile_is_needed_now) {
-        LOG(ERROR) << "WARNING: tile memory limits exceeded, some content may "
-                      "not draw";
+        if (tile_memory_limit.memory_bytes() > 0) {
+          // Don't report error if memory limit is undefined.
+          LOG(ERROR) << "WARNING: tile memory limits exceeded, "
+                        "some content may not draw";
+        }
 
         had_enough_memory_to_schedule_tiles_needed_now = false;
       }
