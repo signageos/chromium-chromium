@@ -7,7 +7,6 @@ package org.chromium.content.browser.input;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 
 import androidx.annotation.VisibleForTesting;
 
@@ -153,8 +152,7 @@ public class SelectPopup implements HideablePopup, ViewAndroidDelegate.Container
         }
         WebContentsAccessibilityImpl wcax =
                 WebContentsAccessibilityImpl.fromWebContents(mWebContents);
-        if (Build.VERSION.SDK_INT >= 21 &&
-                DeviceFormFactor.isTablet() && !multiple && !wcax.isTouchExplorationEnabled()) {
+        if (DeviceFormFactor.isTablet() && !multiple && !wcax.isTouchExplorationEnabled()) {
             mPopupView = new SelectPopupDropdown(context, this::selectMenuItems, anchorView,
                     popupItems, selectedIndices, rightAligned, mWebContents);
         } else {
