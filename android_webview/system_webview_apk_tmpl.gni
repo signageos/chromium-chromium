@@ -89,7 +89,9 @@ template("system_webview_apk_or_module_tmpl") {
         # flag for bundles, so this will only work on M+.
         app_as_shared_lib = true
       } else {
-        shared_resources = true
+        # Must use non-zero package ID for correct resource loading on Kitkat.
+        app_as_shared_lib = true
+        package_id = 119 # 'w'
       }
 
       if (!android_64bit_target_cpu || !_pure_32_bit) {

@@ -550,25 +550,8 @@ class WebViewDelegateFactory {
 
         @Override
         public int getPackageId(Resources resources, String packageName) {
-            // Look for matching package by first resource of any type.
-            // This covers both *.webview and *.webview_translations resources.
-            // This package is always zero on Kitkat.
-            for (int packageId = 0x00; packageId <= 0x7f; packageId++) {
-                for (int resType = 0x01; resType <= 0xff; resType++) {
-                    int resId = (packageId << 24) | (resType << 16);
-                    try {
-                        final String resourcePackageName = resources.getResourcePackageName(resId);
-                        if (resourcePackageName.equals(packageName)) {
-                            return packageId;
-                        } else {
-                            // Skip the rest of resources belonging to this package.
-                            break;
-                        }
-                    } catch (Resources.NotFoundException ignore) {
-                    }
-                }
-            }
-            throw new RuntimeException("Package not found: " + packageName);
+            // Counteract R.onResourcesLoaded when app_as_shared_lib = true.
+            return 0x7f;
         }
 
         @Override
@@ -592,11 +575,9 @@ class WebViewDelegateFactory {
         @Override
         public void addWebViewAssetPath(Context context) {
             try {
-                final int firstStringResId = org.chromium.android_webview.R.string
-                        .class.getFields()[0].getInt(null);
-                context.getResources().getResourceEntryName(firstStringResId);
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException("Invalid reflection", e);
+                // Look for a known resource.
+                final int resId = org.chromium.ui.R.style.DropdownPopupWindow;
+                context.getResources().getResourcePackageName(resId);
             } catch (Resources.NotFoundException e) {
                 throw new RuntimeException("WebView assets were supposed to be loaded already.");
             }
