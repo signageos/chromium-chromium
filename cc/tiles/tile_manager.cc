@@ -775,15 +775,10 @@ TileManager::PrioritizedWorkToSchedule TileManager::AssignGpuMemoryToTiles() {
     // done.
     if (!memory_usage_is_within_limit) {
       if (tile_is_needed_now) {
-        // Don't report error if memory limit is undefined.
         if (tile_memory_limit.memory_bytes() > 0) {
-          const size_t bytes_required = memory_required_by_tile_to_be_scheduled.memory_bytes();
-          const gfx::Size size = tile->desired_texture_size();
-          const int bpp = bytes_required / size.width() / size.height() * 8; // bits per pixel
-          LOG(ERROR) << "WARNING: tile memory limits exceeded, some content may not draw: "
-                     << bytes_required / 1024 / 1024 << " MB required with "
-                     << tile_memory_limit.memory_bytes() / 1024 / 1024 << " MB free for a "
-                     << size.width() << 'x' << size.height() << 'x' << bpp << "bpp tile";
+          // Don't report error if memory limit is undefined.
+          LOG(ERROR) << "WARNING: tile memory limits exceeded, "
+                        "some content may not draw";
         }
 
         had_enough_memory_to_schedule_tiles_needed_now = false;
