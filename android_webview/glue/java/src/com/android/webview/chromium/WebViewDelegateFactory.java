@@ -550,8 +550,8 @@ class WebViewDelegateFactory {
 
         @Override
         public int getPackageId(Resources resources, String packageName) {
-            // Counteract R.onResourcesLoaded when app_as_shared_lib = true.
-            return 0x7f;
+            // Kitkat can't assign dynamic package IDs.
+            return org.chromium.ui.R.style.DropdownPopupWindow >>> 24;
         }
 
         @Override
