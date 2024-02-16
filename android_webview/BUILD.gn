@@ -32,7 +32,6 @@ if (public_android_sdk) {
       android_manifest_dep =
           "//android_webview/nonembedded:system_webview_manifest"
       deps = upstream_only_webview_deps
-      min_sdk_version = 19
     }
   }
 
@@ -50,7 +49,6 @@ if (public_android_sdk) {
     system_webview_bundle("system_webview_bundle") {
       base_module_target = ":system_webview_base_bundle_module"
       bundle_name = "SystemWebView"
-      min_sdk_version = 19
     }
   }
 
@@ -75,7 +73,6 @@ if (public_android_sdk) {
         base_module_target = ":system_webview_32_base_bundle_module"
         bundle_name = "SystemWebView32"
         include_64_bit_webview = false
-        min_sdk_version = 19
       }
     }
   }
@@ -484,7 +481,6 @@ android_library("browser_java") {
   ]
 
   android_manifest_for_lint = system_webview_android_manifest
-  min_sdk_version = 19
 }
 
 android_library("common_variations_java") {
@@ -544,7 +540,6 @@ android_library("common_crash_java") {
     "//components/minidump_uploader:minidump_uploader_java",
   ]
   annotation_processor_deps = [ "//base/android/jni_generator:jni_processor" ]
-  min_sdk_version = 19
 }
 
 android_library("common_java") {
