@@ -91,22 +91,22 @@ import java.util.concurrent.Executor;
  * and a small set of no-op deprecated APIs.
  */
 @SuppressWarnings("deprecation")
-class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate,
+class WebViewChromium2 implements WebViewProvider, WebViewProvider.ScrollDelegate,
                                  WebViewProvider.ViewDelegate, SmartClipProvider {
 
-    private static final String TAG = WebViewChromium.class.getSimpleName();
+    private static final String TAG = WebViewChromium2.class.getSimpleName();
 
     // The WebView that this WebViewChromium is the provider for.
     WebView mWebView;
     // Lets us access protected View-derived methods on the WebView instance we're backing.
     WebView.PrivateAccess mWebViewPrivate;
     // The client adapter class.
-    private WebViewContentsClientAdapter mContentsClientAdapter;
+    private WebViewContentsClientAdapter2 mContentsClientAdapter;
     // The wrapped Context.
     private Context mContext;
 
     // Variables for functionality provided by this adapter ---------------------------------------
-    private ContentSettingsAdapter mWebSettings;
+    private ContentSettingsAdapter2 mWebSettings;
     // The WebView wrapper for WebContents and required browser components.
     AwContents mAwContents;
 
@@ -114,7 +114,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
 
     private final int mAppTargetSdkVersion;
 
-    protected WebViewChromiumFactoryProvider mFactory;
+    protected WebViewChromiumFactoryProviderBase mFactory;
 
     protected final SharedWebViewChromium mSharedWebViewChromium;
 
@@ -244,10 +244,10 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
 
     // This does not touch any global / non-threadsafe state, but note that
     // init is ofter called right after and is NOT threadsafe.
-    public WebViewChromium(WebViewChromiumFactoryProvider factory, WebView webView,
+    public WebViewChromium2(WebViewChromiumFactoryProviderBase factory, WebView webView,
             WebView.PrivateAccess webViewPrivate, boolean shouldDisableThreadChecking) {
         try (ScopedSysTraceEvent e1 = ScopedSysTraceEvent.scoped("WebViewChromium.constructor")) {
-            WebViewChromiumFactoryProvider.checkStorageIsNotDeviceProtected(webView.getContext());
+            WebViewChromiumFactoryProviderBase.checkStorageIsNotDeviceProtected(webView.getContext());
             mWebView = webView;
             mWebViewPrivate = webViewPrivate;
             mHitTestResult = new WebView.HitTestResult();
@@ -263,9 +263,9 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
 
     // See //android_webview/docs/how-does-on-create-window-work.md for more details.
     static void completeWindowCreation(WebView parent, WebView child) {
-        AwContents parentContents = ((WebViewChromium) parent.getWebViewProvider()).mAwContents;
+        AwContents parentContents = ((WebViewChromium2) parent.getWebViewProvider()).mAwContents;
         AwContents childContents =
-                child == null ? null : ((WebViewChromium) child.getWebViewProvider()).mAwContents;
+                child == null ? null : ((WebViewChromium2) child.getWebViewProvider()).mAwContents;
         parentContents.supplyContentsForPopup(childContents);
     }
 
@@ -558,7 +558,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
             return;
         }
         recordWebViewApiCall(ApiCall.SET_HTTP_AUTH_USERNAME_PASSWORD);
-        ((WebViewDatabaseAdapter) mFactory.getWebViewDatabase(mContext))
+        ((WebViewDatabaseAdapter2) mFactory.getWebViewDatabase(mContext))
                 .setHttpAuthUsernamePassword(host, realm, username, password);
     }
 
@@ -575,7 +575,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
             return ret;
         }
         recordWebViewApiCall(ApiCall.GET_HTTP_AUTH_USERNAME_PASSWORD);
-        return ((WebViewDatabaseAdapter) mFactory.getWebViewDatabase(mContext))
+        return ((WebViewDatabaseAdapter2) mFactory.getWebViewDatabase(mContext))
                 .getHttpAuthUsernamePassword(host, realm);
     }
 
@@ -1347,7 +1347,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
         // and we do not handle passing null to the WebBackForwardListChromium constructor.
         NavigationHistory navHistory = mAwContents.getNavigationHistory();
         if (navHistory == null) navHistory = new NavigationHistory();
-        return new WebBackForwardListChromium(navHistory);
+        return new WebBackForwardListChromium2(navHistory);
     }
 
     @Override

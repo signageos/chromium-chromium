@@ -25,11 +25,11 @@ public final class GlueApiHelperForP {
 
     /**
      * See {@link
-     * TracingControllerAdapter#TracingControllerAdapter(WebViewChromiumFactoryProvider,
+     * TracingControllerAdapter#TracingControllerAdapter(WebViewChromiumFactoryProviderBase,
      * AwTracingController)}, which was added in P.
      */
     public static TracingController createTracingControllerAdapter(
-            WebViewChromiumFactoryProvider provider, WebViewChromiumAwInit awInit) {
+            WebViewChromiumFactoryProviderBase provider, WebViewChromiumAwInit awInit) {
         return new TracingControllerAdapter(new SharedTracingControllerAdapter(
                 awInit.getRunQueue(), awInit.getAwTracingController()));
     }

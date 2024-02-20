@@ -19,11 +19,11 @@ import org.chromium.android_webview.AwSettings;
  * {@link org.chromium.android_webview.AwSettings}.
  */
 @SuppressWarnings({"deprecation", "NoSynchronizedMethodCheck"})
-public class ContentSettingsAdapter extends android.webkit.WebSettings {
+public class ContentSettingsAdapter2 extends android.webkit.WebSettings {
     private AwSettings mAwSettings;
     private PluginState mPluginState = PluginState.OFF;
 
-    public ContentSettingsAdapter(AwSettings awSettings) {
+    public ContentSettingsAdapter2(AwSettings awSettings) {
         mAwSettings = awSettings;
     }
 

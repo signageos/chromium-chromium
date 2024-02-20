@@ -135,7 +135,7 @@ public final class WebLayerImpl extends IWebLayer.Stub {
 
     // The required package ID for WebLayer when loaded as a shared library, hardcoded in the
     // resources. If this value changes make sure to change _SHARED_LIBRARY_HARDCODED_ID in
-    // //build/android/gyp/util/protoresources.py and WebViewChromiumFactoryProvider.java.
+    // //build/android/gyp/util/protoresources.py and WebViewChromiumFactoryProviderBase.java.
     private static final int REQUIRED_PACKAGE_IDENTIFIER = 36;
 
     private final ProfileManager mProfileManager = new ProfileManager();
