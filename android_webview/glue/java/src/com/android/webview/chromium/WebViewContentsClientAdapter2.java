@@ -69,7 +69,7 @@ import java.util.WeakHashMap;
  * An adapter class that forwards the callbacks from {@link ContentViewClient}
  * to the appropriate {@link WebViewClient} or {@link WebChromeClient}.
  *
- * An instance of this class is associated with one {@link WebViewChromium}
+ * An instance of this class is associated with one {@link WebViewChromium2}
  * instance. A WebViewChromium is a WebView implementation provider (that is
  * android.webkit.WebView delegates all functionality to it) and has exactly
  * one corresponding {@link ContentView} instance.
@@ -82,7 +82,7 @@ import java.util.WeakHashMap;
  * allow the source WebView to be injected by ContentViewClientAdapter. We
  * choose the latter, because it makes for a cleaner design.
  */
-class WebViewContentsClientAdapter extends SharedWebViewContentsClientAdapter {
+class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
     // The WebChromeClient instance that was passed to WebView.setContentViewClient().
     private WebChromeClient mWebChromeClient;
     // The listener receiving find-in-page API results.
@@ -106,7 +106,7 @@ class WebViewContentsClientAdapter extends SharedWebViewContentsClientAdapter {
      *
      * @param webView the {@link WebView} instance that this adapter is serving.
      */
-    WebViewContentsClientAdapter(WebView webView, Context context,
+    WebViewContentsClientAdapter2(WebView webView, Context context,
             WebViewDelegate webViewDelegate) {
         super(webView, webViewDelegate, context);
         try (ScopedSysTraceEvent event =
@@ -132,7 +132,7 @@ class WebViewContentsClientAdapter extends SharedWebViewContentsClientAdapter {
                                         + " previously navigated.");
                             }
 
-                            WebViewChromium.completeWindowCreation(mWebView, newWebView);
+                            WebViewChromium2.completeWindowCreation(mWebView, newWebView);
                             break;
                         default:
                             throw new IllegalStateException();

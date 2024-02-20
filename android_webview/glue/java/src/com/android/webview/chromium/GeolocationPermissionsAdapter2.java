@@ -16,11 +16,11 @@ import java.util.Set;
  * Chromium implementation of GeolocationPermissions -- forwards calls to the
  * chromium internal implementation.
  */
-final class GeolocationPermissionsAdapter extends GeolocationPermissions {
-    private final WebViewChromiumFactoryProvider mFactory;
+final class GeolocationPermissionsAdapter2 extends GeolocationPermissions {
+    private final WebViewChromiumFactoryProviderBase mFactory;
     private final AwGeolocationPermissions mChromeGeolocationPermissions;
 
-    public GeolocationPermissionsAdapter(WebViewChromiumFactoryProvider factory,
+    public GeolocationPermissionsAdapter2(WebViewChromiumFactoryProviderBase factory,
             AwGeolocationPermissions chromeGeolocationPermissions) {
         mFactory = factory;
         mChromeGeolocationPermissions = chromeGeolocationPermissions;
