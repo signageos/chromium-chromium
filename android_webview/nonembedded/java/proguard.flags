@@ -8,6 +8,10 @@
 
 # Keep the factory and its public members; it's the main entry point used by the
 # framework.
+-keep class com.android.webview.chromium.WebViewChromiumFactoryProvider {
+    public *;
+}
+
 -keep class com.android.webview.chromium.WebViewChromiumFactoryProviderBase {
     public *;
 }
