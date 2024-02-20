@@ -44,6 +44,7 @@ class CodecWrapperImpl : public base::RefCountedThreadSafe<CodecWrapperImpl> {
   bool IsDrained() const;
   bool SupportsFlush(DeviceInfo* device_info) const;
   bool Flush();
+  bool SupportsEos(DeviceInfo* device_info) const;
   bool SetSurface(scoped_refptr<CodecSurfaceBundle> surface_bundle);
   scoped_refptr<CodecSurfaceBundle> SurfaceBundle();
   QueueStatus QueueInputBuffer(const DecoderBuffer& buffer);
@@ -224,6 +225,12 @@ bool CodecWrapperImpl::Flush() {
   state_ = State::kFlushed;
   elided_eos_pending_ = false;
   return true;
+}
+
+bool CodecWrapperImpl::SupportsEos(DeviceInfo* device_info) const {
+  DVLOG(2) << __func__;
+  base::AutoLock l(lock_);
+  return !device_info->CodecNeedsEosPropagationWorkaround(codec_.get());
 }
 
 CodecWrapperImpl::QueueStatus CodecWrapperImpl::QueueInputBuffer(
@@ -533,6 +540,10 @@ bool CodecWrapper::IsDrained() const {
 
 bool CodecWrapper::Flush() {
   return impl_->Flush();
+}
+
+bool CodecWrapper::SupportsEos(DeviceInfo* device_info) const {
+  return impl_->SupportsEos(device_info);
 }
 
 CodecWrapper::QueueStatus CodecWrapper::QueueInputBuffer(

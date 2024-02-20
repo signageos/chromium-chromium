@@ -134,6 +134,14 @@ class MEDIA_EXPORT MediaCodecUtil {
   // WARNING: This can't be used from the renderer process since it attempts to
   // create a MediaCodec (which requires permissions) to get the codec name.
   static bool CodecNeedsFlushWorkaround(MediaCodecBridge* codec);
+
+  // Returns whether the decoder is known to handle the propagation of the
+  // MediaCodec#BUFFER_FLAG_END_OF_STREAM flag incorrectly on the host device.
+  // https://github.com/androidx/media/blob/d13a0f4ec62ca092b79746a5725b62a3244cc5b4/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/mediacodec/MediaCodecRenderer.java#L2589-L2601
+  //
+  // WARNING: This can't be used from the renderer process since it attempts to
+  // create a MediaCodec (which requires permissions) to get the codec name.
+  static bool CodecNeedsEosPropagationWorkaround(MediaCodecBridge* codec);
 };
 
 }  // namespace media
