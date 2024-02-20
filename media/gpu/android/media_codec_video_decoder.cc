@@ -5,6 +5,7 @@
 #include "media/gpu/android/media_codec_video_decoder.h"
 
 #include <memory>
+#include <sys/system_properties.h>
 
 #include "base/android/build_info.h"
 #include "base/bind.h"
@@ -41,6 +42,17 @@
 
 namespace media {
 namespace {
+#if BUILDFLAG(USE_PROPRIETARY_CODECS)
+const std::string& GetBoardPlatform() {
+  static std::string board_platform = []() {
+    char property_value[PROP_VALUE_MAX];
+    __system_property_get("ro.board.platform", property_value);
+    LOG(INFO) << "[ro.board.platform] : [" << property_value << ']';
+    return std::string(property_value);
+  }();
+  return board_platform;
+}
+#endif
 
 void OutputBufferReleased(bool using_async_api,
                           base::RepeatingClosure pump_cb,
@@ -415,6 +427,21 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
     deferred_reallocation_pending_ = true;
     last_width_ = width;
   }  // else leave |last_width_| unmodified, since we're re-using the codec.
+
+  if (width != last_width_) {
+#if BUILDFLAG(USE_PROPRIETARY_CODECS)
+    if (config.codec() == VideoCodec::kH264) {
+      std::string board_platform = GetBoardPlatform();
+      if (board_platform.compare("rk3188") == 0) {
+        // rk3188 OMX.rk.video_decoder.avc crashes when switching resolutions.
+        // Re-allocating the codec works around the problem.
+        deferred_flush_pending_ = true;
+        deferred_reallocation_pending_ = true;
+        last_width_ = width;
+      }
+    }
+#endif
+  }
 }
 
 void MediaCodecVideoDecoder::SetCdm(CdmContext* cdm_context, InitCB init_cb) {
