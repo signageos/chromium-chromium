@@ -161,6 +161,9 @@ class MEDIA_GPU_EXPORT CodecWrapper {
   // Flushes the codec and discards all output buffers.
   bool Flush();
 
+  // Whether the codec correctly handles EOS flag.
+  bool SupportsEos(DeviceInfo* device_info) const;
+
   // Sets the given surface and returns true on success.
   bool SetSurface(scoped_refptr<CodecSurfaceBundle> surface_bundle);
 

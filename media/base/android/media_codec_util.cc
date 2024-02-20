@@ -32,6 +32,7 @@ using base::android::ScopedJavaLocalRef;
 using base::android::SDK_VERSION_KITKAT;
 using base::android::SDK_VERSION_LOLLIPOP;
 using base::android::SDK_VERSION_LOLLIPOP_MR1;
+using base::android::SDK_VERSION_NOUGAT_MR1;
 using base::android::SDK_VERSION_P;
 
 namespace media {
@@ -513,6 +514,13 @@ bool MediaCodecUtil::CodecNeedsFlushWorkaround(MediaCodecBridge* codec) {
                           "SM-G800", base::CompareCase::INSENSITIVE_ASCII) &&
          ("OMX.Exynos.avc.dec" == codec_name ||
           "OMX.Exynos.avc.dec.secure" == codec_name);
+}
+
+bool MediaCodecUtil::CodecNeedsEosPropagationWorkaround(MediaCodecBridge* codec) {
+  const auto& codec_name = codec->GetName();
+  return base::android::BuildInfo::GetInstance()->sdk_int() <=
+             SDK_VERSION_NOUGAT_MR1 &&
+         "OMX.rk.video_decoder.avc" == codec_name;
 }
 
 }  // namespace media
