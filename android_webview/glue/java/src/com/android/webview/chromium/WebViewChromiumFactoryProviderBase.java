@@ -182,27 +182,6 @@ public class WebViewChromiumFactoryProviderBase implements WebViewFactoryProvide
     }
 
     /**
-     * Entry point for newer versions of Android.
-     */
-    public static WebViewChromiumFactoryProviderBase create(android.webkit.WebViewDelegate delegate) {
-        return new WebViewChromiumFactoryProviderBase(delegate);
-    }
-
-    /**
-     * Constructor called by the API 21 version of {@link WebViewFactory} and earlier.
-     */
-    public WebViewChromiumFactoryProviderBase() {
-        initialize(WebViewDelegateFactory.createApi21CompatibilityDelegate());
-    }
-
-    /**
-     * Constructor called by the API 22 version of {@link WebViewFactory} and later.
-     */
-    public WebViewChromiumFactoryProviderBase(android.webkit.WebViewDelegate delegate) {
-        initialize(WebViewDelegateFactory.createProxyDelegate(delegate));
-    }
-
-    /**
      * Constructor for internal use when a proxy delegate has already been created.
      */
     WebViewChromiumFactoryProviderBase(WebViewDelegate delegate) {
