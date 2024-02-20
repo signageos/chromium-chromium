@@ -94,7 +94,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                      "WebView.APICallback.WebViewClient.shouldOverrideUrlLoading")) {
             if (TRACE) Log.i(TAG, "shouldOverrideUrlLoading=" + request.url);
             boolean result;
-            if (mSupportLibClient.isFeatureAvailable(Features.SHOULD_OVERRIDE_WITH_REDIRECTS)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.SHOULD_OVERRIDE_WITH_REDIRECTS)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 result = mSupportLibClient.shouldOverrideUrlLoading(
                         mWebView, new WebResourceRequestAdapter(request));
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -172,7 +173,9 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                 error.description = mWebViewDelegate.getErrorString(mContext, error.errorCode);
             }
             if (TRACE) Log.i(TAG, "onReceivedError=" + request.url);
-            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_WEB_RESOURCE_ERROR)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_WEB_RESOURCE_ERROR)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Note: we must pass AwWebResourceError, since this class was introduced after L.
                 mSupportLibClient.onReceivedError(
                         mWebView, new WebResourceRequestAdapter(request), error);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -189,7 +192,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                         TraceEvent.scoped("WebViewContentsClientAdapter.onSafeBrowsingHit")) {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.ON_SAFE_BROWSING_HIT);
-            if (mSupportLibClient.isFeatureAvailable(Features.SAFE_BROWSING_HIT)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.SAFE_BROWSING_HIT)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mSupportLibClient.onSafeBrowsingHit(
                         mWebView, new WebResourceRequestAdapter(request), threatType, callback);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
@@ -211,7 +215,8 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.ON_RECEIVED_HTTP_ERROR);
             if (TRACE) Log.i(TAG, "onReceivedHttpError=" + request.url);
-            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_HTTP_ERROR)) {
+            if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_HTTP_ERROR)
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mSupportLibClient.onReceivedHttpError(mWebView,
                         new WebResourceRequestAdapter(request),
                         ImmutableWebResourceResponse.from(response));

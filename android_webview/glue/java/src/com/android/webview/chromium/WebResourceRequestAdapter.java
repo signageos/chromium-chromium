@@ -5,7 +5,10 @@
 package com.android.webview.chromium;
 
 import android.net.Uri;
+import android.os.Build;
 import android.webkit.WebResourceRequest;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.android_webview.AwContentsClient.AwWebResourceRequest;
 
@@ -14,6 +17,7 @@ import java.util.Map;
 /**
  * Adapter between WebResourceRequest and AwWebResourceRequest.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class WebResourceRequestAdapter implements WebResourceRequest {
     private final AwWebResourceRequest mRequest;
 

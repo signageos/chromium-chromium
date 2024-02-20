@@ -34,6 +34,8 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.RequiresApi;
+
 import com.android.webview.chromium.WebViewDelegateFactory.WebViewDelegate;
 
 import org.chromium.android_webview.AwConsoleMessage;
@@ -226,13 +228,22 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.SHOULD_INTERCEPT_REQUEST);
             if (TRACE) Log.i(TAG, "shouldInterceptRequest=" + request.url);
-            WebResourceResponse response = mWebViewClient.shouldInterceptRequest(
-                    mWebView, new WebResourceRequestAdapter(request));
-            if (response == null) return null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                WebResourceResponse response = mWebViewClient.shouldInterceptRequest(
+                        mWebView, new WebResourceRequestAdapter(request));
+                if (response == null) return null;
 
-            return new WebResourceResponseInfo(response.getMimeType(), response.getEncoding(),
-                    response.getData(), response.getStatusCode(), response.getReasonPhrase(),
-                    response.getResponseHeaders());
+                return new WebResourceResponseInfo(response.getMimeType(), response.getEncoding(),
+                        response.getData(), response.getStatusCode(), response.getReasonPhrase(),
+                        response.getResponseHeaders());
+            } else {
+                WebResourceResponse response = mWebViewClient.shouldInterceptRequest(
+                        mWebView, request.url);
+                if (response == null) return null;
+
+                return new WebResourceResponseInfo(response.getMimeType(), response.getEncoding(),
+                        response.getData());
+            }
         }
     }
 
@@ -538,7 +549,8 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
                      "WebView.APICallback.WebViewClient.onPermissionRequest")) {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.ON_PERMISSION_REQUEST);
-            if (mWebChromeClient != null) {
+            if (mWebChromeClient != null
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (TRACE) Log.i(TAG, "onPermissionRequest");
                 if (mOngoingPermissionRequests == null) {
                     mOngoingPermissionRequests = new WeakHashMap<AwPermissionRequest,
@@ -561,7 +573,8 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
                      "WebView.APICallback.WebViewClient.onPermissionRequestCanceled")) {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.ON_PERMISSION_REQUEST_CANCELED);
-            if (mWebChromeClient != null && mOngoingPermissionRequests != null) {
+            if (mWebChromeClient != null && mOngoingPermissionRequests != null
+                    && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (TRACE) Log.i(TAG, "onPermissionRequestCanceled");
                 WeakReference<PermissionRequestAdapter> weakRef =
                         mOngoingPermissionRequests.get(permissionRequest);
@@ -756,6 +769,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static class ClientCertRequestImpl extends ClientCertRequest {
         private final AwContentsClientBridge.ClientCertificateRequestCallback mCallback;
         private final String[] mKeyTypes;
@@ -820,9 +834,13 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
                      "WebView.APICallback.WebViewClient.onReceivedClientCertRequest")) {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.ON_RECEIVED_CLIENT_CERT_REQUEST);
-            final ClientCertRequestImpl request =
-                    new ClientCertRequestImpl(callback, keyTypes, principals, host, port);
-            mWebViewClient.onReceivedClientCertRequest(mWebView, request);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                final ClientCertRequestImpl request =
+                        new ClientCertRequestImpl(callback, keyTypes, principals, host, port);
+                mWebViewClient.onReceivedClientCertRequest(mWebView, request);
+            } else {
+                callback.cancel();
+            }
         }
     }
 
@@ -895,18 +913,20 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
                 }
             };
 
-            // Invoke the new callback introduced in Lollipop. If the app handles
-            // it, we're done here.
-            if (mWebChromeClient.onShowFileChooser(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Invoke the new callback introduced in Lollipop. If the app handles
+                // it, we're done here.
+                if (mWebChromeClient.onShowFileChooser(
                         mWebView, callbackAdapter, fromAwFileChooserParams(fileChooserParams))) {
-                return;
-            }
+                    return;
+                }
 
-            // If the app did not handle it and we are running on Lollipop or newer, then
-            // abort.
-            if (mContext.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
-                uploadFileCallback.onResult(null);
-                return;
+                // If the app did not handle it and we are running on Lollipop or newer, then
+                // abort.
+                if (mContext.getApplicationInfo().targetSdkVersion >= Build.VERSION_CODES.LOLLIPOP) {
+                    uploadFileCallback.onResult(null);
+                    return;
+                }
             }
 
             // Otherwise, for older apps, attempt to invoke the legacy (hidden) API for
@@ -1055,6 +1075,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
     /**
      * Type adaptation class for PermissionRequest.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static class PermissionRequestAdapter extends PermissionRequest {
 
         private static long toAwPermissionResources(String[] resources) {
@@ -1126,6 +1147,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static WebChromeClient.FileChooserParams fromAwFileChooserParams(
             final AwContentsClient.FileChooserParamsImpl value) {
         if (value == null) {
