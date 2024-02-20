@@ -5,6 +5,7 @@
 #include "media/gpu/android/media_codec_video_decoder.h"
 
 #include <memory>
+#include <sys/system_properties.h>
 
 #include "base/android/build_info.h"
 #include "base/bind.h"
@@ -422,6 +423,18 @@ void MediaCodecVideoDecoder::Initialize(const VideoDecoderConfig& config,
     should_retry_codec_allocation_ = true;
     last_width_ = width;
   }  // else leave |last_width_| unmodified, since we're re-using the codec.
+
+  if (last_width_ != width) {
+#if BUILDFLAG(USE_PROPRIETARY_CODECS)
+    if (!codec_->SupportsEos(device_info_)) {
+      // rk3188 OMX.rk.video_decoder.avc crashes when switching resolutions.
+      // Re-allocating the codec works around the problem.
+      deferred_flush_pending_ = true;
+      deferred_reallocation_pending_ = true;
+      last_width_ = width;
+    }
+#endif
+  }
 }
 
 void MediaCodecVideoDecoder::SetCdm(CdmContext* cdm_context, InitCB init_cb) {
