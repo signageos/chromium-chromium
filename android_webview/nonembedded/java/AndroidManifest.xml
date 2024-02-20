@@ -160,7 +160,7 @@
                          tools:ignore="ExportedService" />
             {% endif %}
         {% endmacro %}
-        {{ common(manifest_package|default('com.android.webview'), library|default('libwebviewchromium.so')) }}
+        {{ common(manifest_package|default('com.android.webview'), library|default('libwebviewchromium2.so')) }}
         {% if donor_package is defined %}
             <meta-data android:name="com.android.webview.WebViewDonorPackage"
                        android:value="{{ donor_package }}" />

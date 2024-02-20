@@ -37,7 +37,7 @@ CHROME_SPECIFIC = BuildFileMatchRegex(
 
 # WebView specific files which are not in Monochrome.apk
 WEBVIEW_SPECIFIC = BuildFileMatchRegex(
-    r'lib/.*/libwebviewchromium\.so',
+    r'lib/.*/libwebviewchromium2\.so',
     r'lib/.*/libchromium_android_linker\.so',
     r'assets/webview_licenses.notice',
     r'res/.*/accent_font.xml',

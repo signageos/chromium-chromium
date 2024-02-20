@@ -296,7 +296,7 @@ class _BuildHelper:
     if 'monochrome' in self.target or 'trichrome' in self.target:
       ret = 'lib.unstripped/libmonochrome.so'
     elif 'webview' in self.target:
-      ret = 'lib.unstripped/libwebviewchromium.so'
+      ret = 'lib.unstripped/libwebviewchromium2.so'
     else:
       ret = 'lib.unstripped/libchrome.so'
     return ret

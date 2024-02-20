@@ -361,8 +361,8 @@ def main_android_webview(options, args, results_collector):
   target_dir = os.path.join(build_directory.GetBuildOutputDirectory(SRC_DIR),
                             options.target)
 
-  binaries = ['lib/libwebviewchromium.so',
-              'libwebviewchromium.so']
+  binaries = ['lib/libwebviewchromium2.so',
+              'libwebviewchromium2.so']
 
   return check_android_binaries(binaries, target_dir, options,
                                 results_collector)
