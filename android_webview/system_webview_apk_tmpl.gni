@@ -26,6 +26,7 @@ declare_args() {
   enable_webview_bundles = true
 
   min_sdk_version = 21
+  target_sdk_version = android_sdk_version
 }
 
 template("system_webview_apk_or_module_tmpl") {
