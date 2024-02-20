@@ -132,7 +132,7 @@ public class SharedStatics {
         try (TraceEvent event = TraceEvent.scoped(
                      "WebView.APICall.Framework.ENABLE_SLOW_WHOLE_DOCUMENT_DRAW")) {
             recordStaticApiCall(ApiCall.ENABLE_SLOW_WHOLE_DOCUMENT_DRAW);
-            WebViewChromium.enableSlowWholeDocumentDraw();
+            WebViewChromium2.enableSlowWholeDocumentDraw();
         }
     }
 

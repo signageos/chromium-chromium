@@ -43,7 +43,7 @@ public class Profile {
 
     public Profile(@NonNull final AwBrowserContext browserContext) {
         assert ThreadUtils.runningOnUiThread();
-        WebViewChromiumFactoryProvider factory = WebViewChromiumFactoryProvider.getSingleton();
+        WebViewChromiumFactoryProviderBase factory = WebViewChromiumFactoryProviderBase.getSingleton();
         mName = browserContext.getName();
 
         if (browserContext.isDefaultAwBrowserContext()) {
@@ -54,9 +54,9 @@ public class Profile {
                 mServiceWorkerController.set(factory.getServiceWorkerController());
             }
         } else {
-            mCookieManager = new CookieManagerAdapter(browserContext.getCookieManager());
-            mWebStorage = new WebStorageAdapter(factory, browserContext.getQuotaManagerBridge());
-            mGeolocationPermissions = new GeolocationPermissionsAdapter(
+            mCookieManager = new CookieManagerAdapter2(browserContext.getCookieManager());
+            mWebStorage = new WebStorageAdapter2(factory, browserContext.getQuotaManagerBridge());
+            mGeolocationPermissions = new GeolocationPermissionsAdapter2(
                     factory, browserContext.getGeolocationPermissions());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 mServiceWorkerController.set(

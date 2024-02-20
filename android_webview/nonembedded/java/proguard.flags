@@ -9,7 +9,7 @@
 # Keep the factory and its public members; it's the main entry point used by the
 # framework. Also keep the factory's constructors as some things are using them
 # via reflection; crbug.com/1462346
--keep class com.android.webview.chromium.WebViewChromiumFactoryProvider {
+-keep class com.android.webview.chromium.WebViewChromiumFactoryProviderBase {
     public *;
     <init>(...);
 }
@@ -22,17 +22,17 @@
     *;
 }
 
--keep class com.android.webview.chromium.ContentSettingsAdapter {
+-keep class com.android.webview.chromium.ContentSettingsAdapter2 {
     public *;
 }
 
--keep class com.android.webview.chromium.WebViewDatabaseAdapter {
+-keep class com.android.webview.chromium.WebViewDatabaseAdapter2 {
   public *;
 }
 
 # This is the main entry point for APIs. It is kept to make developing with
 # unreleased Android easier.
--keep class com.android.webview.chromium.WebViewChromium {
+-keep class com.android.webview.chromium.WebViewChromium2 {
   public *;
 }
 

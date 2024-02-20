@@ -7,7 +7,7 @@ package com.android.webview.chromium;
 import android.webkit.ValueCallback;
 import android.webkit.WebStorage;
 
-import com.android.webview.chromium.WebViewChromium.ApiCall;
+import com.android.webview.chromium.WebViewChromium2.ApiCall;
 
 import org.chromium.android_webview.AwQuotaManagerBridge;
 import org.chromium.android_webview.common.Lifetime;
@@ -24,12 +24,12 @@ import java.util.Map;
  */
 @SuppressWarnings("deprecation")
 @Lifetime.Profile
-final class WebStorageAdapter extends WebStorage {
-    private final WebViewChromiumFactoryProvider mFactory;
+final class WebStorageAdapter2 extends WebStorage {
+    private final WebViewChromiumFactoryProviderBase mFactory;
     private final AwQuotaManagerBridge mQuotaManagerBridge;
 
-    WebStorageAdapter(
-            WebViewChromiumFactoryProvider factory, AwQuotaManagerBridge quotaManagerBridge) {
+    WebStorageAdapter2(
+            WebViewChromiumFactoryProviderBase factory, AwQuotaManagerBridge quotaManagerBridge) {
         mFactory = factory;
         mQuotaManagerBridge = quotaManagerBridge;
     }
@@ -59,7 +59,7 @@ final class WebStorageAdapter extends WebStorage {
                 public void run() {
                     try (TraceEvent event = TraceEvent.scoped(
                                  "WebView.APICall.Framework.WEB_STORAGE_GET_ORIGINS")) {
-                        WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_ORIGINS);
+                        WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_ORIGINS);
                         mQuotaManagerBridge.getOrigins(awOriginsCallback);
                     }
                 }
@@ -69,7 +69,7 @@ final class WebStorageAdapter extends WebStorage {
         }
         try (TraceEvent event =
                         TraceEvent.scoped("WebView.APICall.Framework.WEB_STORAGE_GET_ORIGINS")) {
-            WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_ORIGINS);
+            WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_ORIGINS);
             mQuotaManagerBridge.getOrigins(awOriginsCallback);
         }
     }
@@ -82,7 +82,7 @@ final class WebStorageAdapter extends WebStorage {
                 public void run() {
                     try (TraceEvent event = TraceEvent.scoped(
                                  "WebView.APICall.Framework.WEB_STORAGE_GET_USAGE_FOR_ORIGIN")) {
-                        WebViewChromium.recordWebViewApiCall(
+                        WebViewChromium2.recordWebViewApiCall(
                                 ApiCall.WEB_STORAGE_GET_USAGE_FOR_ORIGIN);
                         mQuotaManagerBridge.getUsageForOrigin(
                                 origin, CallbackConverter.fromValueCallback(callback));
@@ -94,7 +94,7 @@ final class WebStorageAdapter extends WebStorage {
         }
         try (TraceEvent event = TraceEvent.scoped(
                      "WebView.APICall.Framework.WEB_STORAGE_GET_USAGE_FOR_ORIGIN")) {
-            WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_USAGE_FOR_ORIGIN);
+            WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_USAGE_FOR_ORIGIN);
             mQuotaManagerBridge.getUsageForOrigin(
                     origin, CallbackConverter.fromValueCallback(callback));
         }
@@ -108,7 +108,7 @@ final class WebStorageAdapter extends WebStorage {
                 public void run() {
                     try (TraceEvent event = TraceEvent.scoped(
                                  "WebView.APICall.Framework.WEB_STORAGE_GET_QUOTA_FOR_ORIGIN")) {
-                        WebViewChromium.recordWebViewApiCall(
+                        WebViewChromium2.recordWebViewApiCall(
                                 ApiCall.WEB_STORAGE_GET_QUOTA_FOR_ORIGIN);
                         mQuotaManagerBridge.getQuotaForOrigin(
                                 origin, CallbackConverter.fromValueCallback(callback));
@@ -120,7 +120,7 @@ final class WebStorageAdapter extends WebStorage {
         }
         try (TraceEvent event = TraceEvent.scoped(
                      "WebView.APICall.Framework.WEB_STORAGE_GET_QUOTA_FOR_ORIGIN")) {
-            WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_QUOTA_FOR_ORIGIN);
+            WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_GET_QUOTA_FOR_ORIGIN);
             mQuotaManagerBridge.getQuotaForOrigin(
                     origin, CallbackConverter.fromValueCallback(callback));
         }
@@ -139,7 +139,7 @@ final class WebStorageAdapter extends WebStorage {
                 public void run() {
                     try (TraceEvent event = TraceEvent.scoped(
                                  "WebView.APICall.Framework.WEB_STORAGE_DELETE_ORIGIN")) {
-                        WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ORIGIN);
+                        WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ORIGIN);
                         mQuotaManagerBridge.deleteOrigin(origin);
                     }
                 }
@@ -149,7 +149,7 @@ final class WebStorageAdapter extends WebStorage {
         }
         try (TraceEvent event =
                         TraceEvent.scoped("WebView.APICall.Framework.WEB_STORAGE_DELETE_ORIGIN")) {
-            WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ORIGIN);
+            WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ORIGIN);
             mQuotaManagerBridge.deleteOrigin(origin);
         }
     }
@@ -162,7 +162,7 @@ final class WebStorageAdapter extends WebStorage {
                 public void run() {
                     try (TraceEvent event = TraceEvent.scoped(
                                  "WebView.APICall.Framework.WEB_STORAGE_DELETE_ALL_DATA")) {
-                        WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ALL_DATA);
+                        WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ALL_DATA);
                         mQuotaManagerBridge.deleteAllData();
                     }
                 }
@@ -172,7 +172,7 @@ final class WebStorageAdapter extends WebStorage {
         }
         try (TraceEvent event = TraceEvent.scoped(
                      "WebView.APICall.Framework.WEB_STORAGE_DELETE_ALL_DATA")) {
-            WebViewChromium.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ALL_DATA);
+            WebViewChromium2.recordWebViewApiCall(ApiCall.WEB_STORAGE_DELETE_ALL_DATA);
             mQuotaManagerBridge.deleteAllData();
         }
     }

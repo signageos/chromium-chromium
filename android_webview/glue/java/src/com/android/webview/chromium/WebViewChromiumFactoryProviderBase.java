@@ -103,7 +103,7 @@ import java.util.concurrent.FutureTask;
  */
 @SuppressWarnings("deprecation")
 @Lifetime.Singleton
-public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
+public class WebViewChromiumFactoryProviderBase implements WebViewFactoryProvider {
     private static final String TAG = "WVCFactoryProvider";
 
     private static final String CHROMIUM_PREFS_NAME = "WebViewChromiumPrefs";
@@ -135,12 +135,12 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     }
 
     private static final Object sSingletonLock = new Object();
-    private static WebViewChromiumFactoryProvider sSingleton;
+    private static WebViewChromiumFactoryProviderBase sSingleton;
     // Used to indicate if WebLayer and WebView are running in the same process.
     private static boolean sWebLayerRunningInSameProcess;
 
     private final WebViewChromiumRunQueue mRunQueue = new WebViewChromiumRunQueue(
-            () -> { return WebViewChromiumFactoryProvider.this.mAwInit.hasStarted(); });
+            () -> { return WebViewChromiumFactoryProviderBase.this.mAwInit.hasStarted(); });
 
     /* package */ WebViewChromiumRunQueue getRunQueue() {
         return mRunQueue;
@@ -203,7 +203,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     /**
      * Thread-safe way to set the one and only WebViewChromiumFactoryProvider.
      */
-    private static void setSingleton(WebViewChromiumFactoryProvider provider) {
+    private static void setSingleton(WebViewChromiumFactoryProviderBase provider) {
         synchronized (sSingletonLock) {
             if (sSingleton != null) {
                 throw new RuntimeException(
@@ -216,7 +216,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     /**
      * Thread-safe way to get the one and only WebViewChromiumFactoryProvider.
      */
-    static WebViewChromiumFactoryProvider getSingleton() {
+    static WebViewChromiumFactoryProviderBase getSingleton() {
         synchronized (sSingletonLock) {
             if (sSingleton == null) {
                 throw new RuntimeException("WebViewChromiumFactoryProvider has not been set!");
@@ -228,14 +228,14 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     /**
      * Entry point for Android 26 (Oreo) and above. See class docs for initialization details.
      */
-    public static WebViewChromiumFactoryProvider create(android.webkit.WebViewDelegate delegate) {
-        return new WebViewChromiumFactoryProvider(delegate);
+    public static WebViewChromiumFactoryProviderBase create(android.webkit.WebViewDelegate delegate) {
+        return new WebViewChromiumFactoryProviderBase(delegate);
     }
 
     /**
      * Constructor called by the API 21 version of {@link WebViewFactory} and earlier.
      */
-    public WebViewChromiumFactoryProvider() {
+    public WebViewChromiumFactoryProviderBase() {
         initialize(WebViewDelegateFactory.createApi21CompatibilityDelegate());
     }
 
@@ -244,14 +244,14 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
      * by {@link #create}, this constructor was invoked directly before {@link #create} was defined.
      * See class docs for initialization details.
      */
-    public WebViewChromiumFactoryProvider(android.webkit.WebViewDelegate delegate) {
+    public WebViewChromiumFactoryProviderBase(android.webkit.WebViewDelegate delegate) {
         initialize(WebViewDelegateFactory.createProxyDelegate(delegate));
     }
 
     /**
      * Constructor for internal use when a proxy delegate has already been created.
      */
-    WebViewChromiumFactoryProvider(WebViewDelegate delegate) {
+    WebViewChromiumFactoryProviderBase(WebViewDelegate delegate) {
         initialize(delegate);
     }
 
@@ -264,8 +264,8 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     }
 
     // Protected to allow downstream to override.
-    protected ContentSettingsAdapter createContentSettingsAdapter(AwSettings settings) {
-        return new ContentSettingsAdapter(settings);
+    protected ContentSettingsAdapter2 createContentSettingsAdapter(AwSettings settings) {
+        return new ContentSettingsAdapter2(settings);
     }
 
     private void deleteContentsOnPackageDowngrade(PackageInfo packageInfo) {
@@ -588,7 +588,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
         synchronized (mAwInit.getLock()) {
             SharedStatics sharedStatics = mAwInit.getStatics();
             if (mStaticsAdapter == null) {
-                mStaticsAdapter = new WebViewChromiumFactoryProvider.Statics() {
+                mStaticsAdapter = new WebViewChromiumFactoryProviderBase.Statics() {
                     @Override
                     public String findAddress(String addr) {
                         return sharedStatics.findAddress(addr);
@@ -657,7 +657,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
 
     @Override
     public WebViewProvider createWebView(WebView webView, WebView.PrivateAccess privateAccess) {
-        return new WebViewChromium(this, webView, privateAccess, mShouldDisableThreadChecking);
+        return new WebViewChromium2(this, webView, privateAccess, mShouldDisableThreadChecking);
     }
 
     // Workaround for IME thread crashes on legacy OEM apps.
@@ -757,11 +757,11 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
         return mWebViewDelegate;
     }
 
-    WebViewContentsClientAdapter createWebViewContentsClientAdapter(WebView webView,
+    WebViewContentsClientAdapter2 createWebViewContentsClientAdapter(WebView webView,
             Context context) {
         try (ScopedSysTraceEvent e = ScopedSysTraceEvent.scoped(
                      "WebViewChromiumFactoryProvider.insideCreateWebViewContentsClientAdapter")) {
-            return new WebViewContentsClientAdapter(webView, context, mWebViewDelegate);
+            return new WebViewContentsClientAdapter2(webView, context, mWebViewDelegate);
         }
     }
 
@@ -829,7 +829,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
 
     @Override
     public ClassLoader getWebViewClassLoader() {
-        return new FilteredClassLoader(WebViewChromiumFactoryProvider.class.getClassLoader());
+        return new FilteredClassLoader(WebViewChromiumFactoryProviderBase.class.getClassLoader());
     }
 
     // This is called from WebLayer when WebView and WebLayer are run in the same process. It's

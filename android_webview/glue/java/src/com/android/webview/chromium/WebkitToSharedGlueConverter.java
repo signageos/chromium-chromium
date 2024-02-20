@@ -34,21 +34,21 @@ import org.chromium.content_public.browser.MessagePort;
 @Lifetime.Singleton
 public class WebkitToSharedGlueConverter {
     public static AwCookieManager getCookieManager(CookieManager cookieManager) {
-        return ((CookieManagerAdapter) cookieManager).getCookieManager();
+        return ((CookieManagerAdapter2) cookieManager).getCookieManager();
     }
 
     public static SharedWebViewChromium getSharedWebViewChromium(WebView webview) {
-        WebViewChromium webviewChromium = (WebViewChromium) webview.getWebViewProvider();
+        WebViewChromium2 webviewChromium = (WebViewChromium2) webview.getWebViewProvider();
         return webviewChromium.getSharedWebViewChromium();
     }
 
     public static AwSettings getSettings(WebSettings webSettings) {
-        ContentSettingsAdapter contentSettingsAdapter = (ContentSettingsAdapter) webSettings;
+        ContentSettingsAdapter2 contentSettingsAdapter = (ContentSettingsAdapter2) webSettings;
         return contentSettingsAdapter.getAwSettings();
     }
 
     public static WebViewChromiumAwInit getGlobalAwInit() {
-        return WebViewChromiumFactoryProvider.getSingleton().getAwInit();
+        return WebViewChromiumFactoryProviderBase.getSingleton().getAwInit();
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
