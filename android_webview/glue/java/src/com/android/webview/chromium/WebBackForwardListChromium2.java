@@ -17,23 +17,23 @@ import java.util.List;
  * wrapper around NavigationHistory.
  */
 @SuppressWarnings("NoSynchronizedMethodCheck")
-public class WebBackForwardListChromium extends WebBackForwardList {
-    private final List<WebHistoryItemChromium> mHistoryItemList;
+public class WebBackForwardListChromium2 extends WebBackForwardList {
+    private final List<WebHistoryItemChromium2> mHistoryItemList;
     private final int mCurrentIndex;
 
-    /* package */ WebBackForwardListChromium(NavigationHistory navHistory) {
+    /* package */ WebBackForwardListChromium2(NavigationHistory navHistory) {
         boolean onInitialEntry =
                 (navHistory.getEntryCount() == 1 && navHistory.getEntryAtIndex(0).isInitialEntry());
         if (onInitialEntry) {
             // The initial NavigationEntry should not be exposed in the WebBackForwardList.
             mCurrentIndex = -1;
-            mHistoryItemList = new ArrayList<WebHistoryItemChromium>(0);
+            mHistoryItemList = new ArrayList<WebHistoryItemChromium2>(0);
             return;
         }
         mCurrentIndex = navHistory.getCurrentEntryIndex();
-        mHistoryItemList = new ArrayList<WebHistoryItemChromium>(navHistory.getEntryCount());
+        mHistoryItemList = new ArrayList<WebHistoryItemChromium2>(navHistory.getEntryCount());
         for (int i = 0; i < navHistory.getEntryCount(); ++i) {
-            mHistoryItemList.add(new WebHistoryItemChromium(navHistory.getEntryAtIndex(i)));
+            mHistoryItemList.add(new WebHistoryItemChromium2(navHistory.getEntryAtIndex(i)));
         }
     }
 
@@ -78,7 +78,7 @@ public class WebBackForwardListChromium extends WebBackForwardList {
     }
 
     // Clone constructor.
-    private WebBackForwardListChromium(List<WebHistoryItemChromium> list, int currentIndex) {
+    private WebBackForwardListChromium2(List<WebHistoryItemChromium2> list, int currentIndex) {
         mHistoryItemList = list;
         mCurrentIndex = currentIndex;
     }
@@ -87,11 +87,11 @@ public class WebBackForwardListChromium extends WebBackForwardList {
      * See {@link android.webkit.WebBackForwardList#clone}.
      */
     @Override
-    protected synchronized WebBackForwardListChromium clone() {
-        List<WebHistoryItemChromium> list = new ArrayList<WebHistoryItemChromium>(getSize());
+    protected synchronized WebBackForwardListChromium2 clone() {
+        List<WebHistoryItemChromium2> list = new ArrayList<WebHistoryItemChromium2>(getSize());
         for (int i = 0; i < getSize(); ++i) {
             list.add(mHistoryItemList.get(i).clone());
         }
-        return new WebBackForwardListChromium(list, mCurrentIndex);
+        return new WebBackForwardListChromium2(list, mCurrentIndex);
     }
 }

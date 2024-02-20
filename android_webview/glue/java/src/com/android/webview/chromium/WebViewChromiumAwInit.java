@@ -74,12 +74,12 @@ public class WebViewChromiumAwInit {
     private AwBrowserContext mBrowserContext;
     private AwTracingController mTracingController;
     private SharedStatics mSharedStatics;
-    private GeolocationPermissionsAdapter mGeolocationPermissions;
-    private CookieManagerAdapter mCookieManager;
+    private GeolocationPermissionsAdapter2 mGeolocationPermissions;
+    private CookieManagerAdapter2 mCookieManager;
 
-    private WebIconDatabaseAdapter mWebIconDatabase;
-    private WebStorageAdapter mWebStorage;
-    private WebViewDatabaseAdapter mWebViewDatabase;
+    private WebIconDatabaseAdapter2 mWebIconDatabase;
+    private WebStorageAdapter2 mWebStorage;
+    private WebViewDatabaseAdapter2 mWebViewDatabase;
     private AwServiceWorkerController mServiceWorkerController;
     private AwTracingController mAwTracingController;
     private VariationsSeedLoader mSeedLoader;
@@ -99,11 +99,11 @@ public class WebViewChromiumAwInit {
     // Read/write protected by mLock
     private int mInitState;
 
-    private final WebViewChromiumFactoryProvider mFactory;
+    private final WebViewChromiumFactoryProviderBase mFactory;
 
     private boolean mIsPostedFromBackgroundThread;
 
-    WebViewChromiumAwInit(WebViewChromiumFactoryProvider factory) {
+    WebViewChromiumAwInit(WebViewChromiumFactoryProviderBase factory) {
         mFactory = factory;
         // Do not make calls into 'factory' in this ctor - this ctor is called from the
         // WebViewChromiumFactoryProvider ctor, so 'factory' is not properly initialized yet.
@@ -225,10 +225,10 @@ public class WebViewChromiumAwInit {
                          "WebViewChromiumAwInit.initThreadUnsafeSingletons")) {
                 // Initialize thread-unsafe singletons.
                 AwBrowserContext awBrowserContext = getBrowserContextOnUiThread();
-                mGeolocationPermissions = new GeolocationPermissionsAdapter(
+                mGeolocationPermissions = new GeolocationPermissionsAdapter2(
                         mFactory, awBrowserContext.getGeolocationPermissions());
                 mWebStorage =
-                        new WebStorageAdapter(mFactory, mBrowserContext.getQuotaManagerBridge());
+                        new WebStorageAdapter2(mFactory, mBrowserContext.getQuotaManagerBridge());
                 mAwTracingController = getTracingController();
                 mServiceWorkerController = awBrowserContext.getServiceWorkerController();
                 mAwProxyController = new AwProxyController();
@@ -451,7 +451,7 @@ public class WebViewChromiumAwInit {
     public CookieManager getCookieManager() {
         synchronized (mLock) {
             if (mCookieManager == null) {
-                mCookieManager = new CookieManagerAdapter(new AwCookieManager());
+                mCookieManager = new CookieManagerAdapter2(new AwCookieManager());
             }
         }
         return mCookieManager;
@@ -470,7 +470,7 @@ public class WebViewChromiumAwInit {
         synchronized (mLock) {
             ensureChromiumStartedLocked(true);
             if (mWebIconDatabase == null) {
-                mWebIconDatabase = new WebIconDatabaseAdapter();
+                mWebIconDatabase = new WebIconDatabaseAdapter2();
             }
         }
         return mWebIconDatabase;
@@ -489,7 +489,7 @@ public class WebViewChromiumAwInit {
         synchronized (mLock) {
             ensureChromiumStartedLocked(true);
             if (mWebViewDatabase == null) {
-                mWebViewDatabase = new WebViewDatabaseAdapter(
+                mWebViewDatabase = new WebViewDatabaseAdapter2(
                         mFactory, HttpAuthDatabase.newInstance(context, HTTP_AUTH_DATABASE_FILE));
             }
         }
