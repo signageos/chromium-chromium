@@ -24,6 +24,7 @@ struct MEDIA_GPU_EXPORT DeviceInfo {
   virtual bool IsSetOutputSurfaceSupported();
   virtual bool SupportsOverlaySurfaces();
   virtual bool CodecNeedsFlushWorkaround(MediaCodecBridge* codec);
+  virtual bool CodecNeedsEosPropagationWorkaround(MediaCodecBridge* codec);
   virtual bool IsAsyncApiSupported();
   virtual bool AddSupportedCodecProfileLevels(
       std::vector<CodecProfileLevel>* result);

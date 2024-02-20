@@ -53,6 +53,10 @@ bool DeviceInfo::CodecNeedsFlushWorkaround(MediaCodecBridge* codec) {
   return MediaCodecUtil::CodecNeedsFlushWorkaround(codec);
 }
 
+bool DeviceInfo::CodecNeedsEosPropagationWorkaround(MediaCodecBridge* codec) {
+  return MediaCodecUtil::CodecNeedsEosPropagationWorkaround(codec);
+}
+
 bool DeviceInfo::IsAsyncApiSupported() {
   // Technically the base setCallback() API is available in L, but we
   // need the version which accepts a Handler which is in M... but
