@@ -12,7 +12,7 @@ import org.chromium.android_webview.AwContents;
  * Chromium implementation of WebIconDatabase -- big old no-op (base class is deprecated).
  */
 @SuppressWarnings("deprecation")
-final class WebIconDatabaseAdapter extends android.webkit.WebIconDatabase {
+final class WebIconDatabaseAdapter2 extends android.webkit.WebIconDatabase {
     @Override
     public void open(String path) {
         AwContents.setShouldDownloadFavicons();

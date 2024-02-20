@@ -20,12 +20,12 @@ import java.net.URISyntaxException;
  * chromium internal implementation.
  */
 @SuppressWarnings({"deprecation", "NoSynchronizedMethodCheck"})
-public class CookieManagerAdapter extends CookieManager {
+public class CookieManagerAdapter2 extends CookieManager {
     private static final String TAG = "CookieManager";
 
     AwCookieManager mChromeCookieManager;
 
-    public CookieManagerAdapter(AwCookieManager chromeCookieManager) {
+    public CookieManagerAdapter2(AwCookieManager chromeCookieManager) {
         mChromeCookieManager = chromeCookieManager;
     }
 

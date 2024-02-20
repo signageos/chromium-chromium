@@ -18,12 +18,12 @@ import java.util.concurrent.Callable;
  * chromium internal implementation.
  */
 @SuppressWarnings("deprecation")
-final class WebViewDatabaseAdapter extends WebViewDatabase {
-    private final WebViewChromiumFactoryProvider mFactory;
+final class WebViewDatabaseAdapter2 extends WebViewDatabase {
+    private final WebViewChromiumFactoryProviderBase mFactory;
     private final HttpAuthDatabase mHttpAuthDatabase;
 
-    public WebViewDatabaseAdapter(
-            WebViewChromiumFactoryProvider factory, HttpAuthDatabase httpAuthDatabase) {
+    public WebViewDatabaseAdapter2(
+            WebViewChromiumFactoryProviderBase factory, HttpAuthDatabase httpAuthDatabase) {
         mFactory = factory;
         mHttpAuthDatabase = httpAuthDatabase;
     }

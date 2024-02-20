@@ -81,7 +81,7 @@ public class SharedStatics {
     }
 
     public void enableSlowWholeDocumentDraw() {
-        WebViewChromium.enableSlowWholeDocumentDraw();
+        WebViewChromium2.enableSlowWholeDocumentDraw();
     }
 
     public Uri[] parseFileChooserResult(int resultCode, Intent intent) {
