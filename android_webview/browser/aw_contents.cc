@@ -95,7 +95,6 @@
 #include "ui/gfx/geometry/rect_f.h"
 #include "ui/gfx/geometry/size.h"
 #include "ui/gfx/image/image.h"
-struct AwDrawSWFunctionTable;
 
 using autofill::AutofillManager;
 using autofill::ContentAutofillDriverFactory;
@@ -427,7 +426,7 @@ static jboolean JNI_AwContents_HasRequiredHardwareExtensions(JNIEnv* env) {
 static void JNI_AwContents_SetAwDrawSWFunctionTable(JNIEnv* env,
                                                     jlong function_table) {
   RasterHelperSetAwDrawSWFunctionTable(
-      reinterpret_cast<AwDrawSWFunctionTable*>(function_table));
+      reinterpret_cast<void*>(function_table));
 }
 
 static void JNI_AwContents_SetAwDrawGLFunctionTable(JNIEnv* env,
