@@ -10,6 +10,7 @@
 #include "base/android/jni_weak_ref.h"
 
 struct AwDrawGLInfo;
+struct AwDrawGLInfoKitkat;
 
 namespace android_webview {
 
@@ -31,6 +32,7 @@ class AwGLFunctor {
                             const base::android::JavaParamRef<jobject>& obj);
 
   void DrawGL(AwDrawGLInfo* draw_info);
+  void DrawGLKitkat(AwDrawGLInfoKitkat* draw_info);
 
  private:
   bool RequestInvokeGL(bool wait_for_completion);
