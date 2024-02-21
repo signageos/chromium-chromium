@@ -100,8 +100,6 @@
 #include "url/origin.h"
 #include "url/url_constants.h"
 
-struct AwDrawSWFunctionTable;
-
 using autofill::ContentAutofillDriverFactory;
 using base::android::AttachCurrentThread;
 using base::android::ConvertJavaStringToUTF16;
@@ -448,7 +446,7 @@ static jboolean JNI_AwContents_HasRequiredHardwareExtensions(JNIEnv* env) {
 static void JNI_AwContents_SetAwDrawSWFunctionTable(JNIEnv* env,
                                                     jlong function_table) {
   RasterHelperSetAwDrawSWFunctionTable(
-      reinterpret_cast<AwDrawSWFunctionTable*>(function_table));
+      reinterpret_cast<void*>(function_table));
 }
 
 static void JNI_AwContents_SetAwDrawGLFunctionTable(JNIEnv* env,
