@@ -291,6 +291,13 @@ public class WebViewChromiumAwInit {
     private void setUpResources(int packageId, Context context) {
         try (ScopedSysTraceEvent e =
                         ScopedSysTraceEvent.scoped("WebViewChromiumAwInit.setUpResources")) {
+            final int buildPackageId = org.chromium.ui.R.style.DropdownPopupWindow >>> 24;
+            if (buildPackageId != 0) {
+                // Counteract non-zero build package ID.
+                packageId ^= buildPackageId;
+                // Counteract R.onResourcesLoaded when app_as_shared_lib = true.
+                packageId ^= 0x7f;
+            }
             R.onResourcesLoaded(packageId);
 
             AwResource.setResources(context.getResources());

@@ -244,6 +244,16 @@ template("system_webview_apk_or_module_tmpl") {
       }
     }
 
+    if (default_min_sdk_version < 21) {
+      if (!_is_trichrome && !_is_bundle_module) {
+        # Must use non-zero package ID for correct resource loading on Kitkat.
+        package_id = 35
+        # --package-id and --shared-resources are mutually exclusive.
+        shared_resources = false
+        app_as_shared_lib = true
+      }
+    }
+
     if (_include_primary_support) {
       deps += [
         "//android_webview:webview_primary_abi_assets",
