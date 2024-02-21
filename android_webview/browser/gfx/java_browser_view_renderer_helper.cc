@@ -7,8 +7,11 @@
 #include <android/bitmap.h>
 #include <memory>
 
+#include "SkCanvasStateUtilsKitkat.h"
 #include "android_webview/browser_jni_headers/JavaBrowserViewRendererHelper_jni.h"
 #include "android_webview/public/browser/draw_sw.h"
+#include "android_webview/public/browser/draw_sw_kitkat.h"
+#include "base/android/build_info.h"
 #include "base/android/scoped_java_ref.h"
 #include "base/memory/raw_ptr.h"
 #include "base/trace_event/trace_event.h"
@@ -26,6 +29,10 @@ namespace {
 // Provides software rendering functions from the Android glue layer.
 // Allows preventing extra copies of data when rendering.
 AwDrawSWFunctionTable* g_sw_draw_functions = NULL;
+AwDrawSWFunctionTableKitkat* g_sw_draw_functions_kitkat = NULL;
+
+typedef std::unique_ptr<SkCanvas> (MakeFromCanvasStateFunction)(const SkCanvasState* state);
+MakeFromCanvasStateFunction* g_make_from_canvas_state_function = NULL;
 
 class JavaCanvasHolder : public SoftwareCanvasHolder {
  public:
@@ -49,13 +56,16 @@ JavaCanvasHolder::JavaCanvasHolder(JNIEnv* env,
                                    jobject java_canvas,
                                    const gfx::Point& scroll)
     : pixels_(nullptr) {
-  if (!g_sw_draw_functions)
+  if (!g_make_from_canvas_state_function)
     return;
-  pixels_ = g_sw_draw_functions->access_pixels(env, java_canvas);
+  if (g_sw_draw_functions)
+    pixels_ = g_sw_draw_functions->access_pixels(env, java_canvas);
+  else if (g_sw_draw_functions_kitkat)
+    pixels_ = g_sw_draw_functions_kitkat->access_pixels(env, java_canvas);
   if (!pixels_ || !pixels_->state)
     return;
 
-  canvas_ = SkCanvasStateUtils::MakeFromCanvasState(pixels_->state);
+  canvas_ = g_make_from_canvas_state_function(pixels_->state);
   // Workarounds for http://crbug.com/271096: SW draw only supports
   // translate & scale transforms, and a simple rectangular clip.
   if (canvas_ && (!canvas_->isClipRect() ||
@@ -69,8 +79,12 @@ JavaCanvasHolder::JavaCanvasHolder(JNIEnv* env,
 }
 
 JavaCanvasHolder::~JavaCanvasHolder() {
-  if (pixels_)
-    g_sw_draw_functions->release_pixels(pixels_);
+  if (pixels_) {
+    if (g_sw_draw_functions)
+      g_sw_draw_functions->release_pixels(pixels_);
+    else if (g_sw_draw_functions_kitkat)
+      g_sw_draw_functions_kitkat->release_pixels(pixels_);
+  }
   pixels_ = nullptr;
 }
 
@@ -151,8 +165,14 @@ SkCanvas* AuxiliaryCanvasHolder::GetCanvas() {
 
 }  // namespace
 
-void RasterHelperSetAwDrawSWFunctionTable(AwDrawSWFunctionTable* table) {
-  g_sw_draw_functions = table;
+void RasterHelperSetAwDrawSWFunctionTable(void* table) {
+  if (base::android::BuildInfo::GetInstance()->sdk_int() >= base::android::SDK_VERSION_LOLLIPOP) {
+    g_sw_draw_functions = reinterpret_cast<AwDrawSWFunctionTable*>(table);
+    g_make_from_canvas_state_function = SkCanvasStateUtils::MakeFromCanvasState;
+  } else {
+    g_sw_draw_functions_kitkat = reinterpret_cast<AwDrawSWFunctionTableKitkat*>(table);
+    g_make_from_canvas_state_function = SkCanvasStateUtilsKitkat::MakeFromCanvasState;
+  }
 }
 
 // static

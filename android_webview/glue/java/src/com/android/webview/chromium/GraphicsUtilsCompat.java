@@ -24,7 +24,7 @@ final class GraphicsUtilsCompat {
         }
     }
 
-    private static long getDrawSWFunctionTableInt() {
+    private static int getDrawSWFunctionTableInt() {
         try {
             return (int) getGraphicsUtilsClass()
                     .getMethod("getDrawSWFunctionTable")
@@ -34,7 +34,7 @@ final class GraphicsUtilsCompat {
         }
     }
 
-    private static long getDrawGLFunctionTableInt() {
+    private static int getDrawGLFunctionTableInt() {
         try {
             return (int) getGraphicsUtilsClass()
                     .getMethod("getDrawGLFunctionTable")

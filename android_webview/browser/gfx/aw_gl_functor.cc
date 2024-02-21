@@ -6,6 +6,8 @@
 
 #include "android_webview/browser_jni_headers/AwGLFunctor_jni.h"
 #include "android_webview/public/browser/draw_gl.h"
+#include "android_webview/public/browser/draw_gl_kitkat.h"
+#include "base/android/build_info.h"
 #include "base/trace_event/trace_event.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -24,6 +26,16 @@ static void DrawGLFunction(long view_context,
   // AwContents.onPrepareDrawGL; this cast must match the code there.
   reinterpret_cast<android_webview::AwGLFunctor*>(view_context)
       ->DrawGL(draw_info);
+}
+
+static AwDrawGLFunctionKitkat DrawGLFunctionKitkat;
+static void DrawGLFunctionKitkat(int view_context,
+                                 AwDrawGLInfoKitkat* draw_info,
+                                 void* spare) {
+  // |view_context| is the value that was returned from the java
+  // AwContents.onPrepareDrawGL; this cast must match the code there.
+  reinterpret_cast<android_webview::AwGLFunctor*>(view_context)
+      ->DrawGLKitkat(draw_info);
 }
 }
 
@@ -123,6 +135,34 @@ void AwGLFunctor::DrawGL(AwDrawGLInfo* draw_info) {
   }
 }
 
+void AwGLFunctor::DrawGLKitkat(AwDrawGLInfoKitkat* draw_info) {
+  TRACE_EVENT0("android_webview,toplevel", "DrawFunctor");
+  bool save_restore = true; // draw_info->version = 2
+  switch (draw_info->mode) {
+    case AwDrawGLInfoKitkat::kModeProcess:
+      render_thread_manager_.DestroyHardwareRendererOnRT(
+          save_restore, false /* abandon_context */);
+      break;
+    case AwDrawGLInfoKitkat::kModeDraw: {
+      // This effectively fakes the kModeSync call in L+
+      render_thread_manager_.CommitFrameOnRT();
+
+      HardwareRendererDrawParams params{
+          draw_info->clip_left,   draw_info->clip_top, draw_info->clip_right,
+          draw_info->clip_bottom, draw_info->width,    draw_info->height,
+      };
+      static_assert(std::size(decltype(draw_info->transform){}) ==
+                        std::size(params.transform),
+                    "transform size mismatch");
+      for (unsigned int i = 0; i < std::size(params.transform); ++i) {
+        params.transform[i] = draw_info->transform[i];
+      }
+      render_thread_manager_.DrawOnRT(save_restore, params, OverlaysParams());
+      break;
+    }
+  }
+}
+
 void AwGLFunctor::RemoveFromCompositorFrameProducer(
     JNIEnv* env,
     const base::android::JavaParamRef<jobject>& obj) {
@@ -143,7 +183,11 @@ static jint JNI_AwGLFunctor_GetNativeInstanceCount(JNIEnv* env) {
 }
 
 static jlong JNI_AwGLFunctor_GetAwDrawGLFunction(JNIEnv* env) {
-  return reinterpret_cast<intptr_t>(&DrawGLFunction);
+  if (base::android::BuildInfo::GetInstance()->sdk_int() >= base::android::SDK_VERSION_LOLLIPOP) {
+    return reinterpret_cast<intptr_t>(&DrawGLFunction);
+  } else {
+    return reinterpret_cast<intptr_t>(&DrawGLFunctionKitkat);
+  }
 }
 
 static jlong JNI_AwGLFunctor_Create(

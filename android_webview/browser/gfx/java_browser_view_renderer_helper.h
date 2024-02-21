@@ -13,7 +13,6 @@
 #include "ui/gfx/geometry/size.h"
 
 class SkCanvas;
-struct AwDrawSWFunctionTable;
 
 namespace android_webview {
 
@@ -32,7 +31,7 @@ class SoftwareCanvasHolder {
   virtual SkCanvas* GetCanvas() = 0;
 };
 
-void RasterHelperSetAwDrawSWFunctionTable(AwDrawSWFunctionTable* table);
+void RasterHelperSetAwDrawSWFunctionTable(void* table);
 
 }  // namespace android_webview
 
