@@ -187,6 +187,18 @@ template("system_webview_apk_or_module_tmpl") {
       }
     }
 
+    if (min_sdk_version < 21) {
+      if (!_use_trichrome_library) {
+        if (!_is_bundle_module) {
+          # Must use non-zero package ID for correct resource loading on Kitkat.
+          package_id = 35
+          # --package-id and --shared-resources are mutually exclusive.
+          shared_resources = false
+          app_as_shared_lib = true
+        }
+      }
+    }
+
     _libarcore_dir = get_label_info(
                          "//third_party/arcore-android-sdk-client:com_google_ar_core_java($default_toolchain)",
                          "target_out_dir") + "/com_google_ar_core_java/jni"
