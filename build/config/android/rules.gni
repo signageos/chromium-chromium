@@ -3679,6 +3679,7 @@ if (enable_java_templates) {
                                "native_lib_placeholders",
                                "never_incremental",
                                "no_xml_namespaces",
+                               "package_id",
                                "omit_dex",
                                "png_to_webp",
                                "post_process_package_resources_script",
