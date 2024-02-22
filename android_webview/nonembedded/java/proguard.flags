@@ -60,3 +60,5 @@
   public int getMinApkVersion();
   public boolean requiresSignIn();
 }
+
+-dontobfuscate
