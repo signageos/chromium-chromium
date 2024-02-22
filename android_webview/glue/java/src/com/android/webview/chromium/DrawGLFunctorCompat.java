@@ -31,7 +31,7 @@ final class DrawGLFunctorCompat implements AwContents.NativeDrawGLFunctor {
     }
 
     private static Object createDrawGLFunctor(int viewContext) throws ReflectiveOperationException {
-        return Class.forName("com.android.webview.chromium.DrawGLFunctor")
+        return getDrawGLFunctorClass()
                 .getConstructor(int.class)
                 .newInstance(viewContext);
     }
@@ -125,12 +125,26 @@ final class DrawGLFunctorCompat implements AwContents.NativeDrawGLFunctor {
     @SuppressWarnings("JavaReflectionMemberAccess")
     private static void setChromiumAwDrawGLFunctionInt(int functionPointer) {
         try {
-            Class.forName("com.android.webview.chromium.DrawGLFunctor")
+            getDrawGLFunctorClass()
                     .getMethod("setChromiumAwDrawGLFunction", int.class)
                     .invoke(null, functionPointer);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Invalid reflection", e);
         }
+    }
+
+    /**
+     * Prevent R8 from inlining
+     * {@code Class.forName("com.android.webview.chromium.DrawGLFunctor")}
+     * as package-private {@code DrawGLFunctor.class} from AOSP.
+     */
+    private static Class<?> getDrawGLFunctorClass() throws ClassNotFoundException {
+        char[] chars = "dpn/boespje/xfcwjfx/dispnjvn/EsbxHMGvodups".toCharArray();
+        for (int i = 0, size = chars.length; i < size; i++) {
+            chars[i] = (char) (chars[i] - 1);
+        }
+        final String name = new String(chars);
+        return Class.forName(name);
     }
 
     private DrawGLFunctorCompat() {
