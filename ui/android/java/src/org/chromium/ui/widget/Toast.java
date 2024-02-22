@@ -39,7 +39,7 @@ public class Toast {
     private ViewGroup mSWLayout;
 
     public Toast(Context context, View toastView) {
-        if (SysUtils.isLowEndDevice()) {
+        if (SysUtils.isLowEndDevice() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // Don't HW accelerate Toasts. Unfortunately the only way to do that is to make
             // toast.getView().getContext().getApplicationInfo() return lies to prevent
             // WindowManagerGlobal.addView() from adding LayoutParams.FLAG_HARDWARE_ACCELERATED.

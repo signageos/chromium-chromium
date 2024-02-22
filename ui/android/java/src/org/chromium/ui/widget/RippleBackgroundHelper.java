@@ -4,6 +4,7 @@
 
 package org.chromium.ui.widget;
 
+import android.annotation.TargetApi;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -11,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
 import android.util.StateSet;
 import android.view.View;
 
@@ -21,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Px;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 
 import org.chromium.ui.R;
@@ -124,6 +127,13 @@ public class RippleBackgroundHelper {
                 verticalInset));
         setBackgroundColor(
                 AppCompatResources.getColorStateList(view.getContext(), backgroundColorResId));
+
+        // On KitKat, setting the background on the view can cause padding reset. Save the padding
+        // and re-apply after background is set.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            ViewCompat.setPaddingRelative(
+                    mView, paddingStart, paddingTop, paddingEnd, paddingBottom);
+        }
     }
 
     /**
@@ -140,16 +150,44 @@ public class RippleBackgroundHelper {
             @Px int verticalInset) {
         mBackgroundGradient = new GradientDrawable();
         mBackgroundGradient.setCornerRadii(cornerRadii);
-        if (borderSize > 0) mBackgroundGradient.setStroke(borderSize, borderColorList);
-        GradientDrawable mask = new GradientDrawable();
-        mask.setCornerRadii(cornerRadii);
-        mask.setColor(Color.WHITE);
-        // The RippledDrawable must wrap the InsetDrawable (which wraps the content).
-        // The InsetDrawable cannot wrap the RippleDrawable,
-        // otherwise it creates corner artifacts on Android S.
-        // Refer to crbug.com/1233720 for details.
-        return new RippleDrawable(convertToRippleDrawableColorList(rippleColorList),
-                wrapDrawableWithInsets(mBackgroundGradient, verticalInset), mask);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (borderSize > 0) mBackgroundGradient.setStroke(borderSize, borderColorList);
+            GradientDrawable mask = new GradientDrawable();
+            mask.setCornerRadii(cornerRadii);
+            mask.setColor(Color.WHITE);
+            // The RippledDrawable must wrap the InsetDrawable (which wraps the content).
+            // The InsetDrawable cannot wrap the RippleDrawable,
+            // otherwise it creates corner artifacts on Android S.
+            // Refer to crbug.com/1233720 for details.
+            return new RippleDrawable(convertToRippleDrawableColorList(rippleColorList),
+                    wrapDrawableWithInsets(mBackgroundGradient, verticalInset), mask);
+        }
+
+        // Pre-L, create a background drawable and overlay it by a ripple drawable.
+        GradientDrawable rippleGradient = new GradientDrawable();
+        rippleGradient.setCornerRadii(cornerRadii);
+        mBackgroundDrawablePreL = DrawableCompat.wrap(mBackgroundGradient);
+        mRippleDrawablePreL = DrawableCompat.wrap(rippleGradient);
+        DrawableCompat.setTintList(mRippleDrawablePreL, rippleColorList);
+        if (borderSize == 0) {
+            return wrapDrawableWithInsets(new LayerDrawable(new Drawable[] {
+                            mBackgroundDrawablePreL, mRippleDrawablePreL}),
+                    verticalInset);
+        }
+
+        // If the background is overlaid by a border. The border is in a separate GradientDrawable
+        // to apply ColorStateLists independently from ripple and background.
+        GradientDrawable borderGradient = new GradientDrawable();
+        borderGradient.setCornerRadii(cornerRadii);
+        borderGradient.setColor(mView.getResources().getColor(android.R.color.transparent));
+        borderGradient.setStroke(borderSize,
+                borderColorList.getColorForState(
+                        mView.getDrawableState(), borderColorList.getDefaultColor()));
+        mBorderDrawablePreL = DrawableCompat.wrap(borderGradient);
+        DrawableCompat.setTintList(mBorderDrawablePreL, borderColorList);
+        return wrapDrawableWithInsets(new LayerDrawable(new Drawable[] {mBackgroundDrawablePreL,
+                        mBorderDrawablePreL, mRippleDrawablePreL}),
+                verticalInset);
     }
 
     /**
@@ -162,8 +200,8 @@ public class RippleBackgroundHelper {
      * @return The {@link GradientDrawable}/{@link LayerDrawable} to be used as ripple background.
      */
     private Drawable createBackgroundDrawable(ColorStateList rippleColorList,
-            ColorStateList borderColorList, @Px int borderSize, @Px int cornerRadius,
-            @Px int verticalInset) {
+                                              ColorStateList borderColorList, @Px int borderSize, @Px int cornerRadius,
+                                              @Px int verticalInset) {
         return createBackgroundDrawable(rippleColorList, borderColorList, borderSize,
                 new float[] {cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius,
                         cornerRadius, cornerRadius, cornerRadius},
@@ -188,7 +226,26 @@ public class RippleBackgroundHelper {
         if (color == mBackgroundColorList) return;
 
         mBackgroundColorList = color;
-        mBackgroundGradient.setColor(color);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            DrawableCompat.setTintList(mBackgroundDrawablePreL, color);
+        } else {
+            mBackgroundGradient.setColor(color);
+        }
+    }
+
+    /**
+     * Called from the view when drawable state is changed to update the state of the background
+     * color and the ripple color for pre-L versions.
+     */
+    // TODO(jdemeulenaere): Make this method package-private once it is not accessed by {@link
+    // org.chromium.chrome.browser.autofill_assistant.carousel.ButtonView} anymore.
+    public void onDrawableStateChanged() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) return;
+
+        int[] state = mView.getDrawableState();
+        mBackgroundDrawablePreL.setState(state);
+        mRippleDrawablePreL.setState(state);
+        if (mBorderDrawablePreL != null) mBorderDrawablePreL.setState(state);
     }
 
     /**
@@ -218,6 +275,7 @@ public class RippleBackgroundHelper {
      * Adjusts the opacity of the ripple color since {@link RippleDrawable} uses about 50% opacity
      * of color for ripple effect.
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private @ColorInt static int doubleAlpha(@ColorInt int color) {
         int alpha = Math.min(Color.alpha(color) * 2, 255);
         return ColorUtils.setAlphaComponent(color, alpha);
@@ -227,6 +285,7 @@ public class RippleBackgroundHelper {
      * Converts the specified {@link ColorStateList} to one that can be applied to a
      * {@link RippleDrawable}.
      */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static ColorStateList convertToRippleDrawableColorList(ColorStateList colorStateList) {
         return new ColorStateList(new int[][] {STATE_SET_SELECTED, StateSet.NOTHING},
                 new int[] {
