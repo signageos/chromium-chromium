@@ -4,6 +4,7 @@
 
 #include "content/browser/android/overscroll_controller_android.h"
 
+#include "base/android/build_info.h"
 #include "base/command_line.h"
 #include "base/metrics/field_trial_params.h"
 #include "cc/layers/layer.h"
@@ -15,6 +16,7 @@
 #include "third_party/blink/public/common/input/web_gesture_event.h"
 #include "third_party/blink/public/common/input/web_input_event.h"
 #include "ui/android/edge_effect.h"
+#include "ui/android/edge_effect_l.h"
 #include "ui/android/resources/resource_manager.h"
 #include "ui/android/window_android.h"
 #include "ui/android/window_android_compositor.h"
@@ -25,6 +27,8 @@
 
 using ui::DidOverscrollParams;
 using ui::EdgeEffect;
+using ui::EdgeEffectBase;
+using ui::EdgeEffectL;
 using ui::OverscrollGlow;
 using ui::OverscrollGlowClient;
 using ui::OverscrollRefresh;
@@ -36,13 +40,40 @@ namespace {
 // be suppressed. This value was experimentally determined to provide a
 // reasonable balance between avoiding accidental refresh activation and
 // minimizing the wait required to refresh after the glow has been triggered.
-const float kMinGlowAlphaToDisableRefresh = 0.085f;
+const float kMinGlowAlphaToDisableRefreshOnL = 0.085f;
 
-std::unique_ptr<EdgeEffect> CreateGlowEdgeEffect(
+// Used for conditional creation of EdgeEffect types for the overscroll glow.
+bool IsAndroidLOrNewer() {
+  static bool android_l_or_newer =
+      base::android::BuildInfo::GetInstance()->sdk_int() >=
+      base::android::SDK_VERSION_LOLLIPOP;
+  return android_l_or_newer;
+}
+
+// Suppressing refresh detection when the glow is still animating prevents
+// visual confusion and accidental activation after repeated scrolls.
+float MinGlowAlphaToDisableRefresh() {
+  // Only the L effect is guaranteed to be both sufficiently brief and prominent
+  // to provide a meaningful "wait" signal. The refresh effect on previous
+  // Android releases can be quite faint, depending on the OEM-supplied
+  // overscroll resources, and lasts nearly twice as long.
+  if (IsAndroidLOrNewer())
+    return kMinGlowAlphaToDisableRefreshOnL;
+
+  // Any value greater than 1 effectively prevents the glow effect from ever
+  // suppressing the refresh effect.
+  return 1.01f;
+}
+
+std::unique_ptr<EdgeEffectBase> CreateGlowEdgeEffect(
     ui::ResourceManager* resource_manager,
     float dpi_scale) {
   DCHECK(resource_manager);
-  return std::make_unique<EdgeEffect>(resource_manager);
+  if (IsAndroidLOrNewer())
+    return std::unique_ptr<EdgeEffectBase>(new EdgeEffectL(resource_manager));
+
+  return std::unique_ptr<EdgeEffectBase>(
+      new EdgeEffect(resource_manager, dpi_scale));
 }
 
 std::unique_ptr<OverscrollGlow> CreateGlowEffect(OverscrollGlowClient* client) {
@@ -125,7 +156,7 @@ bool OverscrollControllerAndroid::WillHandleGestureEvent(
 
   // Suppress refresh detection if the glow effect is still prominent.
   if (glow_effect_ && glow_effect_->IsActive()) {
-    if (glow_effect_->GetVisibleAlpha() > kMinGlowAlphaToDisableRefresh)
+    if (glow_effect_->GetVisibleAlpha() > MinGlowAlphaToDisableRefresh())
       return false;
   }
 
@@ -307,7 +338,8 @@ void OverscrollControllerAndroid::Disable() {
   }
 }
 
-std::unique_ptr<EdgeEffect> OverscrollControllerAndroid::CreateEdgeEffect() {
+std::unique_ptr<EdgeEffectBase>
+OverscrollControllerAndroid::CreateEdgeEffect() {
   return CreateGlowEdgeEffect(&compositor_->GetResourceManager(), dpi_scale_);
 }
 

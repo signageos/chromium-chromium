@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.text.TextUtils;
+import android.os.Build;
 
 import org.chromium.base.BuildInfo;
 import org.chromium.base.ContextUtils;
@@ -41,7 +42,8 @@ public abstract class PackagePaths {
 
             List<String> zipPaths = new ArrayList<>(10);
             zipPaths.add(pi.applicationInfo.sourceDir);
-            if (pi.applicationInfo.splitSourceDirs != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && pi.applicationInfo.splitSourceDirs != null) {
                 Collections.addAll(zipPaths, pi.applicationInfo.splitSourceDirs);
             }
 

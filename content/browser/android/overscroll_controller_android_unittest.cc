@@ -19,14 +19,14 @@
 #include "ui/events/base_event_utils.h"
 #include "ui/events/blink/did_overscroll_params.h"
 
-using ::testing::_;
-using ::testing::Return;
-using ui::EdgeEffect;
+using ui::EdgeEffectBase;
+using ui::ResourceManager;
 using ui::OverscrollGlow;
 using ui::OverscrollGlowClient;
 using ui::OverscrollRefresh;
-using ui::ResourceManager;
 using ui::WindowAndroidCompositor;
+using ::testing::_;
+using ::testing::Return;
 
 namespace content {
 
@@ -52,7 +52,7 @@ class MockCompositor : public WindowAndroidCompositor {
 
 class MockGlowClient : public OverscrollGlowClient {
  public:
-  MOCK_METHOD0(CreateEdgeEffect, std::unique_ptr<EdgeEffect>());
+  MOCK_METHOD0(CreateEdgeEffect, std::unique_ptr<EdgeEffectBase>());
 };
 
 class MockGlow : public OverscrollGlow {
