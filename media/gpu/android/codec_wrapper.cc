@@ -37,6 +37,7 @@ class CodecWrapperImpl : public base::RefCountedThreadSafe<CodecWrapperImpl> {
   bool IsFlushed() const;
   bool IsDraining() const;
   bool IsDrained() const;
+  bool SupportsFlush(DeviceInfo* device_info) const;
   bool Flush();
   bool SetSurface(scoped_refptr<CodecSurfaceBundle> surface_bundle);
   scoped_refptr<CodecSurfaceBundle> SurfaceBundle();
@@ -185,6 +186,12 @@ void CodecWrapperImpl::DiscardOutputBuffers_Locked() {
   for (auto& kv : buffer_ids_)
     codec_->ReleaseOutputBuffer(kv.second, false);
   buffer_ids_.clear();
+}
+
+bool CodecWrapperImpl::SupportsFlush(DeviceInfo* device_info) const {
+  DVLOG(2) << __func__;
+  base::AutoLock l(lock_);
+  return !device_info->CodecNeedsFlushWorkaround(codec_.get());
 }
 
 bool CodecWrapperImpl::Flush() {
@@ -452,6 +459,10 @@ bool CodecWrapper::HasUnreleasedOutputBuffers() const {
 
 void CodecWrapper::DiscardOutputBuffers() {
   impl_->DiscardOutputBuffers();
+}
+
+bool CodecWrapper::SupportsFlush(DeviceInfo* device_info) const {
+  return impl_->SupportsFlush(device_info);
 }
 
 bool CodecWrapper::IsFlushed() const {
