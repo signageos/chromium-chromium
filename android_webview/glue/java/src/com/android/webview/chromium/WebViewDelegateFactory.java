@@ -398,7 +398,8 @@ class WebViewDelegateFactory {
      * reflection to call into hidden frameworks APIs released in the API-19 version of the
      * framework.
      */
-    private static class Api19CompatibilityDelegate implements WebViewDelegate {
+    private static class Api19CompatibilityDelegate implements WebViewDelegate,
+            LoadedPackageInfoOwner {
         /** Hidden APIs released in the API 19 version of the framework */
         private final Method mGetViewRootImplMethod;
         private final Method mAttachFunctorMethod;
@@ -525,6 +526,11 @@ class WebViewDelegateFactory {
         @Override
         public long[] getTimestamps() {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public PackageInfo getLoadedPackageInfo() {
+            return mLoadedPackageInfo;
         }
     }
 }

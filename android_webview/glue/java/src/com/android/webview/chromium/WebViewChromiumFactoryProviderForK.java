@@ -7,7 +7,8 @@ package com.android.webview.chromium;
 import android.content.pm.PackageInfo;
 import android.webkit.WebViewFactory;
 
-class WebViewChromiumFactoryProviderForK extends WebViewChromiumFactoryProviderBase {
+class WebViewChromiumFactoryProviderForK extends WebViewChromiumFactoryProviderBase
+        implements LoadedPackageInfoOwner {
     /**
      * Entry point for the API 19 version of {@link WebViewFactory}.
      */
@@ -17,5 +18,10 @@ class WebViewChromiumFactoryProviderForK extends WebViewChromiumFactoryProviderB
 
     protected WebViewChromiumFactoryProviderForK(PackageInfo loadedPackageInfo) {
         super(WebViewDelegateFactory.createApi19CompatibilityDelegate(loadedPackageInfo));
+    }
+
+    @Override
+    public PackageInfo getLoadedPackageInfo() {
+        return ((LoadedPackageInfoOwner) getWebViewDelegate()).getLoadedPackageInfo();
     }
 }
