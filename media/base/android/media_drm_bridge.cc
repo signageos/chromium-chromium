@@ -265,6 +265,22 @@ std::string GetSecurityLevelString(
   return "";
 }
 
+bool AreMediaDrmApisAvailable() {
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <
+      base::android::SDK_VERSION_KITKAT)
+    return false;
+
+  int32_t os_major_version = 0;
+  int32_t os_minor_version = 0;
+  int32_t os_bugfix_version = 0;
+  base::SysInfo::OperatingSystemVersionNumbers(
+      &os_major_version, &os_minor_version, &os_bugfix_version);
+  if (os_major_version == 4 && os_minor_version == 4 && os_bugfix_version == 0)
+    return false;
+
+  return true;
+}
+
 int GetFirstApiLevel() {
   JNIEnv* env = AttachCurrentThread();
   int first_api_level = Java_MediaDrmBridge_getFirstApiLevel(env);
@@ -277,7 +293,7 @@ int GetFirstApiLevel() {
 // APIs and MediaCodec APIs must be enabled and not blocked.
 // static
 bool MediaDrmBridge::IsAvailable() {
-  return MediaCodecUtil::IsMediaCodecAvailable();
+  return AreMediaDrmApisAvailable() && MediaCodecUtil::IsMediaCodecAvailable();
 }
 
 // static
@@ -359,6 +375,7 @@ scoped_refptr<MediaDrmBridge> MediaDrmBridge::CreateInternal(
     const SessionKeysChangeCB& session_keys_change_cb,
     const SessionExpirationUpdateCB& session_expiration_update_cb) {
   // All paths requires the MediaDrmApis.
+  DCHECK(AreMediaDrmApisAvailable());
   DCHECK(!scheme_uuid.empty());
 
   // TODO(crbug.com/917527): Check that |origin_id| is specified on devices
@@ -382,6 +399,10 @@ scoped_refptr<MediaDrmBridge> MediaDrmBridge::CreateWithoutSessionSupport(
     SecurityLevel security_level,
     CreateFetcherCB create_fetcher_cb) {
   DVLOG(1) << __func__;
+
+  // Sessions won't be used so decoding capability is not required.
+  if (!AreMediaDrmApisAvailable())
+    return nullptr;
 
   UUID scheme_uuid = GetKeySystemManager()->GetUUID(key_system);
   if (scheme_uuid.empty())
