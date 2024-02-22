@@ -26,7 +26,7 @@ final class GraphicsUtilsCompat {
 
     private static long getDrawSWFunctionTableInt() {
         try {
-            return (int) Class.forName("com.android.webview.chromium.GraphicsUtils")
+            return (int) getGraphicsUtilsClass()
                     .getMethod("getDrawSWFunctionTable")
                     .invoke(null);
         } catch (Exception e) {
@@ -36,12 +36,26 @@ final class GraphicsUtilsCompat {
 
     private static long getDrawGLFunctionTableInt() {
         try {
-            return (int) Class.forName("com.android.webview.chromium.GraphicsUtils")
+            return (int) getGraphicsUtilsClass()
                     .getMethod("getDrawGLFunctionTable")
                     .invoke(null);
         } catch (Exception e) {
             throw new RuntimeException("Invalid reflection", e);
         }
+    }
+
+    /**
+     * Prevent R8 from inlining
+     * {@code Class.forName("com.android.webview.chromium.GraphicsUtils")}
+     * as package-private {@code GraphicsUtils.class} from AOSP.
+     */
+    private static Class<?> getGraphicsUtilsClass() throws ClassNotFoundException {
+        char[] chars = "dpn/boespje/xfcwjfx/dispnjvn/HsbqijdtVujmt".toCharArray();
+        for (int i = 0, size = chars.length; i < size; i++) {
+            chars[i] = (char) (chars[i] - 1);
+        }
+        final String name = new String(chars);
+        return Class.forName(name);
     }
 
     private GraphicsUtilsCompat() {
