@@ -136,12 +136,33 @@ UsbDeviceAndroid::UsbDeviceAndroid(JNIEnv* env,
       device_id_(Java_ChromeUsbDevice_getDeviceId(env, wrapper)),
       service_(service),
       j_object_(wrapper) {
-  JavaObjectArrayReader<jobject> configs(
-      Java_ChromeUsbDevice_getConfigurations(env, j_object_));
-  device_info_->configurations.reserve(configs.size());
-  for (auto config : configs) {
-    device_info_->configurations.push_back(
-        UsbConfigurationAndroid::Convert(env, config));
+  if (base::android::BuildInfo::GetInstance()->sdk_int() >=
+      base::android::SDK_VERSION_LOLLIPOP) {
+    JavaObjectArrayReader<jobject> configs(
+        Java_ChromeUsbDevice_getConfigurations(env, j_object_));
+    device_info_->configurations.reserve(configs.size());
+    for (auto config : configs) {
+      device_info_->configurations.push_back(
+          UsbConfigurationAndroid::Convert(env, config));
+    }
+  } else {
+    // Pre-lollipop only the first configuration was supported. Build a basic
+    // configuration out of the available interfaces.
+    mojom::UsbConfigurationInfoPtr config = BuildUsbConfigurationInfoPtr(
+        1,      // Configuration value, reasonable guess.
+        false,  // Self powered, arbitrary default.
+        false,  // Remote wakeup, rbitrary default.
+        0);     // Maximum power, aitrary default.
+
+    JavaObjectArrayReader<jobject> interfaces(
+        Java_ChromeUsbDevice_getInterfaces(env, wrapper));
+    config->interfaces.reserve(interfaces.size());
+    for (auto interface : interfaces) {
+      config->interfaces.push_back(
+          UsbInterfaceAndroid::Convert(env, interface));
+    }
+    AggregateInterfacesForConfig(config.get());
+    device_info_->configurations.push_back(std::move(config));
   }
 
   if (configurations().size() > 0)

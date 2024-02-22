@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 
 import androidx.annotation.GuardedBy;
 
@@ -153,9 +154,12 @@ public class PlatformSensor implements SensorEventListener {
      */
     @CalledByNative
     protected int getReportingMode() {
-        return mSensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS
-                ? ReportingMode.CONTINUOUS
-                : ReportingMode.ON_CHANGE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return mSensor.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS
+                    ? ReportingMode.CONTINUOUS
+                    : ReportingMode.ON_CHANGE;
+        }
+        return ReportingMode.CONTINUOUS;
     }
 
     /**
