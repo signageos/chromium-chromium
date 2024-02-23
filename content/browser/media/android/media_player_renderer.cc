@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "base/android/build_info.h"
 #include "base/bind.h"
 #include "base/callback_helpers.h"
 #include "content/browser/android/scoped_surface_request_manager.h"
@@ -114,12 +115,17 @@ void MediaPlayerRenderer::CreateMediaPlayer(
 
   const std::string user_agent = GetContentClient()->browser()->GetUserAgent();
 
+  // Never allow credentials on KitKat. See https://crbug.com/936566.
+  bool allow_credentials = url_params.allow_credentials &&
+                           base::android::BuildInfo::GetInstance()->sdk_int() >
+                               base::android::SDK_VERSION_KITKAT;
+
   media_player_ = std::make_unique<media::MediaPlayerBridge>(
       url_params.media_url, url_params.site_for_cookies,
       url_params.top_frame_origin, user_agent,
       false,  // hide_url_log
       this,   // MediaPlayerBridge::Client
-      url_params.allow_credentials, url_params.is_hls);
+      allow_credentials, url_params.is_hls);
 
   media_player_->Initialize();
   UpdateVolume();
