@@ -4,8 +4,10 @@
 
 package org.chromium.content.browser.input;
 
+import android.annotation.TargetApi;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.CursorAnchorInfo;
@@ -18,6 +20,7 @@ import org.junit.runner.RunWith;
 
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.Feature;
+import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.content_public.browser.test.ContentJUnit4ClassRunner;
 import org.chromium.content_public.browser.test.util.TestInputMethodManagerWrapper;
 
@@ -25,6 +28,8 @@ import org.chromium.content_public.browser.test.util.TestInputMethodManagerWrapp
  * Test for {@link CursorAnchorInfoController}.
  */
 @RunWith(ContentJUnit4ClassRunner.class)
+@MinAndroidSdkLevel(Build.VERSION_CODES.LOLLIPOP)
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 @Batch(Batch.UNIT_TESTS)
 public class CursorAnchorInfoControllerTest {
     private static final class TestViewDelegate implements CursorAnchorInfoController.ViewDelegate {

@@ -24,7 +24,7 @@ import java.util.Arrays;
  */
 @JNINamespace("content")
 @TargetApi(Build.VERSION_CODES.O)
-public class OWebContentsAccessibility extends WebContentsAccessibilityImpl {
+public class OWebContentsAccessibility extends LollipopWebContentsAccessibility {
     OWebContentsAccessibility(AccessibilityDelegate delegate) {
         super(delegate);
     }

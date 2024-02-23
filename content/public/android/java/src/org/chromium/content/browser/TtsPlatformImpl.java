@@ -4,6 +4,7 @@
 
 package org.chromium.content.browser;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -75,18 +76,34 @@ class TtsPlatformImpl {
         }
     }
 
-    private static class TtsEngine {
-        private TextToSpeech mTextToSpeech;
+    static class TtsEngine {
+        protected TextToSpeech mTextToSpeech;
         private @Nullable List<TtsVoice> mVoices;
         private boolean mInitialized;
         private @Nullable String mCurrentLanguage;
         private @Nullable PendingUtterance mPendingUtterance;
         private long mNativeTtsPlatformImplAndroid;
 
+        static TtsEngine create(long nativeTtsPlatformImplAndroid) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return new LollipopTtsEngine(nativeTtsPlatformImplAndroid);
+            } else {
+                return new TtsEngine(nativeTtsPlatformImplAndroid);
+            }
+        }
+
+        static TtsEngine create(String engineId) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                return new LollipopTtsEngine(engineId);
+            } else {
+                return new TtsEngine(engineId);
+            }
+        }
+
         /**
          * Constructor with the default TTS Engine
          */
-        private TtsEngine(long nativeTtsPlatformImplAndroid) {
+        protected TtsEngine(long nativeTtsPlatformImplAndroid) {
             mNativeTtsPlatformImplAndroid = nativeTtsPlatformImplAndroid;
             mInitialized = false;
             mTextToSpeech = new TextToSpeech(ContextUtils.getApplicationContext(), status -> {
@@ -100,7 +117,7 @@ class TtsPlatformImpl {
          * Constructor for a specific TTS Engine with package name
          * @param engineId Package name for the TTS Engine to be used.
          */
-        private TtsEngine(String engineId) {
+        protected TtsEngine(String engineId) {
             mInitialized = false;
             mTextToSpeech = new TextToSpeech(ContextUtils.getApplicationContext(), status -> {
                 if (status == TextToSpeech.SUCCESS) {
@@ -198,13 +215,22 @@ class TtsPlatformImpl {
 
             mTextToSpeech.setSpeechRate(rate);
             mTextToSpeech.setPitch(pitch);
-            Bundle params = new Bundle();
-            if (volume != 1.0) {
-                params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume);
-            }
-            int result = mTextToSpeech.speak(
-                    text, TextToSpeech.QUEUE_FLUSH, params, Integer.toString(utteranceId));
+
+            int result = callSpeak(text, volume, utteranceId);
             return (result == TextToSpeech.SUCCESS);
+        }
+
+        /**
+         * This is overridden by LollipopTtsEngine because the API changed.
+         */
+        @SuppressWarnings("deprecation")
+        protected int callSpeak(String text, float volume, int utteranceId) {
+            HashMap<String, String> params = new HashMap<String, String>();
+            if (volume != 1.0) {
+                params.put(TextToSpeech.Engine.KEY_PARAM_VOLUME, Double.toString(volume));
+            }
+            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, Integer.toString(utteranceId));
+            return mTextToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, params);
         }
 
         private void stop() {
@@ -413,7 +439,9 @@ class TtsPlatformImpl {
 
             @Override
             @Deprecated
-            public void onError(final String utteranceId) {}
+            public void onError(final String utteranceId) {
+                sendErrorEventOnUiThread(utteranceId);
+            }
 
             @Override
             public void onStart(final String utteranceId) {
