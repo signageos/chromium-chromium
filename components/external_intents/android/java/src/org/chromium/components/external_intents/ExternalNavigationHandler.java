@@ -1640,6 +1640,8 @@ public class ExternalNavigationHandler {
      * capable activities. If the intent is pdf type, return the platform pdf viewer if
      * it is available so user don't need to choose it from Intent picker.
      *
+     * Note this function is slow on Android versions less than Lollipop.
+     *
      * @param intent Intent to open.
      * @param allowSelfOpen Whether chrome itself is allowed to open the intent.
      * @return true if the intent can be resolved, or false otherwise.
