@@ -218,9 +218,6 @@ bool AwMainDelegate::BasicStartupComplete(int* exit_code) {
     // WebView does not and should not support WebAuthN.
     features.DisableIfNotSet(::features::kWebAuth);
 
-    // Enable VizForWebView by default.
-    features.EnableIfNotSet(::features::kVizForWebViewDefault);
-
     // WebView doesn't support surface embedding without viz.The media code
     // checks for both media::kDisableSurfaceLayerForVideo and VizForWebView to
     // decide if it can embed, so we always enable kDisableSurfaceLayerForVideo
