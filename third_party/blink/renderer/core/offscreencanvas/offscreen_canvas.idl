@@ -6,7 +6,8 @@
 
 [
     Exposed=(Window,Worker),
-    Transferable    
+    Transferable,
+    RuntimeEnabled=SurfaceEmbeddingFeatures
 ] interface OffscreenCanvas : EventTarget {
     [CallWith=ExecutionContext, MeasureAs=OffscreenCanvas] constructor([EnforceRange] unsigned long width, [EnforceRange] unsigned long height);
     attribute [EnforceRange] unsigned long width;
