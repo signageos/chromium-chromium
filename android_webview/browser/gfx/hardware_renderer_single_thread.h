@@ -35,7 +35,7 @@ class HardwareRendererSingleThread
                    const OverlaysParams& overlays_params) override;
   void RemoveOverlays(
       OverlaysParams::MergeTransactionFn merge_transaction) override;
-  void AbandonContext() override;
+  void AbandonContext() override {}
 
   // viz::mojom::CompositorFrameSinkClient implementation.
   void DidReceiveCompositorFrameAck(
