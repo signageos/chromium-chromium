@@ -116,8 +116,10 @@ BrowserViewRenderer::BrowserViewRenderer(
       clear_view_(false),
       offscreen_pre_raster_(false) {
   begin_frame_source_ = std::make_unique<BeginFrameSourceWebView>();
-  root_frame_sink_proxy_ = std::make_unique<RootFrameSinkProxy>(
-      ui_task_runner_, this, begin_frame_source_.get());
+  if (::features::IsUsingVizForWebView()) {
+    root_frame_sink_proxy_ = std::make_unique<RootFrameSinkProxy>(
+        ui_task_runner_, this, begin_frame_source_.get());
+  }
   UpdateBeginFrameSource();
 }
 

@@ -73,7 +73,8 @@ SurfacesInstance::SurfacesInstance()
   begin_frame_source_ = std::make_unique<viz::StubBeginFrameSource>();
   auto scheduler = std::make_unique<viz::DisplayScheduler>(
       begin_frame_source_.get(), nullptr /* current_task_runner */,
-      output_surface->capabilities().max_frames_pending);
+      output_surface->capabilities().max_frames_pending,
+      output_surface->capabilities().max_frames_pending_120hz);
   auto overlay_processor = std::make_unique<viz::OverlayProcessorStub>();
   // Android WebView has no overlay processor, and does not need to share
   // gpu_task_scheduler, so it is passed in as nullptr.
