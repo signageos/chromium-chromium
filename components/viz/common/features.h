@@ -43,6 +43,7 @@ VIZ_COMMON_EXPORT extern const base::Feature kUseX11Present;
 VIZ_COMMON_EXPORT extern const base::Feature kWebViewVulkanIntermediateBuffer;
 VIZ_COMMON_EXPORT extern const base::Feature kUsePlatformDelegatedInk;
 #if defined(OS_ANDROID)
+VIZ_COMMON_EXPORT extern const base::Feature kDisableSurfaceLayerForVideo;
 VIZ_COMMON_EXPORT extern const base::Feature kUseSurfaceLayerForVideoDefault;
 #endif
 VIZ_COMMON_EXPORT extern const base::Feature kSurfaceSyncThrottling;
