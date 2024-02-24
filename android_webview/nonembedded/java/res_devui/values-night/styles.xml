@@ -6,5 +6,5 @@
 -->
 
 <resources>
-    <style name="Theme.DevUi.DayNight" parent="@android:style/Theme.Material" />
+    <style name="Theme.DevUi.DayNight" parent="@android:style/Theme.DeviceDefault" />
 </resources>
