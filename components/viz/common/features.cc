@@ -296,11 +296,6 @@ bool ShouldUsePlatformDelegatedInk() {
 
 #if defined(OS_ANDROID)
 bool UseSurfaceLayerForVideo() {
-  if (base::FeatureList::IsEnabled(kDisableSurfaceLayerForVideo) &&
-      !IsUsingVizForWebView()) {
-    return false;
-  }
-
   // Allow enabling UseSurfaceLayerForVideo if webview is using surface control.
   if (::features::IsAndroidSurfaceControlEnabled()) {
     return true;
