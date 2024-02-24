@@ -218,8 +218,8 @@ bool AwMainDelegate::BasicStartupComplete(int* exit_code) {
     // WebView does not and should not support WebAuthN.
     features.DisableIfNotSet(::features::kWebAuth);
 
-    // WebView requires SkiaRenderer.
-    features.EnableIfNotSet(::features::kUseSkiaRenderer);
+    // Enable VizForWebView by default.
+    features.EnableIfNotSet(::features::kVizForWebViewDefault);
 
     // WebView does not support overlay fullscreen yet for video overlays.
     features.DisableIfNotSet(media::kOverlayFullscreenVideo);
