@@ -9348,6 +9348,22 @@
             ]
         }
     ],
+    "VizForWebView": [
+        {
+            "platforms": [
+                "android_webview"
+            ],
+            "experiments": [
+                {
+                    "name": "Enabled",
+                    "enable_features": [
+                        "EnableSharedImageForWebview",
+                        "VizForWebView"
+                    ]
+                }
+            ]
+        }
+    ],
     "VizGLFastSolidColorDraw": [
         {
             "platforms": [

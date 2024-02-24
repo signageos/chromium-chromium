@@ -91,15 +91,16 @@ public final class ProductionSupportedFlagList {
                             + "one site, using out-of-process iframes when needed. Highly "
                             + "experimental."),
             Flag.baseFeature(GpuFeatures.WEBVIEW_VULKAN,
-                    "Use Vulkan for composite. Requires Android device and OS support. May crash "
-                            + "if enabled on unsupported device."),
+                    "Use Vulkan for composite. Requires VizForWebView and Android device and "
+                            + "OS support. May crash if enabled on unsupported device."),
             Flag.baseFeature(GpuFeatures.WEBVIEW_SURFACE_CONTROL,
-                    "Use SurfaceControl. Requires WebViewZeroCopyVideo and Android device and OS "
-                            + "support."),
+                    "Use SurfaceControl. Requires VizForWebView, WebViewZeroCopyVideo and Android "
+                            + "device and OS support."),
             Flag.baseFeature(GpuFeatures.WEBVIEW_ZERO_COPY_VIDEO,
                     "Avoid extra copy for video frames when possible"),
             Flag.baseFeature(GpuFeatures.WEBVIEW_THREAD_SAFE_MEDIA,
                     "Use thread-safe media path, requires Android P."),
+            Flag.baseFeature(VizFeatures.VIZ_FOR_WEBVIEW, "Enables Viz for WebView."),
             Flag.baseFeature(
                     VizFeatures.WEBVIEW_VULKAN_INTERMEDIATE_BUFFER, "For debugging vulkan"),
             Flag.baseFeature(
