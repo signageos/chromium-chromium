@@ -231,6 +231,7 @@ RenderWidgetHostViewAndroid::RenderWidgetHostViewAndroid(
           this),
       stylus_text_selector_(this),
       using_browser_compositor_(CompositorImpl::IsInitialized()),
+      using_viz_for_webview_(features::IsUsingVizForWebView()),
       synchronous_compositor_client_(nullptr),
       observing_root_window_(false),
       prev_top_shown_pix_(0.f),
@@ -255,22 +256,24 @@ RenderWidgetHostViewAndroid::RenderWidgetHostViewAndroid(
   if (is_showing_)
     local_surface_id_allocator_.GenerateId();
 
-  delegated_frame_host_client_ =
-      std::make_unique<DelegatedFrameHostClientAndroid>(this);
-  delegated_frame_host_ = std::make_unique<ui::DelegatedFrameHostAndroid>(
-      &view_, GetHostFrameSinkManager(), delegated_frame_host_client_.get(),
-      host()->GetFrameSinkId());
-  if (is_showing_) {
-    delegated_frame_host_->WasShown(
-        local_surface_id_allocator_.GetCurrentLocalSurfaceId(),
-        GetCompositorViewportPixelSize(), host()->delegate()->IsFullscreen());
-  }
+  if (using_browser_compositor_ || using_viz_for_webview_) {
+    delegated_frame_host_client_ =
+        std::make_unique<DelegatedFrameHostClientAndroid>(this);
+    delegated_frame_host_ = std::make_unique<ui::DelegatedFrameHostAndroid>(
+        &view_, GetHostFrameSinkManager(), delegated_frame_host_client_.get(),
+        host()->GetFrameSinkId());
+    if (is_showing_) {
+      delegated_frame_host_->WasShown(
+          local_surface_id_allocator_.GetCurrentLocalSurfaceId(),
+          GetCompositorViewportPixelSize(), host()->delegate()->IsFullscreen());
+    }
 
-  // Let the page-level input event router know about our frame sink ID
-  // for surface-based hit testing.
-  if (ShouldRouteEvents()) {
-    host()->delegate()->GetInputEventRouter()->AddFrameSinkIdOwner(
-        GetFrameSinkId(), this);
+    // Let the page-level input event router know about our frame sink ID
+    // for surface-based hit testing.
+    if (ShouldRouteEvents()) {
+      host()->delegate()->GetInputEventRouter()->AddFrameSinkIdOwner(
+          GetFrameSinkId(), this);
+    }
   }
 
   host()->SetView(this);
@@ -1266,6 +1269,10 @@ RenderWidgetHostViewAndroid::CreateSyntheticGestureTarget() {
 
 bool RenderWidgetHostViewAndroid::ShouldRouteEvents() const {
   DCHECK(host());
+
+  if (!using_browser_compositor_ && !using_viz_for_webview_)
+    return false;
+
   return host()->delegate() && host()->delegate()->GetInputEventRouter();
 }
 
@@ -1297,7 +1304,13 @@ void RenderWidgetHostViewAndroid::FrameTokenChangedForSynchronousCompositor(
   sync_compositor_last_frame_token_ = frame_token;
 
   if (host() && frame_token) {
-    DCHECK(!using_browser_compositor_);
+    if (!using_viz_for_webview_) {
+      // For viz it's reported through FrameSinkManager.
+      // For non-viz we are not interested in a non-surface activation parallel,
+      // use the current time for |activation_time|.
+      host()->DidProcessFrame(frame_token, base::TimeTicks::Now());
+    }
+
     // DevTools ScreenCast support for Android WebView. Don't call this if
     // we're currently in SynchronousCopyContents, as this can lead to
     // redundant copies.
