@@ -34,6 +34,7 @@ public class AwResource {
     @CalledByNative
     private static String[] getConfigKeySystemUuidMapping() {
         // No need to cache, since this should be called only once.
+        if (sStringArrayConfigKeySystemUUIDMapping == 0) return new String[]{};
         return sResources.getStringArray(sStringArrayConfigKeySystemUUIDMapping);
     }
 }

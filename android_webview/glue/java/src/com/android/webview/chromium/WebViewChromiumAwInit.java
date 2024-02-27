@@ -301,7 +301,9 @@ public class WebViewChromiumAwInit {
             R.onResourcesLoaded(packageId);
 
             AwResource.setResources(context.getResources());
-            AwResource.setConfigKeySystemUuidMapping(android.R.array.config_keySystemUuidMapping);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                AwResource.setConfigKeySystemUuidMapping(android.R.array.config_keySystemUuidMapping);
+            }
         }
     }
 
