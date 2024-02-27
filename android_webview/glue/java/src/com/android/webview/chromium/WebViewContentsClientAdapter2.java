@@ -4,6 +4,7 @@
 
 package com.android.webview.chromium;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -104,6 +105,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
      *
      * @param webView the {@link WebView} instance that this adapter is serving.
      */
+    @SuppressWarnings("HandlerLeak")
     WebViewContentsClientAdapter2(WebView webView, Context context,
             WebViewDelegate webViewDelegate) {
         super(webView, webViewDelegate, context);
@@ -720,6 +722,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
         }
     }
 
+    @SuppressWarnings("HandlerLeak")
     @Override
     public void onReceivedSslError(final Callback<Boolean> callback, SslError error) {
         try {
@@ -742,6 +745,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
     }
 
     @RequiresApi(21)
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private static class ClientCertRequestImpl extends ClientCertRequest {
         private final AwContentsClientBridge.ClientCertificateRequestCallback mCallback;
         private final String[] mKeyTypes;
@@ -1056,6 +1060,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
      * Type adaptation class for PermissionRequest.
      */
     @RequiresApi(21)
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static class PermissionRequestAdapter extends PermissionRequest {
 
         private static long toAwPermissionResources(String[] resources) {
@@ -1128,6 +1133,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
     }
 
     @RequiresApi(21)
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static WebChromeClient.FileChooserParams fromAwFileChooserParams(
             final AwContentsClient.FileChooserParamsImpl value) {
         if (value == null) {
