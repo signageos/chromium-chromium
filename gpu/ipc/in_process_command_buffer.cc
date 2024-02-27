@@ -316,7 +316,10 @@ gpu::ContextResult InProcessCommandBuffer::Initialize(
   gpu::ContextResult result = gpu::ContextResult::kSuccess;
   task_sequence_->ScheduleTask(
       WrapTaskWithResult(std::move(init_task), &result, &completion), {});
-  completion.Wait();
+  {
+    base::ScopedAllowBaseSyncPrimitivesOutsideBlockingScope allow_wait;
+    completion.Wait();
+  }
 
   if (result == gpu::ContextResult::kSuccess) {
     capabilities_ = capabilities;
@@ -989,7 +992,10 @@ void InProcessCommandBuffer::SetGetBuffer(int32_t shm_id) {
   ScheduleGpuTask(base::BindOnce(
       &InProcessCommandBuffer::SetGetBufferOnGpuThread,
       gpu_thread_weak_ptr_factory_.GetWeakPtr(), shm_id, &completion));
-  completion.Wait();
+  {
+    base::ScopedAllowBaseSyncPrimitivesOutsideBlockingScope allow_wait;
+    completion.Wait();
+  }
 
   last_put_offset_ = 0;
 }

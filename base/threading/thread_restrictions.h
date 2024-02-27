@@ -178,6 +178,9 @@ class InFlightIO;
 namespace functions {
 class ExecScriptScopedAllowBaseSyncPrimitives;
 }
+namespace gpu {
+class InProcessCommandBuffer;
+}
 namespace history_report {
 class HistoryReportJniBridge;
 }
@@ -514,6 +517,7 @@ class BASE_EXPORT ScopedAllowBaseSyncPrimitivesOutsideBlockingScope {
   friend class content::SynchronousCompositorHost;
   friend class content::SynchronousCompositorSyncCallBridge;
   friend class content::WaitForProcessesToDumpProfilingInfo;
+  friend class gpu::InProcessCommandBuffer;
   friend class media::AudioInputDevice;
   friend class media::AudioOutputDevice;
   friend class media::PaintCanvasVideoRenderer;
