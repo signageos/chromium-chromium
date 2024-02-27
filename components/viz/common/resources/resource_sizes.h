@@ -56,6 +56,10 @@ class VIZ_RESOURCE_FORMAT_EXPORT ResourceSizes {
   // sizes that have already been checked.
   template <typename T>
   static T UncheckedSizeInBytes(const gfx::Size& size, ResourceFormat format);
+  // Returns the size in bytes but may overflow or return 0. Only do this for
+  // sizes that have already been checked. Allows empty size in debug builds.
+  template <typename T>
+  static T UncheckedSizeInBytesAllowEmpty(const gfx::Size& size, ResourceFormat format);
   // Returns the width in bytes aligned but may overflow or return 0. Only do
   // this for computing widths for sizes that have already been checked.
   template <typename T>
@@ -176,6 +180,13 @@ T ResourceSizes::UncheckedSizeInBytes(const gfx::Size& size,
                                       ResourceFormat format) {
   VerifyType<T>();
   DCHECK(!size.IsEmpty());
+  DCHECK(VerifySizeInBytesInternal<T>(size, format, false));
+  return SizeInBytesInternal<T>(size, format, false);
+}
+
+template <typename T>
+T ResourceSizes::UncheckedSizeInBytesAllowEmpty(const gfx::Size& size, ResourceFormat format) {
+  VerifyType<T>();
   DCHECK(VerifySizeInBytesInternal<T>(size, format, false));
   return SizeInBytesInternal<T>(size, format, false);
 }
