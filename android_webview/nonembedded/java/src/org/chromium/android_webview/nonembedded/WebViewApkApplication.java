@@ -12,12 +12,14 @@ import android.content.pm.PackageManager;
 import org.chromium.android_webview.AwLocaleConfig;
 import org.chromium.android_webview.common.CommandLineUtil;
 import org.chromium.android_webview.devui.util.WebViewPackageHelper;
+import org.chromium.base.BuildConfig;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.PathUtils;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
 import org.chromium.base.library_loader.LibraryLoader;
 import org.chromium.base.library_loader.LibraryProcessType;
+import org.chromium.base.multidex.ChromiumMultiDexInstaller;
 import org.chromium.base.task.PostTask;
 import org.chromium.base.task.TaskTraits;
 import org.chromium.components.embedder_support.application.FontPreloadingWorkaround;
@@ -62,6 +64,11 @@ public class WebViewApkApplication extends Application {
      */
     public static void maybeInitProcessGlobals() {
         if (isWebViewProcess()) {
+            Context ctx = ContextUtils.getApplicationContext();
+            if (BuildConfig.IS_MULTIDEX_ENABLED) {
+                ChromiumMultiDexInstaller.install(ctx);
+            }
+
             PathUtils.setPrivateDataDirectorySuffix("webview", "WebView");
             CommandLineUtil.initCommandLine();
 
@@ -71,7 +78,6 @@ public class WebViewApkApplication extends Application {
             // explicitly reset the component state to safely handle these clients. Only do this if
             // we're in a WebView process, because only WebView's Context can change this state.
             // TODO(ntfschr): remove this in M83, when all clients are likely to have hit this code.
-            Context ctx = ContextUtils.getApplicationContext();
             ComponentName developerModeContentProvider = new ComponentName(
                     ctx, "org.chromium.android_webview.services.DeveloperModeContentProvider");
             ctx.getPackageManager().setComponentEnabledSetting(developerModeContentProvider,
