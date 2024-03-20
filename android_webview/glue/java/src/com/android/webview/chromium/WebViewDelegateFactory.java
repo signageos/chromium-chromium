@@ -453,7 +453,6 @@ class WebViewDelegateFactory {
         private final Method mIsTagEnabledMethod;
         private final Method mAddChangeCallbackMethod;
         private final Method mGetViewRootImplMethod;
-        private final Method mAttachFunctorMethod;
         private final Method mCallDrawGLFunctionMethod;
         private final Method mDetachFunctorMethod;
         private final Method mCurrentApplicationMethod;
@@ -470,9 +469,6 @@ class WebViewDelegateFactory {
                 mAddChangeCallbackMethod = Class.forName("android.os.SystemProperties")
                                                    .getMethod("addChangeCallback", Runnable.class);
                 mGetViewRootImplMethod = View.class.getMethod("getViewRootImpl");
-                mAttachFunctorMethod =
-                        Class.forName("android.view.ViewRootImpl")
-                                .getMethod("attachFunctor", int.class);
                 mDetachFunctorMethod = Class.forName("android.view.ViewRootImpl")
                                                .getMethod("detachFunctor", int.class);
                 mCallDrawGLFunctionMethod = Class.forName("android.view.HardwareCanvas")
