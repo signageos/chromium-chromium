@@ -21,6 +21,8 @@ declare_args() {
   # on which you are going to install WebView is configured to load a
   # different package name than the default used in AOSP.
   system_webview_package_name = "com.android.webview"
+
+  target_sdk_version = android_sdk_version
 }
 
 template("system_webview_apk_or_module_tmpl") {
