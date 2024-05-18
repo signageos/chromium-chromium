@@ -33,6 +33,7 @@ void MediaDrmBridgeFactory::Create(
     const SessionExpirationUpdateCB& session_expiration_update_cb,
     CdmCreatedCB cdm_created_cb) {
   DCHECK(MediaDrmBridge::IsKeySystemSupported(cdm_config.key_system));
+  DCHECK(MediaDrmBridge::IsAvailable());
   DCHECK(scheme_uuid_.empty()) << "This factory can only be used once.";
 
   scheme_uuid_ = MediaDrmBridge::GetUUID(cdm_config.key_system);

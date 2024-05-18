@@ -28,6 +28,8 @@ using base::android::ConvertUTF8ToJavaString;
 using base::android::JavaIntArrayToIntVector;
 using base::android::JavaRef;
 using base::android::ScopedJavaLocalRef;
+using base::android::SDK_VERSION_LOLLIPOP;
+using base::android::SDK_VERSION_LOLLIPOP_MR1;
 using base::android::SDK_VERSION_P;
 
 namespace media {
@@ -75,6 +77,7 @@ static bool IsSupportedAndroidMimeType(const std::string& mime_type) {
 static std::string GetDefaultCodecName(const std::string& mime_type,
                                        MediaCodecDirection direction,
                                        bool requires_software_codec) {
+  DCHECK(MediaCodecUtil::IsMediaCodecAvailable());
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jstring> j_mime = ConvertUTF8ToJavaString(env, mime_type);
   ScopedJavaLocalRef<jstring> j_codec_name =
@@ -84,6 +87,7 @@ static std::string GetDefaultCodecName(const std::string& mime_type,
 }
 
 static bool IsDecoderSupportedByDevice(const std::string& android_mime_type) {
+  DCHECK(MediaCodecUtil::IsMediaCodecAvailable());
   DCHECK(IsSupportedAndroidMimeType(android_mime_type));
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jstring> j_mime =
@@ -92,6 +96,7 @@ static bool IsDecoderSupportedByDevice(const std::string& android_mime_type) {
 }
 
 static bool IsEncoderSupportedByDevice(const std::string& android_mime_type) {
+  DCHECK(MediaCodecUtil::IsMediaCodecAvailable());
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jstring> j_mime =
       ConvertUTF8ToJavaString(env, android_mime_type);
@@ -99,6 +104,8 @@ static bool IsEncoderSupportedByDevice(const std::string& android_mime_type) {
 }
 
 static bool CanDecodeInternal(const std::string& mime, bool is_secure) {
+  if (!MediaCodecUtil::IsMediaCodecAvailable())
+    return false;
   if (mime.empty())
     return false;
 
@@ -179,6 +186,36 @@ std::string MediaCodecUtil::CodecToAndroidMimeType(VideoCodec codec) {
 }
 
 // static
+bool MediaCodecUtil::IsMediaCodecAvailable() {
+  return IsMediaCodecAvailableFor(
+      base::android::BuildInfo::GetInstance()->sdk_int(),
+      base::android::BuildInfo::GetInstance()->model());
+}
+
+// static
+bool MediaCodecUtil::IsMediaCodecAvailableFor(int sdk, const char* model) {
+  // We will block the model on any sdk that is as old or older than
+  // |last_bad_sdk| for the given model.
+  struct BlocklistEntry {
+    BlocklistEntry(const char* m, int s) : model(m), last_bad_sdk(s) {}
+    base::StringPiece model;
+    int last_bad_sdk;
+    bool operator==(const BlocklistEntry& other) const {
+      // Search on name only.  Ignore |last_bad_sdk|.
+      return model == other.model;
+    }
+  };
+  static const BlocklistEntry blocklist[] = {
+      // crbug.com/653905
+      {"LGMS330", SDK_VERSION_LOLLIPOP_MR1},
+  };
+
+  const BlocklistEntry* iter = std::find(
+      std::begin(blocklist), std::end(blocklist), BlocklistEntry(model, 0));
+  return iter == std::end(blocklist) || sdk > iter->last_bad_sdk;
+}
+
+// static
 bool MediaCodecUtil::PlatformSupportsCbcsEncryption(int sdk) {
   JNIEnv* env = AttachCurrentThread();
   return Java_MediaCodecUtil_platformSupportsCbcsEncryption(env, sdk);
@@ -188,6 +225,8 @@ bool MediaCodecUtil::PlatformSupportsCbcsEncryption(int sdk) {
 std::set<int> MediaCodecUtil::GetEncoderColorFormats(
     const std::string& mime_type) {
   std::set<int> color_formats;
+  if (!IsMediaCodecAvailable())
+    return color_formats;
 
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jstring> j_mime = ConvertUTF8ToJavaString(env, mime_type);
@@ -206,13 +245,14 @@ std::set<int> MediaCodecUtil::GetEncoderColorFormats(
 #if BUILDFLAG(ENABLE_PLATFORM_DOLBY_VISION)
 // static
 bool MediaCodecUtil::IsDolbyVisionDecoderAvailable() {
-  return IsDecoderSupportedByDevice(kDolbyVisionMimeType);
+  return IsMediaCodecAvailable() &&
+         IsDecoderSupportedByDevice(kDolbyVisionMimeType);
 }
 #endif
 
 // static
 bool MediaCodecUtil::IsVp8DecoderAvailable() {
-  return IsDecoderSupportedByDevice(kVp8MimeType);
+  return IsMediaCodecAvailable() && IsDecoderSupportedByDevice(kVp8MimeType);
 }
 
 // static
@@ -224,7 +264,7 @@ bool MediaCodecUtil::IsVp8EncoderAvailable() {
 
 // static
 bool MediaCodecUtil::IsVp9DecoderAvailable() {
-  return IsDecoderSupportedByDevice(kVp9MimeType);
+  return IsMediaCodecAvailable() && IsDecoderSupportedByDevice(kVp9MimeType);
 }
 
 // static
@@ -239,18 +279,18 @@ bool MediaCodecUtil::IsVp9Profile3DecoderAvailable() {
 
 // static
 bool MediaCodecUtil::IsOpusDecoderAvailable() {
-  return IsDecoderSupportedByDevice(kOpusMimeType);
+  return IsMediaCodecAvailable() && IsDecoderSupportedByDevice(kOpusMimeType);
 }
 
 // static
 bool MediaCodecUtil::IsAv1DecoderAvailable() {
-  return IsDecoderSupportedByDevice(kAv1MimeType);
+  return IsMediaCodecAvailable() && IsDecoderSupportedByDevice(kAv1MimeType);
 }
 
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
 // static
 bool MediaCodecUtil::IsHEVCDecoderAvailable() {
-  return IsDecoderSupportedByDevice(kHevcMimeType);
+  return IsMediaCodecAvailable() && IsDecoderSupportedByDevice(kHevcMimeType);
 }
 #endif
 
@@ -310,17 +350,32 @@ bool MediaCodecUtil::CanDecode(AudioCodec codec) {
 
 // static
 bool MediaCodecUtil::IsH264EncoderAvailable(bool use_codec_list) {
+  if (!IsMediaCodecAvailable())
+    return false;
+
+  constexpr const char* kDisabledModels[] = {"SAMSUNG-SGH-I337", "Nexus 7",
+                                             "Nexus 4"};
+  const std::string model(base::android::BuildInfo::GetInstance()->model());
+  for (auto* disabled_model : kDisabledModels) {
+    if (base::StartsWith(model, disabled_model,
+                         base::CompareCase::INSENSITIVE_ASCII)) {
+      return false;
+    }
+  }
+
   if (use_codec_list)
     return IsEncoderSupportedByDevice(kAvcMimeType);
 
-  // Assume support since Chrome only supports Marshmallow+.
+  // Assume support since Chrome only supports Lollipop+.
   return true;
 }
 
 // static
-void MediaCodecUtil::AddSupportedCodecProfileLevels(
+bool MediaCodecUtil::AddSupportedCodecProfileLevels(
     std::vector<CodecProfileLevel>* result) {
   DCHECK(result);
+  if (!IsMediaCodecAvailable())
+    return false;
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jobjectArray> j_codec_profile_levels(
       Java_MediaCodecUtil_getSupportedCodecProfileLevels(env));
@@ -329,11 +384,15 @@ void MediaCodecUtil::AddSupportedCodecProfileLevels(
     result->push_back(MediaCodecProfileLevelToChromiumProfileLevel(
         env, java_codec_profile_level));
   }
+  return true;
 }
 
 // static
 bool MediaCodecUtil::IsKnownUnaccelerated(VideoCodec codec,
                                           MediaCodecDirection direction) {
+  if (!IsMediaCodecAvailable())
+    return true;
+
   std::string codec_name =
       GetDefaultCodecName(CodecToAndroidMimeType(codec), direction, false);
   DVLOG(1) << __func__ << "Default codec for " << GetCodecName(codec) << " : "
