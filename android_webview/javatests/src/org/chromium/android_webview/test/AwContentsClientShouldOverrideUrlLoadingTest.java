@@ -26,7 +26,6 @@ import org.chromium.android_webview.AwContents;
 import org.chromium.android_webview.AwContentsClient;
 import org.chromium.android_webview.AwSettings;
 import org.chromium.android_webview.policy.AwPolicyProvider;
-import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedError2Helper;
 import org.chromium.android_webview.test.util.CommonResources;
 import org.chromium.android_webview.test.util.JSUtils;
 import org.chromium.base.test.util.CallbackHelper;
@@ -42,6 +41,7 @@ import org.chromium.content_public.browser.LoadUrlParams;
 import org.chromium.content_public.browser.NavigationHistory;
 import org.chromium.content_public.browser.test.util.TestCallbackHelperContainer.OnEvaluateJavaScriptResultHelper;
 import org.chromium.content_public.browser.test.util.TestCallbackHelperContainer.OnPageStartedHelper;
+import org.chromium.content_public.browser.test.util.TestCallbackHelperContainer.OnReceivedErrorHelper;
 import org.chromium.content_public.browser.test.util.TestThreadUtils;
 import org.chromium.content_public.common.ContentUrlConstants;
 import org.chromium.net.test.util.TestWebServer;
@@ -270,8 +270,8 @@ public class AwContentsClientShouldOverrideUrlLoadingTest {
     @Feature({"AndroidWebView", "Navigation"})
     public void testDoesNotCauseOnReceivedError() throws Throwable {
         standardSetup();
-        OnReceivedError2Helper onReceivedError2Helper = mContentsClient.getOnReceivedError2Helper();
-        final int onReceivedError2Count = onReceivedError2Helper.getCallCount();
+        OnReceivedErrorHelper onReceivedErrorHelper = mContentsClient.getOnReceivedErrorHelper();
+        final int onReceivedErrorCallCount = onReceivedErrorHelper.getCallCount();
 
         mActivityTestRule.loadDataSync(mAwContents, mContentsClient.getOnPageFinishedHelper(),
                 CommonResources.makeHtmlPageWithSimpleLinkTo(
@@ -290,7 +290,7 @@ public class AwContentsClientShouldOverrideUrlLoadingTest {
         mActivityTestRule.loadUrlSync(
                 mAwContents, mContentsClient.getOnPageFinishedHelper(), DATA_URL);
 
-        Assert.assertEquals(onReceivedError2Count, onReceivedError2Helper.getCallCount());
+        Assert.assertEquals(onReceivedErrorCallCount, onReceivedErrorHelper.getCallCount());
     }
 
     @Test
@@ -845,8 +845,8 @@ public class AwContentsClientShouldOverrideUrlLoadingTest {
         setupWithProvidedContentsClient(new DestroyInCallbackClient());
         mShouldOverrideUrlLoadingHelper = mContentsClient.getShouldOverrideUrlLoadingHelper();
 
-        OnReceivedError2Helper onReceivedError2Helper = mContentsClient.getOnReceivedError2Helper();
-        int onReceivedError2Count = onReceivedError2Helper.getCallCount();
+        OnReceivedErrorHelper onReceivedErrorHelper = mContentsClient.getOnReceivedErrorHelper();
+        int onReceivedErrorCallCount = onReceivedErrorHelper.getCallCount();
 
         mActivityTestRule.loadDataSync(mAwContents, mContentsClient.getOnPageFinishedHelper(),
                 CommonResources.makeHtmlPageWithSimpleLinkTo(
@@ -1216,6 +1216,12 @@ public class AwContentsClientShouldOverrideUrlLoadingTest {
                 return true;
             }
             return false;
+        }
+
+        @Override
+        public void onReceivedError(int errorCode, String description, String failingUrl) {
+            super.onReceivedError(errorCode, description, failingUrl);
+            throw new RuntimeException("we should not receive an error code! " + failingUrl);
         }
 
         @Override
