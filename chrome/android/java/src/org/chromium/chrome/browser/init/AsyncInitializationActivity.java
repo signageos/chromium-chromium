@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Process;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
@@ -26,6 +27,7 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.StrictModeContext;
 import org.chromium.base.SysUtils;
 import org.chromium.base.TraceEvent;
@@ -394,7 +396,19 @@ public abstract class AsyncInitializationActivity
             return;
         } else {
             assert dispatchAction == LaunchIntentDispatcher.Action.FINISH_ACTIVITY_REMOVE_TASK;
-            finishAndRemoveTask();
+            ApiCompatibilityUtils.finishAndRemoveTask(this);
+
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP
+                    || Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
+                // On L ApiCompatibilityUtils.finishAndRemoveTask() sometimes fails, which causes
+                // NPE in onStart() later, see crbug.com/781396. We can't let this activity to
+                // start, and we don't want to crash either. So try finishing one more time and
+                // suicide if that fails.
+                if (!isFinishing()) {
+                    finish();
+                    if (!isFinishing()) Process.killProcess(Process.myPid());
+                }
+            }
         }
         overridePendingTransition(0, R.anim.no_anim);
     }

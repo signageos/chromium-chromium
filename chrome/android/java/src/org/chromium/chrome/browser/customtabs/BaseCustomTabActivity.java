@@ -19,6 +19,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.customtabs.TrustedWebUtils;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.IntentUtils;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.chrome.R;
@@ -267,7 +268,7 @@ public abstract class BaseCustomTabActivity extends ChromeActivity<BaseCustomTab
         if (mIntentDataProvider == null) {
             // |mIntentDataProvider| is null if the WebAPK server vended an invalid WebAPK (WebAPK
             // correctly signed, mandatory <meta-data> missing).
-            this.finishAndRemoveTask();
+            ApiCompatibilityUtils.finishAndRemoveTask(this);
             return;
         }
 
@@ -447,7 +448,7 @@ public abstract class BaseCustomTabActivity extends ChromeActivity<BaseCustomTab
     protected void handleFinishAndClose() {
         Runnable defaultBehavior = () -> {
             if (useSeparateTask()) {
-                this.finishAndRemoveTask();
+                ApiCompatibilityUtils.finishAndRemoveTask(this);
             } else {
                 finish();
             }
