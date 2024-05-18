@@ -24,6 +24,7 @@ declare_args() {
 
   target_sdk_version = android_sdk_version
   max_sdk_version = android_sdk_version
+  enable_lint = false
 }
 
 template("system_webview_apk_or_module_tmpl") {
