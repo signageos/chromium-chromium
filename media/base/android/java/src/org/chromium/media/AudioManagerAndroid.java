@@ -17,6 +17,7 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Process;
 import android.provider.Settings;
 
 import org.chromium.base.ContextUtils;
@@ -390,7 +391,8 @@ class AudioManagerAndroid {
 
     /** Checks if the process has as specified permission or not. */
     private boolean hasPermission(String permission) {
-        return ContextUtils.getApplicationContext().checkSelfPermission(permission)
+        return ContextUtils.getApplicationContext().checkPermission(
+                permission, Process.myPid(), Process.myUid())
                 == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -464,6 +466,10 @@ class AudioManagerAndroid {
 
     /** Return the AudioDeviceInfo array as reported by the Android OS. */
     private static AudioDeviceInfo[] getAudioDeviceInfo() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            return new AudioDeviceInfo[0];
+        }
+
         AudioManager audioManager =
                 (AudioManager) ContextUtils.getApplicationContext().getSystemService(
                         Context.AUDIO_SERVICE);
@@ -473,6 +479,10 @@ class AudioManagerAndroid {
     /** Returns whether an audio sink device is connected. */
     @CalledByNative
     private static boolean isAudioSinkConnected() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            return false;
+        }
+
         for (AudioDeviceInfo deviceInfo : getAudioDeviceInfo()) {
             if (deviceInfo.isSink()) {
                 return true;
@@ -487,6 +497,10 @@ class AudioManagerAndroid {
      */
     @CalledByNative
     private static int getAudioEncodingFormatsSupported() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) {
+            return 0;
+        }
+
         int intersection_mask = 0; // intersection of multiple device encoding arrays
         boolean first = true;
         for (AudioDeviceInfo deviceInfo : getAudioDeviceInfo()) {
