@@ -6,11 +6,9 @@ package com.android.webview.chromium;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
@@ -25,12 +23,13 @@ import android.webkit.ValueCallback;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewDatabase;
-import android.webkit.WebViewDelegate;
 import android.webkit.WebViewFactory;
 import android.webkit.WebViewFactoryProvider;
 import android.webkit.WebViewProvider;
 
 import androidx.annotation.RequiresApi;
+
+import com.android.webview.chromium.WebViewDelegateFactory.WebViewDelegate;
 
 import org.chromium.android_webview.ApkType;
 import org.chromium.android_webview.AwBrowserContext;
@@ -229,8 +228,15 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     /**
      * Entry point for Android 26 (Oreo) and above. See class docs for initialization details.
      */
-    public static WebViewChromiumFactoryProvider create(WebViewDelegate delegate) {
+    public static WebViewChromiumFactoryProvider create(android.webkit.WebViewDelegate delegate) {
         return new WebViewChromiumFactoryProvider(delegate);
+    }
+
+    /**
+     * Constructor called by the API 21 version of {@link WebViewFactory} and earlier.
+     */
+    public WebViewChromiumFactoryProvider() {
+        initialize(WebViewDelegateFactory.createApi21CompatibilityDelegate());
     }
 
     /**
@@ -238,7 +244,14 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
      * by {@link #create}, this constructor was invoked directly before {@link #create} was defined.
      * See class docs for initialization details.
      */
-    public WebViewChromiumFactoryProvider(WebViewDelegate delegate) {
+    public WebViewChromiumFactoryProvider(android.webkit.WebViewDelegate delegate) {
+        initialize(WebViewDelegateFactory.createProxyDelegate(delegate));
+    }
+
+    /**
+     * Constructor for internal use when a proxy delegate has already been created.
+     */
+    WebViewChromiumFactoryProvider(WebViewDelegate delegate) {
         initialize(delegate);
     }
 
@@ -284,29 +297,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
      * This must not be called until {@link #initialize(WebViewDelegate)} has set mWebViewDelegate.
      */
     public void addWebViewAssetPath(Context ctx) {
-        mWebViewDelegate.addWebViewAssetPath(new ContextWrapper(ctx) {
-            // In the Android framework (<= API level 23)
-            // ContextThemeWrapper provides an implementation of
-            // getResources() that may proxy to either the wrapped
-            // context or a newly constructed context, but it does not
-            // provide an implementation of getAssets() that overrides
-            // the ContextWrapper implementation that always proxies
-            // to the wrapped context. This means that getAssets() and
-            // getResources().getAssets() may potentially return
-            // different AssetManagers, confusing WebView.
-            //
-            // To work around this problem, we provide an additional
-            // wrapper here here to avoid calling the getAssets()
-            // proxy chain (which we cannot change because it is in
-            // WebView framework code).
-            //
-            // We should be able to remove this workaround once we
-            // drop support for API 23.
-            @Override
-            public AssetManager getAssets() {
-                return getResources().getAssets();
-            }
-        });
+        mWebViewDelegate.addWebViewAssetPath(ctx);
     }
 
     @SuppressWarnings("NoContextGetApplicationContext")
@@ -387,7 +378,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
             boolean multiProcess = false;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Ask the system if multiprocess should be enabled on O+.
-                multiProcess = GlueApiHelperForO.isMultiProcessEnabled(webViewDelegate);
+                multiProcess = webViewDelegate.isMultiProcessEnabled();
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 // Check the multiprocess developer setting directly on N.
                 multiProcess = Settings.Global.getInt(ctx.getContentResolver(),
@@ -456,8 +447,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
                             androidXConfig.getCacheDirectoryBasePathOrNull();
                     String dataDirectorySuffix;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        dataDirectorySuffix =
-                                GlueApiHelperForP.getDataDirectorySuffix(webViewDelegate);
+                        dataDirectorySuffix = webViewDelegate.getDataDirectorySuffix();
                     } else {
                         // Try the AndroidX library version
                         dataDirectorySuffix = androidXConfig.getDataDirectorySuffixOrNull();
@@ -522,7 +512,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             mInitInfo.mTotalFactoryInitStartTime =
-                    mWebViewDelegate.getStartupTimestamps().getWebViewLoadStart();
+                    mWebViewDelegate.getTimestamps()[0];
             mInitInfo.mTotalFactoryInitDuration =
                     SystemClock.uptimeMillis() - mInitInfo.mTotalFactoryInitStartTime;
             RecordHistogram.recordTimesHistogram(
