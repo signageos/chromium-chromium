@@ -6,8 +6,10 @@ package org.chromium.components.background_task_scheduler.internal;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.os.Build;
 import android.os.SystemClock;
 
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ContextUtils;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Delegates calls out to various tasks that need to run in the background. */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
 public class BackgroundTaskJobService extends JobService {
     private static final String TAG = "BkgrdTaskJS";
 

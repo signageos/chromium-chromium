@@ -6,8 +6,11 @@ package org.chromium.net;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
+
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -239,6 +242,7 @@ public class CronetPerfTestActivity extends Activity {
         }
 
         // NOTE(pauljensen): Sampling profiling won't work on KitKat and earlier devices.
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         private void startLogging() {
             if (getConfigBoolean("CAPTURE_NETLOG")) {
                 mCronetEngine.startNetLogToFile(

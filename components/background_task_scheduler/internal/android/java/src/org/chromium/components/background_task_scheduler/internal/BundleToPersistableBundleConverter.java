@@ -4,9 +4,11 @@
 
 package org.chromium.components.background_task_scheduler.internal;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.annotation.NonNull;
 
 import java.util.HashSet;
@@ -22,6 +24,7 @@ import java.util.Set;
  * a {@link PersistableBundle} in the case of using {@link android.app.job.JobScheduler} as the
  * backend for scheduling.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
 class BundleToPersistableBundleConverter {
     /**
      * A Result which contains the resulting {@link PersistableBundle} after a conversion, and also

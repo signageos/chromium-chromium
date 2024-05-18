@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AlertDialog;
 
@@ -165,6 +166,7 @@ public class ShareHelper {
                     && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1;
         }
 
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
         public static void sendChooserIntent(WindowAndroid window, Intent sharingIntent,
                 @Nullable TargetChosenCallback callback) {
             final Context context = ContextUtils.getApplicationContext();
