@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.chrome.browser.download.internal.R;
 import org.chromium.components.browser_ui.widget.text.AlertDialogEditText;
@@ -145,7 +146,8 @@ public class RenameDialogCustomView extends ScrollView {
     }
 
     private void setErrorMessageVisibility(boolean hasError) {
-        mErrorMessageView.setTextColor(getContext().getColor(R.color.default_text_color_error));
+        mErrorMessageView.setTextColor(
+                ApiCompatibilityUtils.getColor(getResources(), R.color.default_text_color_error));
         mErrorMessageView.setVisibility(hasError ? View.VISIBLE : View.GONE);
     }
 
@@ -161,7 +163,8 @@ public class RenameDialogCustomView extends ScrollView {
         if (hasError) {
             // Change the edit text box underline tint color.
             mFileName.getBackground().setColorFilter(
-                    getContext().getColor(R.color.default_red), PorterDuff.Mode.SRC_IN);
+                    ApiCompatibilityUtils.getColor(getResources(), R.color.default_red),
+                    PorterDuff.Mode.SRC_IN);
         } else {
             mFileName.getBackground().clearColorFilter();
         }

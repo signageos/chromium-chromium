@@ -11,6 +11,7 @@ import android.graphics.Color;
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
 
@@ -41,7 +42,7 @@ public abstract class AssistantColor {
             return false;
         }
         try {
-            context.getColor(colorId);
+            ApiCompatibilityUtils.getColor(context.getResources(), colorId);
             return true;
         } catch (Resources.NotFoundException e) {
             return false;
@@ -73,7 +74,7 @@ public abstract class AssistantColor {
             return null;
         }
         try {
-            return context.getColor(colorId);
+            return ApiCompatibilityUtils.getColor(context.getResources(), colorId);
         } catch (Resources.NotFoundException e) {
             return null;
         }

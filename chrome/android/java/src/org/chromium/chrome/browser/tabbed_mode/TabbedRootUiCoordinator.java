@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.CommandLine;
 import org.chromium.base.Function;
@@ -636,7 +637,8 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                     }
                 };
         return new ScrimCoordinator(mActivity, delegate, coordinator,
-                coordinator.getContext().getColor(R.color.omnibox_focused_fading_background_color));
+                ApiCompatibilityUtils.getColor(coordinator.getResources(),
+                        R.color.omnibox_focused_fading_background_color));
     }
 
     // Private class methods

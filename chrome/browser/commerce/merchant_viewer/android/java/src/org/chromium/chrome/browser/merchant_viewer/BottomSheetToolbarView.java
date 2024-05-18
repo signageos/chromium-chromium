@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.DrawableRes;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.chrome.tab_ui.R;
 import org.chromium.components.browser_ui.widget.FadingShadow;
 import org.chromium.components.browser_ui.widget.FadingShadowView;
@@ -37,7 +38,9 @@ public class BottomSheetToolbarView {
         mToolbarView = LayoutInflater.from(context).inflate(R.layout.sheet_tab_toolbar, null);
 
         FadingShadowView shadow = mToolbarView.findViewById(R.id.shadow);
-        shadow.init(context.getColor(R.color.toolbar_shadow_color), FadingShadow.POSITION_TOP);
+        shadow.init(ApiCompatibilityUtils.getColor(
+                            context.getResources(), R.color.toolbar_shadow_color),
+                FadingShadow.POSITION_TOP);
     }
 
     /** Sets the title of the bottom sheet. */

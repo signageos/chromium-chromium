@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.browserservices.intents.BrowserServicesIntentDataProvider;
 import org.chromium.chrome.browser.browserservices.intents.WebappExtras;
@@ -93,7 +94,8 @@ public class CustomTabTaskDescriptionHelper implements NativeInitObserver, Destr
         boolean canUpdate = (webappExtras != null || usesSeparateTask());
         if (!canUpdate) return;
 
-        mDefaultThemeColor = mActivity.getColor(R.color.default_primary_color);
+        mDefaultThemeColor = ApiCompatibilityUtils.getColor(
+                mActivity.getResources(), R.color.default_primary_color);
         if (webappExtras != null) {
             if (mIntentDataProvider.getColorProvider().hasCustomToolbarColor()) {
                 mDefaultThemeColor = mIntentDataProvider.getColorProvider().getToolbarColor();

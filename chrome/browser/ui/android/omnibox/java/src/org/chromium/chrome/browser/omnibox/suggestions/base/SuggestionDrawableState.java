@@ -16,6 +16,8 @@ import androidx.annotation.DrawableRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.util.ObjectsCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
+
 /** Represents graphical decoration for the suggestion components. */
 public class SuggestionDrawableState {
     /** Embedded drawable object. */
@@ -74,7 +76,8 @@ public class SuggestionDrawableState {
          * @param colorRes Color resource to use.
          */
         public static Builder forColorRes(Context ctx, @ColorRes int colorRes) {
-            return new Builder(new ColorDrawable(ctx.getColor(colorRes)));
+            return new Builder(new ColorDrawable(
+                    ApiCompatibilityUtils.getColor(ctx.getResources(), colorRes)));
         }
 
         /**

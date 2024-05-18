@@ -21,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.test.util.CommandLineFlags;
 import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.base.test.util.Restriction;
@@ -126,7 +127,8 @@ public class CustomTabTaskDescriptionHelperTest {
         mWebappActivityTestRule.loadUrl(pageWithoutThemeColorUrl);
         int defaultThemeColor = computeDefaultThemeColor(webappActivity);
         ThemeTestUtils.waitForThemeColor(webappActivity, defaultThemeColor);
-        int defaultTaskDescriptionColor = webappActivity.getColor(R.color.default_primary_color);
+        int defaultTaskDescriptionColor = ApiCompatibilityUtils.getColor(
+                webappActivity.getResources(), R.color.default_primary_color);
         assertEquals(defaultTaskDescriptionColor, fetchTaskDescriptionColor(webappActivity));
     }
 

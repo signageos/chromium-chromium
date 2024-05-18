@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.test.params.ParameterAnnotations.UseRunnerDelegate;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CallbackHelper;
@@ -583,7 +584,8 @@ public class UrlBarTest {
 
         CriteriaHelper.pollUiThread(() -> {
             final int expectedTextColor =
-                    sActivityTestRule.getActivity().getColor(R.color.branded_url_text_on_dark_bg);
+                    ApiCompatibilityUtils.getColor(sActivityTestRule.getActivity().getResources(),
+                            R.color.branded_url_text_on_dark_bg);
             Criteria.checkThat(mUrlBar.getCurrentTextColor(), equalTo(expectedTextColor));
         });
     }

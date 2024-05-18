@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.CallbackController;
 import org.chromium.base.TraceEvent;
@@ -1205,7 +1206,8 @@ public class RootUiCoordinator
                     public void setNavigationBarScrimFraction(float scrimFraction) {}
                 };
         return new ScrimCoordinator(mActivity, delegate, coordinator,
-                coordinator.getContext().getColor(R.color.omnibox_focused_fading_background_color));
+                ApiCompatibilityUtils.getColor(coordinator.getResources(),
+                        R.color.omnibox_focused_fading_background_color));
     }
 
     protected void setStatusBarScrimFraction(float scrimFraction) {

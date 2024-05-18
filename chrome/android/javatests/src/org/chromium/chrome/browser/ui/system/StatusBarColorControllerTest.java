@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.supplier.Supplier;
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.CommandLineFlags;
@@ -70,7 +71,7 @@ public class StatusBarColorControllerTest {
 
     @Before
     public void setUp() {
-        mScrimColor = sActivityTestRule.getActivity().getColor(
+        mScrimColor = ApiCompatibilityUtils.getColor(sActivityTestRule.getActivity().getResources(),
                 org.chromium.chrome.R.color.default_scrim_color);
     }
 

@@ -175,7 +175,8 @@ class AssistantOverlayDrawable extends Drawable implements AssistantBrowserContr
     /** Sets the color of the border or {@code null} to use the default color. */
     void setHighlightBorderColor(@Nullable Integer color) {
         if (color == null) {
-            color = mContext.getColor(R.color.modern_blue_600);
+            color = ApiCompatibilityUtils.getColor(
+                    mContext.getResources(), R.color.modern_blue_600);
         }
         mBoxStrokeAlpha = Color.alpha(color);
         mBoxStroke.setColor(color);

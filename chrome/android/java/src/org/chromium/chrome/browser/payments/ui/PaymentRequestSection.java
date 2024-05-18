@@ -170,7 +170,8 @@ public abstract class PaymentRequestSection extends LinearLayout implements View
 
         // Set the styling of the view.
         mUnfocusedBackgroundColor = ChromeSemanticColorUtils.getPaymentRequestBg(context);
-        mFocusedBackgroundColor = getContext().getColor(R.color.payments_section_edit_background);
+        mFocusedBackgroundColor = ApiCompatibilityUtils.getColor(
+                getResources(), R.color.payments_section_edit_background);
         mLargeSpacing =
                 getResources().getDimensionPixelSize(R.dimen.editor_dialog_section_large_spacing);
         mVerticalSpacing =
@@ -609,7 +610,8 @@ public abstract class PaymentRequestSection extends LinearLayout implements View
             LinearLayout.LayoutParams updatedLayoutParams = new LinearLayout.LayoutParams(
                     LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             mUpdatedView.setTextAlignment(TEXT_ALIGNMENT_TEXT_END);
-            mUpdatedView.setTextColor(context.getColor(R.color.google_green_600));
+            mUpdatedView.setTextColor(ApiCompatibilityUtils.getColor(
+                    context.getResources(), R.color.google_green_600));
             MarginLayoutParamsCompat.setMarginStart(updatedLayoutParams,
                     context.getResources().getDimensionPixelSize(
                             R.dimen.editor_dialog_section_small_spacing));

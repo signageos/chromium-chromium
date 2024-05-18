@@ -26,6 +26,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.content.res.ResourcesCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.StrictModeContext;
 import org.chromium.components.browser_ui.widget.DualControlLayout;
 import org.chromium.components.browser_ui.widget.RadioButtonLayout;
@@ -387,7 +388,7 @@ public final class InfoBarControlLayout extends ViewGroup {
         ImageView iconView = (ImageView) layout.findViewById(R.id.control_icon);
         iconView.setImageResource(iconResourceId);
         if (iconColorId != 0) {
-            iconView.setColorFilter(getContext().getColor(iconColorId));
+            iconView.setColorFilter(ApiCompatibilityUtils.getColor(getResources(), iconColorId));
         }
 
         // The primary message text is always displayed.
@@ -433,7 +434,7 @@ public final class InfoBarControlLayout extends ViewGroup {
         ImageView iconView = (ImageView) layout.findViewById(R.id.control_icon);
         iconView.setImageBitmap(iconBitmap);
         if (iconColorId != 0) {
-            iconView.setColorFilter(getContext().getColor(iconColorId));
+            iconView.setColorFilter(ApiCompatibilityUtils.getColor(getResources(), iconColorId));
         }
 
         // The primary message text is always displayed.
@@ -481,7 +482,8 @@ public final class InfoBarControlLayout extends ViewGroup {
         } else {
             iconView.setImageResource(iconResourceId);
             if (iconColorId != 0) {
-                iconView.setColorFilter(getContext().getColor(iconColorId));
+                iconView.setColorFilter(
+                        ApiCompatibilityUtils.getColor(getResources(), iconColorId));
             }
         }
 

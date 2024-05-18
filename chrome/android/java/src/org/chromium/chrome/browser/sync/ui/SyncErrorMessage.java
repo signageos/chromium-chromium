@@ -99,7 +99,7 @@ public class SyncErrorMessage implements SyncStateChangedListener, UnownedUserDa
                                  ApiCompatibilityUtils.getDrawable(
                                          resources, R.drawable.ic_sync_error_legacy_24dp))
                          .with(MessageBannerProperties.ICON_TINT_COLOR,
-                                 context.getColor(R.color.default_red))
+                                 ApiCompatibilityUtils.getColor(resources, R.color.default_red))
                          .with(MessageBannerProperties.ON_PRIMARY_ACTION, this::onAccepted)
                          .with(MessageBannerProperties.ON_DISMISSED, this::onDismissed)
                          .build();

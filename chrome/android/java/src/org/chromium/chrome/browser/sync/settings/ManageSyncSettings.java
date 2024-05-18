@@ -29,6 +29,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.IntentUtils;
 import org.chromium.base.metrics.RecordUserAction;
@@ -435,7 +436,8 @@ public class ManageSyncSettings extends PreferenceFragmentCompat
 
     private void setEncryptionErrorSummary(@StringRes int stringId) {
         SpannableString summary = new SpannableString(getString(stringId));
-        final int errorColor = getContext().getColor(R.color.input_underline_error_color);
+        final int errorColor =
+                ApiCompatibilityUtils.getColor(getResources(), R.color.input_underline_error_color);
         summary.setSpan(new ForegroundColorSpan(errorColor), 0, summary.length(), 0);
         mSyncEncryption.setSummary(summary);
     }
