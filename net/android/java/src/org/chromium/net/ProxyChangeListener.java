@@ -75,6 +75,7 @@ public class ProxyChangeListener {
             mExclusionList = exclusionList;
         }
 
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         private static ProxyConfig fromProxyInfo(ProxyInfo proxyInfo) {
             if (proxyInfo == null) {
                 return null;

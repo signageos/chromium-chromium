@@ -218,6 +218,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * @param networkInfo The NetworkInfo for the active network.
          * @return the info of the network that is available to this app.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         private NetworkInfo processActiveNetworkInfo(NetworkInfo networkInfo) {
             if (networkInfo == null) {
                 return null;
@@ -303,6 +304,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * getNetworkInfo(Network) for a method that does.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         NetworkInfo getRawNetworkInfo(Network network) {
             try {
                 return mConnectivityManager.getNetworkInfo(network);
@@ -320,6 +322,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * Fetches NetworkInfo for |network|.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         NetworkInfo getNetworkInfo(Network network) {
             NetworkInfo networkInfo = getRawNetworkInfo(network);
             if (networkInfo != null && networkInfo.getType() == TYPE_VPN) {
@@ -335,6 +338,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * Returns connection type for |network|.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         @ConnectionType
         int getConnectionType(Network network) {
             NetworkInfo networkInfo = getNetworkInfo(network);
@@ -350,6 +354,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * another user); use {@link getAllNetworks} for a filtered list.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         @VisibleForTesting
         protected Network[] getAllNetworksUnfiltered() {
             Network[] networks = mConnectivityManager.getAllNetworks();
@@ -361,6 +366,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * Returns {@code true} if {@code network} applies to (and hence is accessible) to the
          * current user.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         @VisibleForTesting
         protected boolean vpnAccessible(Network network) {
             // Determine if the VPN applies to the current user by seeing if a socket can be bound
@@ -389,6 +395,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * Return the NetworkCapabilities for {@code network}, or {@code null} if they cannot
          * be retrieved (e.g. {@code network} has disconnected).
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         @VisibleForTesting
         protected NetworkCapabilities getNetworkCapabilities(Network network) {
             final int retryCount = 2;
@@ -409,6 +416,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * that satisfy networkRequest.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         void registerNetworkCallback(
                 NetworkRequest networkRequest, NetworkCallback networkCallback, Handler handler) {
             // Starting with Oreo specifying a Handler is allowed.  Use this to avoid thread-hops.
@@ -434,6 +442,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * Unregisters networkCallback from receiving notifications.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         void unregisterNetworkCallback(NetworkCallback networkCallback) {
             mConnectivityManager.unregisterNetworkCallback(networkCallback);
         }
@@ -442,6 +451,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
          * Returns the current default {@link Network}, or {@code null} if disconnected.
          * Only callable on Lollipop and newer releases.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         Network getDefaultNetwork() {
             Network defaultNetwork = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -563,6 +573,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
     }
 
     // NetworkCallback used for listening for changes to the default network.
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class DefaultNetworkCallback extends NetworkCallback {
         // If registered, notify connectionTypeChanged() to look for changes.
         @Override
@@ -684,6 +695,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
     // and go. It gets called back on a special handler thread
     // ConnectivityManager creates for making the callbacks. The callbacks in
     // turn post to mLooper where mObserver lives.
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class MyNetworkCallback extends NetworkCallback {
         // If non-null, this indicates a VPN is in place for the current user, and no other
         // networks are accessible.
@@ -978,6 +990,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
      *     for network changes (e.g. see (@link RegistrationPolicyAlwaysRegister} and
      *     {@link RegistrationPolicyApplicationStatus}).
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public NetworkChangeNotifierAutoDetect(Observer observer, RegistrationPolicy policy) {
         mLooper = Looper.myLooper();
         mHandler = new Handler(mLooper);
@@ -1171,6 +1184,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
      * Only callable on Lollipop and newer releases.
      * @param ignoreNetwork ignore this network as if it is not connected.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static Network[] getAllNetworksFiltered(
             ConnectivityManagerDelegate connectivityManagerDelegate, Network ignoreNetwork) {
         Network[] networks = connectivityManagerDelegate.getAllNetworksUnfiltered();
@@ -1339,6 +1353,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
      * Extracts NetID of Network on Lollipop and NetworkHandle (which is munged NetID) on
      * Marshmallow and newer releases. Only available on Lollipop and newer releases.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static long networkToNetId(Network network) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return ApiHelperForM.getNetworkHandle(network);

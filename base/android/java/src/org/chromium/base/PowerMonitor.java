@@ -12,6 +12,8 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
@@ -106,6 +108,7 @@ public class PowerMonitor {
         return getRemainingBatteryCapacityImpl();
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static int getRemainingBatteryCapacityImpl() {
         return ((BatteryManager) ContextUtils.getApplicationContext().getSystemService(
                         Context.BATTERY_SERVICE))
