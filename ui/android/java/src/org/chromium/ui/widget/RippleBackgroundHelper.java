@@ -209,7 +209,11 @@ public class RippleBackgroundHelper {
         mBackgroundColorList = color;
         // This works around an issue before Android O where the drawable is drawn in the wrong
         // default state.
-        if (VERSION.SDK_INT < VERSION_CODES.O) {
+        if (VERSION.SDK_INT < VERSION_CODES.M) {
+            int id = View.generateViewId();
+            mBackgroundLayerDrawable.setId(0, id);
+            mBackgroundLayerDrawable.setDrawableByLayerId(id, mBackgroundGradient);
+        } else if (VERSION.SDK_INT < VERSION_CODES.O) {
             mBackgroundLayerDrawable.setDrawable(/* index */ 0, mBackgroundGradient);
         }
         mBackgroundGradient.setColor(color);
@@ -225,7 +229,11 @@ public class RippleBackgroundHelper {
         mStateLayerColorList = color;
         // This works around an issue before Android O where the drawable is drawn in the wrong
         // default state.
-        if (VERSION.SDK_INT < VERSION_CODES.O) {
+        if (VERSION.SDK_INT < VERSION_CODES.M) {
+            int id = View.generateViewId();
+            mBackgroundLayerDrawable.setId(1, id);
+            mBackgroundLayerDrawable.setDrawableByLayerId(id, mStateLayerGradient);
+        } else if (VERSION.SDK_INT < VERSION_CODES.O) {
             mBackgroundLayerDrawable.setDrawable(/* index */ 1, mStateLayerGradient);
         }
         mStateLayerGradient.setColor(color);

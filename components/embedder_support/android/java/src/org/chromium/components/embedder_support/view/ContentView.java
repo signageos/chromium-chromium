@@ -24,6 +24,7 @@ import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ObserverList;
 import org.chromium.base.TraceEvent;
@@ -574,12 +575,15 @@ public class ContentView extends FrameLayout
      * ContentView on Api23 to override onProvideVirtualStructure.
      */
     public static class ContentViewApi23 extends ContentView {
+
+        @RequiresApi(Build.VERSION_CODES.M)
         protected ContentViewApi23(
                 Context context, EventOffsetHandler eventOffsetHandler, WebContents webContents) {
             super(context, eventOffsetHandler, webContents);
         }
 
         @Override
+        @RequiresApi(Build.VERSION_CODES.M)
         public void onProvideVirtualStructure(final ViewStructure structure) {
             WebContentsAccessibility wcax = getWebContentsAccessibility();
             if (wcax != null) wcax.onProvideVirtualStructure(structure, false);

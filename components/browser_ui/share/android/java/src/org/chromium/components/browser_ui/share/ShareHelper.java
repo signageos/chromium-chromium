@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -161,6 +162,7 @@ public class ShareHelper {
             mCallback = callback;
         }
 
+        @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.LOLLIPOP_MR1)
         public static boolean isSupported() {
             return !sForceCustomChooserForTesting
                     && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1;
@@ -314,6 +316,7 @@ public class ShareHelper {
      * Shares the params using the system share sheet, or skipping the sheet and sharing directl if
      * the target component is specified.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     static void shareWithSystemSheet(ShareParams params) {
         assert TargetChosenReceiver.isSupported();
         TargetChosenReceiver.sendChooserIntent(

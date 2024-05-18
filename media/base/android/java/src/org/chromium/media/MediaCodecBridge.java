@@ -17,6 +17,8 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.view.Surface;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.Log;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -253,6 +255,7 @@ class MediaCodecBridge {
         }
     };
 
+    @SuppressLint("NewApi")
     MediaCodecBridge(
             MediaCodec mediaCodec, @BitrateAdjuster.Type int bitrateAdjuster, boolean useAsyncApi) {
         assert mediaCodec != null;
@@ -266,6 +269,7 @@ class MediaCodecBridge {
         prepareAsyncApiForRestart();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private void enableAsyncApi() {
         mPendingError = false;
         mPendingFormat = new LinkedList<MediaFormatWrapper>();
@@ -713,6 +717,7 @@ class MediaCodecBridge {
         return false;
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
     private boolean setSurface(Surface surface) {
         try {

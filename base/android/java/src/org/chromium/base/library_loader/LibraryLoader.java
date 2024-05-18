@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.system.Os;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -415,6 +416,7 @@ public class LibraryLoader {
      * Call this method to determine if the chromium project must load the library
      * directly from a zip file.
      */
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     private static boolean isInZipFile() {
         // The auto-generated NativeLibraries.sUseLibraryInZipFile variable will be true
         // iff the library remains embedded in the APK zip file on the target.

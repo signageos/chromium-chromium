@@ -47,7 +47,6 @@ import java.util.UUID;
  * pass through to the Android object and instead provide fake implementations.
  */
 @JNINamespace("device")
-@RequiresApi(Build.VERSION_CODES.M)
 class Wrappers {
     private static final String TAG = "Bluetooth";
 
@@ -347,6 +346,7 @@ class Wrappers {
                     new HashMap<BluetoothGattDescriptor, BluetoothGattDescriptorWrapper>();
         }
 
+        @RequiresApi(Build.VERSION_CODES.M)
         public BluetoothGattWrapper connectGatt(Context context, boolean autoConnect,
                 BluetoothGattCallbackWrapper callback, int transport) {
             return new BluetoothGattWrapper(

@@ -8,11 +8,14 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
 import android.provider.Settings;
 import android.view.View;
 import android.view.inputmethod.CursorAnchorInfo;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.BuildInfo;
 import org.chromium.base.Log;
@@ -30,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 // TODO(peconn): Comment out once we have that build code.
 // @RequiresApi(Build.VERSION_CODES.T)
+@RequiresApi(Build.VERSION_CODES.S_V2)
 public class AndroidStylusWritingHandler implements StylusWritingHandler, StylusApiOption {
     private static final String TAG = "AndroidStylus";
 

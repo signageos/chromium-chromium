@@ -4,6 +4,7 @@
 
 package org.chromium.content.browser.selection;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.view.WindowManager;
 import android.view.textclassifier.SelectionEvent;
 import android.view.textclassifier.TextClassifier;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
@@ -175,6 +177,7 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
      */
     private SelectionClient mSelectionClient;
 
+    @TargetApi(Build.VERSION_CODES.P)
     @Nullable
     private SmartSelectionEventProcessor mSmartSelectionEventProcessor;
 
@@ -500,6 +503,7 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
         if (!isActionModeValid()) clearSelection();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private ActionMode startFloatingActionMode() {
         assert mView != null;
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
@@ -582,6 +586,7 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
     }
 
     @Override
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     public boolean supportsFloatingActionMode() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }

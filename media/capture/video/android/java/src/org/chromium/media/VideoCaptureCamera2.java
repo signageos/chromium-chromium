@@ -4,6 +4,7 @@
 
 package org.chromium.media;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -30,6 +31,7 @@ import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.IntDef;
 import androidx.annotation.RequiresApi;
 
@@ -52,8 +54,8 @@ import java.util.List;
  * static methods are provided to retrieve information on current system cameras
  * and their capabilities, using android.hardware.camera2.CameraManager.
  **/
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 @JNINamespace("media")
-@RequiresApi(Build.VERSION_CODES.M)
 public class VideoCaptureCamera2 extends VideoCapture {
     // Inner class to extend a CameraDevice state change listener.
     private class CrStateListener extends CameraDevice.StateCallback {
@@ -579,6 +581,7 @@ public class VideoCaptureCamera2 extends VideoCapture {
                 }
             }
             try {
+                @SuppressLint("NewApi")
                 Boolean ae_lock_available =
                         cameraCharacteristics.get(CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE);
                 if (ae_lock_available != null && ae_lock_available.booleanValue()) {
@@ -628,6 +631,7 @@ public class VideoCaptureCamera2 extends VideoCapture {
                 }
             }
             try {
+                @SuppressLint("NewApi")
                 Boolean awb_lock_available =
                         cameraCharacteristics.get(CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
                 if (awb_lock_available != null && awb_lock_available.booleanValue()) {
@@ -1335,6 +1339,8 @@ public class VideoCaptureCamera2 extends VideoCapture {
         return matchedTemperature;
     }
 
+    @RequiresApi(0)
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.LOLLIPOP)
     public static boolean isLegacyDevice(int id) {
         final CameraCharacteristics cameraCharacteristics = getCameraCharacteristics(id);
         return cameraCharacteristics != null
@@ -1342,6 +1348,7 @@ public class VideoCaptureCamera2 extends VideoCapture {
                 == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
     }
 
+    @RequiresApi(0)
     public static int getNumberOfCameras() {
         CameraManager manager = null;
         try {

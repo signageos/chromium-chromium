@@ -8,7 +8,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Proxy;
+import android.os.Build;
 
+import androidx.annotation.RequiresApi;
+
+@RequiresApi(Build.VERSION_CODES.M)
 final class ProxyBroadcastReceiver extends BroadcastReceiver {
     private final ProxyChangeListener mListener;
 

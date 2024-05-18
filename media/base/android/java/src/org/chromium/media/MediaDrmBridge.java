@@ -5,6 +5,7 @@
 package org.chromium.media;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.media.MediaCrypto;
 import android.media.MediaDrm;
 import android.os.Build;
@@ -263,7 +264,6 @@ public class MediaDrmBridge {
         return mSchemeUUID.equals(WIDEVINE_UUID);
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private MediaDrmBridge(UUID schemeUUID, boolean requiresMediaCrypto, long nativeMediaDrmBridge,
             long nativeMediaDrmStorageBridge) throws android.media.UnsupportedSchemeException {
         mSchemeUUID = schemeUUID;
@@ -434,6 +434,7 @@ public class MediaDrmBridge {
      * @param nativeMediaDrmBridge Native object of this class.
      * @param nativeMediaDrmStorageBridge Native object of persistent storage.
      */
+    @TargetApi(Build.VERSION_CODES.M) // Non-empty origin implies Marshmallow.
     @CalledByNative
     private static MediaDrmBridge create(byte[] schemeUUID, String securityOrigin,
             String securityLevel, boolean requiresMediaCrypto, long nativeMediaDrmBridge,
@@ -487,6 +488,7 @@ public class MediaDrmBridge {
      * Set the security origin for the MediaDrm. All information should be isolated for different
      * origins, e.g. certificates, licenses.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private boolean setOrigin(String origin) {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
         Log.d(TAG, "Set origin: %s", origin);
@@ -1353,7 +1355,6 @@ public class MediaDrmBridge {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private void onSessionMessage(final SessionId sessionId, final MediaDrm.KeyRequest request) {
         if (!isNativeMediaDrmBridgeValid()) return;
 

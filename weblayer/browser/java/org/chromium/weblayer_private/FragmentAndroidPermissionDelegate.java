@@ -4,6 +4,10 @@
 
 package org.chromium.weblayer_private;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.compat.ApiHelperForM;
 import org.chromium.ui.permissions.AndroidPermissionDelegateWithRequester;
 
@@ -23,6 +27,7 @@ public class FragmentAndroidPermissionDelegate extends AndroidPermissionDelegate
         return mFragment.shouldShowRequestPermissionRationale(permission);
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @Override
     protected final boolean isPermissionRevokedByPolicyInternal(String permission) {
         if (mFragment.getActivity() == null) return false;

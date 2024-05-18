@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Log;
@@ -58,7 +59,10 @@ public final class LGEmailActionModeWorkaroundImpl {
         }
     }
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     private static boolean shouldAllowActionModeDestroyOnNonUiThread(Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
+
         String appName = context.getPackageName();
         int versionCode = PackageUtils.getPackageVersion(context, appName);
         if (versionCode == -1) return false;

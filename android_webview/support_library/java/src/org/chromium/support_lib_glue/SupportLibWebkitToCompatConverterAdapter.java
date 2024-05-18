@@ -73,6 +73,7 @@ class SupportLibWebkitToCompatConverterAdapter implements WebkitToCompatConverte
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public /* SupportLibWebResourceError */ InvocationHandler convertWebResourceError(
             /* WebResourceError */ Object webResourceError) {
         return BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
@@ -81,6 +82,7 @@ class SupportLibWebkitToCompatConverterAdapter implements WebkitToCompatConverte
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public /* WebResourceError */ Object convertWebResourceError(
             /* SupportLibWebResourceError */ InvocationHandler webResourceError) {
         SupportLibWebResourceError supportLibError =
@@ -111,6 +113,7 @@ class SupportLibWebkitToCompatConverterAdapter implements WebkitToCompatConverte
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public /* SupportLibWebMessagePort */ InvocationHandler convertWebMessagePort(
             /* WebMessagePort */ Object webMessagePort) {
         return BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
@@ -119,6 +122,7 @@ class SupportLibWebkitToCompatConverterAdapter implements WebkitToCompatConverte
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public /* WebMessagePort */ Object convertWebMessagePort(
             /* SupportLibWebMessagePort */ InvocationHandler webMessagePort) {
         SupportLibWebMessagePortAdapter supportLibMessagePort =

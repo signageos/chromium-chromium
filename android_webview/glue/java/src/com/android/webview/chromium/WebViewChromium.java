@@ -1621,6 +1621,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public WebMessagePort[] createWebMessageChannel() {
         recordWebViewApiCall(ApiCall.CREATE_WEBMESSAGE_CHANNEL);
         return WebMessagePortAdapter.fromMessagePorts(

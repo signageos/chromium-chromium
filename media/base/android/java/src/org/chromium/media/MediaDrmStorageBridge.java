@@ -6,8 +6,6 @@ package org.chromium.media;
 
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
 import org.chromium.base.Callback;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -20,7 +18,6 @@ import org.chromium.base.annotations.NativeMethods;
  */
 @JNINamespace("media")
 @MainDex
-@RequiresApi(Build.VERSION_CODES.M)
 class MediaDrmStorageBridge {
     private static final long INVALID_NATIVE_MEDIA_DRM_STORAGE_BRIDGE = -1;
 

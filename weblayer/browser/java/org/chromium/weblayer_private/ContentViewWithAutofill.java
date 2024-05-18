@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewStructure;
 import android.view.autofill.AutofillValue;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.components.embedder_support.view.ContentView;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.base.EventOffsetHandler;
@@ -29,6 +31,7 @@ public class ContentViewWithAutofill extends ContentView.ContentViewApi23 {
 
     private TabImpl mTab;
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private ContentViewWithAutofill(Context context, EventOffsetHandler eventOffsetHandler) {
         super(context, eventOffsetHandler, null /* webContents */);
 

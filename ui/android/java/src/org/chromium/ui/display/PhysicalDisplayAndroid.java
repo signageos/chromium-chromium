@@ -162,7 +162,8 @@ import java.util.List;
 
     private void updateFromConfiguration() {
         Point size = new Point();
-        WindowManager windowManager = mWindowContext.getSystemService(WindowManager.class);
+        WindowManager windowManager =
+                (WindowManager) mWindowContext.getSystemService(Context.WINDOW_SERVICE);
         Rect rect = ApiHelperForR.getMaximumWindowMetricsBounds(windowManager);
         size.set(rect.width(), rect.height());
         DisplayMetrics displayMetrics = mWindowContext.getResources().getDisplayMetrics();

@@ -10,6 +10,9 @@ import android.os.Handler;
 import android.os.Process;
 import android.util.SparseArray;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ContextUtils;
 
@@ -76,9 +79,11 @@ public abstract class AndroidPermissionDelegateWithRequester implements AndroidP
     }
 
     /** @see PackageManager#isPermissionRevokedByPolicy(String, String) */
+    @RequiresApi(Build.VERSION_CODES.M)
     protected abstract boolean isPermissionRevokedByPolicyInternal(String permission);
 
     @Override
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     public final boolean isPermissionRevokedByPolicy(String permission) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
         return isPermissionRevokedByPolicyInternal(permission);

@@ -80,7 +80,6 @@ public class AutoAnimatorDrawable extends DrawableWrapper {
         return found.get();
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private static void attachRestartListeners(@Nullable Drawable drawable) {
         AutoAnimatorDrawable.animatedDrawableHelper(drawable, animatable -> {
             if (animatable instanceof Animatable2Compat) {
@@ -141,6 +140,7 @@ public class AutoAnimatorDrawable extends DrawableWrapper {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private static final class LazyHolder {
         private static final AutoRestarter INSTANCE = new AutoRestarter();
     }

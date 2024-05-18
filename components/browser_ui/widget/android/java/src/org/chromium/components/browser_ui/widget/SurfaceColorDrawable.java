@@ -9,12 +9,14 @@ import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.util.AttributeSet;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Px;
+import androidx.annotation.RequiresApi;
 
 import com.google.android.material.elevation.ElevationOverlayProvider;
 
@@ -37,7 +39,10 @@ import java.io.IOException;
  *     xmlns:app="http://schemas.android.com/apk/res-auto"
  *     android:shape="oval"
  *     app:surfaceElevation="@dimen/default_elevation_1"/>
+ *
+ * This class is a custom drawable, which is only supported after API 24.
  */
+@RequiresApi(Build.VERSION_CODES.N)
 public class SurfaceColorDrawable extends GradientDrawable {
     private @Px float mElevation;
     private float mDensity;
@@ -98,7 +103,6 @@ public class SurfaceColorDrawable extends GradientDrawable {
      * is available after API 24. This is fine, since this class is a custom drawable, which is only
      * supported after API 24.
      */
-    @SuppressLint("NewApi")
     private void onNonNullTheme(@NonNull Theme theme) {
         boolean elevationOverlayEnabled =
                 AttrUtils.resolveBoolean(theme, R.attr.elevationOverlayEnabled);
