@@ -3288,6 +3288,8 @@ public class AwContents implements SmartClipProvider {
     }
 
     private void setWindowVisibilityInternal(boolean visible) {
+        mInvalidateRootViewOnNextDraw |= Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP
+                && visible && !mIsWindowVisible;
         mIsWindowVisible = visible;
         if (!isDestroyed(NO_WARN)) {
             AwContentsJni.get().setWindowVisibility(mNativeAwContents, mIsWindowVisible);

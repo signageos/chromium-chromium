@@ -8,8 +8,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.SystemClock;
 import android.view.Gravity;
@@ -33,6 +33,8 @@ import org.chromium.ui.display.DisplayAndroid.DisplayAndroidObserver;
 import org.chromium.ui.resources.HandleViewResources;
 import org.chromium.ui.touch_selection.TouchHandleOrientation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collections;
 
 /**
@@ -131,7 +133,7 @@ public class PopupTouchHandleDrawable extends View implements DisplayAndroidObse
 
         // The SUB_PANEL window layout type improves z-ordering with respect to
         // other popup-based elements.
-        mContainer.setWindowLayoutType(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
+        setWindowLayoutType(mContainer, WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
         mContainer.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         mContainer.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -187,6 +189,24 @@ public class PopupTouchHandleDrawable extends View implements DisplayAndroidObse
 
     public long getNativeDrawable() {
         return mNativeDrawable;
+    }
+
+    private static void setWindowLayoutType(PopupWindow window, int layoutType) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.setWindowLayoutType(layoutType);
+            return;
+        }
+
+        // Android doc says PopupWindow#setWindowLayoutType() was added since API level 23, however,
+        // it was introduced long time before M as a hidden API. Using reflection here to access it
+        // on blew M.
+        try {
+            Method setWindowLayoutTypeMethod =
+                    PopupWindow.class.getMethod("setWindowLayoutType", int.class);
+            setWindowLayoutTypeMethod.invoke(window, layoutType);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException
+                | RuntimeException e) {
+        }
     }
 
     private static Drawable getHandleDrawable(Context context, int orientation) {
