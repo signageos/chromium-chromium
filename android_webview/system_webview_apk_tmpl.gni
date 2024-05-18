@@ -23,6 +23,7 @@ declare_args() {
   system_webview_package_name = "com.android.webview"
 
   target_sdk_version = android_sdk_version
+  max_sdk_version = android_sdk_version
 }
 
 template("system_webview_apk_or_module_tmpl") {
