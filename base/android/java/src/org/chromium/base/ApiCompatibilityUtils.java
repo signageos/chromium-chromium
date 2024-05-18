@@ -42,9 +42,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DeprecatedSinceApi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import java.io.IOException;
@@ -362,6 +366,15 @@ public class ApiCompatibilityUtils {
     @SuppressWarnings("deprecation")
     public static int getColor(Resources res, int id) throws NotFoundException {
         return res.getColor(id);
+    }
+
+    /**
+     * @see androidx.core.content.ContextCompat#getColorStateList(android.content.Content context, int id).
+     */
+    @ColorInt
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static int getColor(@NonNull Context context, @ColorRes int id) throws NotFoundException {
+        return ContextCompat.getColorStateList(context, id).getDefaultColor();
     }
 
     /**

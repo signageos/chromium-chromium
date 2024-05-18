@@ -29,6 +29,7 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.annotations.UsedByReflection;
 import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.components.browser_ui.settings.ChromeBasePreference;
@@ -338,7 +339,8 @@ public class AllSiteSettings extends SiteSettingsPreferenceFragment
             }
             SpannableString spannableString = new SpannableString(
                     getResources().getString(R.string.clear_browsing_data_link));
-            spannableString.setSpan(new ForegroundColorSpan(getContext().getColor(
+            spannableString.setSpan(new ForegroundColorSpan(
+                    ApiCompatibilityUtils.getColor(getContext().getResources(),
                                             R.color.default_text_color_link_baseline)),
                     0, spannableString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
             clearBrowsingDataLink.setSummary(spannableString);

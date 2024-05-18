@@ -157,7 +157,8 @@ public class MaterialProgressBar extends View implements AnimatorUpdateListener 
 
     private void initialize(Context context, AttributeSet attrs, int defStyle) {
         Resources resources = context.getResources();
-        int backgroundColor = context.getColor(R.color.progress_bar_bg_color_list);
+        int backgroundColor =
+                ApiCompatibilityUtils.getColor(context, R.color.progress_bar_bg_color_list);
         int progressColor = SemanticColorUtils.getProgressBarForeground(context);
         int secondaryProgressColor =
                 ApiCompatibilityUtils.getColor(resources, R.color.progress_bar_secondary);
