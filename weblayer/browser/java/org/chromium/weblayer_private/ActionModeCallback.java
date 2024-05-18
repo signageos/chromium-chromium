@@ -7,12 +7,10 @@ package org.chromium.weblayer_private;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.os.RemoteException;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 
@@ -28,7 +26,7 @@ import org.chromium.weblayer_private.interfaces.ObjectWrapper;
 /**
  * A class that handles selection action mode for WebLayer.
  */
-public final class ActionModeCallback extends ActionMode.Callback2 {
+public final class ActionModeCallback implements ActionMode.Callback {
     private final ActionModeCallbackHelper mHelper;
     // Can be null during init.
     private @Nullable ITabClient mTabClient;
@@ -109,10 +107,5 @@ public final class ActionModeCallback extends ActionMode.Callback2 {
     @Override
     public final void onDestroyActionMode(ActionMode mode) {
         mHelper.onDestroyActionMode();
-    }
-
-    @Override
-    public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
-        mHelper.onGetContentRect(mode, view, outRect);
     }
 }

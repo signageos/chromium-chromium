@@ -5,7 +5,6 @@
 package org.chromium.content_shell;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.graphics.drawable.ClipDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -320,12 +319,12 @@ public class Shell extends LinearLayout {
      * {link @ActionMode.Callback} that uses the default implementation in
      * {@link SelectionPopupController}.
      */
-    private ActionMode.Callback2 defaultActionCallback() {
+    private ActionMode.Callback defaultActionCallback() {
         final ActionModeCallbackHelper helper =
                 SelectionPopupController.fromWebContents(mWebContents)
                         .getActionModeCallbackHelper();
 
-        return new ActionMode.Callback2() {
+        return new ActionMode.Callback() {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 helper.onCreateActionMode(mode, menu);
@@ -345,11 +344,6 @@ public class Shell extends LinearLayout {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 helper.onDestroyActionMode();
-            }
-
-            @Override
-            public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
-                helper.onGetContentRect(mode, view, outRect);
             }
         };
     }
