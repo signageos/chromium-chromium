@@ -527,6 +527,15 @@ void KeySystemsImpl::ProcessSupportedKeySystems(KeySystemInfos key_systems) {
              EmeFeatureSupport::ALWAYS_ENABLED);
     }
 
+#if BUILDFLAG(IS_ANDROID)
+    // Ensure that the renderer can access the decoders necessary to use the
+    // key system.
+    if (!key_system->UseAesDecryptor() && !HasPlatformDecoderSupport()) {
+      DLOG(WARNING) << key_system->GetBaseKeySystemName() << " not registered";
+      continue;
+    }
+#endif  // BUILDFLAG(IS_ANDROID)
+
     const auto base_key_system_name = key_system->GetBaseKeySystemName();
     DVLOG(1) << __func__ << ": Adding key system " << base_key_system_name;
     key_system_info_vector_.push_back(std::move(key_system));

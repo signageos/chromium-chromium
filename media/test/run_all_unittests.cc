@@ -34,7 +34,10 @@ void TestSuiteNoAtExit::Initialize() {
   base::TestSuite::Initialize();
 
 #if BUILDFLAG(IS_ANDROID)
-  media::MediaCodecBridgeImpl::SetupCallbackHandlerForTesting();
+  if (media::MediaCodecUtil::IsMediaCodecAvailable()) {
+    media::EnablePlatformDecoderSupport();
+    media::MediaCodecBridgeImpl::SetupCallbackHandlerForTesting();
+  }
 #endif
 
   // Run this here instead of main() to ensure an AtExitManager is already
