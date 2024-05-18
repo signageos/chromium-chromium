@@ -122,7 +122,7 @@ public class CustomTabActivity extends BaseCustomTabActivity {
 
         mSession = mIntentDataProvider.getSession();
 
-        CustomTabNavigationBarController.update(getWindow(), mIntentDataProvider, this);
+        CustomTabNavigationBarController.update(getWindow(), mIntentDataProvider, getResources());
     }
 
     @Override

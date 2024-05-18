@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import androidx.annotation.IntDef;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ApplicationStatus;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.StrictModeContext;
@@ -484,7 +485,7 @@ public class DownloadNotificationService {
         final OvalShape circle = new OvalShape();
         circle.resize(width, height);
         final Paint paint = new Paint();
-        paint.setColor(ContextUtils.getApplicationContext().getColor(R.color.google_blue_grey_500));
+        paint.setColor(ApiCompatibilityUtils.getColor(resources, R.color.google_blue_grey_500));
 
         final Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);

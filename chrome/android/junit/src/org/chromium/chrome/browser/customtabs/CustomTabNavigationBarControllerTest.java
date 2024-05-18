@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.Window;
@@ -24,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.test.BaseRobolectricTestRunner;
 import org.chromium.chrome.browser.browserservices.intents.ColorProvider;
 import org.chromium.chrome.browser.customtabs.features.CustomTabNavigationBarController;
@@ -38,21 +39,21 @@ public class CustomTabNavigationBarControllerTest {
     @Mock
     private CustomTabIntentDataProvider mCustomTabIntentDataProvider;
     private Window mWindow;
-    private Context mContext;
+    private Resources mResources;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         Activity activity = Robolectric.buildActivity(Activity.class).get();
         mWindow = spy(activity.getWindow());
-        mContext = activity;
+        mResources = activity.getResources();
         when(mCustomTabIntentDataProvider.getColorProvider()).thenReturn(mColorProvider);
     }
 
     @Test
     public void doesNotSetBarColorWhenNull() {
         when(mColorProvider.getNavigationBarColor()).thenReturn(null);
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
 
         verify(mWindow, never()).setNavigationBarColor(Mockito.anyInt());
     }
@@ -65,7 +66,7 @@ public class CustomTabNavigationBarControllerTest {
         // needsDarkButtons is true.
         when(mColorProvider.getNavigationBarColor()).thenReturn(null);
 
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
         verify(mWindow, never()).setNavigationBarDividerColor(Mockito.anyInt());
     }
 
@@ -78,7 +79,7 @@ public class CustomTabNavigationBarControllerTest {
 
         // Make sure calling the line below does not throw an exception, because the method does not
         // exist in android P+.
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
     }
 
     @Test
@@ -88,12 +89,12 @@ public class CustomTabNavigationBarControllerTest {
 
         // The case when needsDarkButtons=true.
         when(mColorProvider.getNavigationBarColor()).thenReturn(Color.WHITE);
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
         verify(mWindow).setNavigationBarColor(ColorUtils.getDarkenedColorForStatusBar(Color.WHITE));
 
         // The case when needsDarkButtons=false.
         when(mColorProvider.getNavigationBarColor()).thenReturn(Color.BLACK);
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
         verify(mWindow).setNavigationBarColor(Color.BLACK);
     }
 
@@ -105,7 +106,7 @@ public class CustomTabNavigationBarControllerTest {
 
         // The case when needsDarkButtons=true
         when(mColorProvider.getNavigationBarColor()).thenReturn(Color.WHITE);
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
         verify(mWindow).setNavigationBarColor(Color.WHITE);
     }
 
@@ -116,14 +117,14 @@ public class CustomTabNavigationBarControllerTest {
         when(mColorProvider.getNavigationBarDividerColor()).thenReturn(Color.RED);
         when(mColorProvider.getNavigationBarColor()).thenReturn(Color.BLACK);
 
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
         verify(mWindow).setNavigationBarDividerColor(Color.RED);
 
         // The case when divider color is set implicitly due to needsDarkButtons=true.
         when(mColorProvider.getNavigationBarDividerColor()).thenReturn(null);
         when(mColorProvider.getNavigationBarColor()).thenReturn(Color.WHITE);
-        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mContext);
-        verify(mWindow).setNavigationBarDividerColor(
-                mContext.getColor(org.chromium.chrome.R.color.black_alpha_12));
+        CustomTabNavigationBarController.update(mWindow, mCustomTabIntentDataProvider, mResources);
+        verify(mWindow).setNavigationBarDividerColor(ApiCompatibilityUtils.getColor(
+                mResources, org.chromium.chrome.R.color.black_alpha_12));
     }
 }

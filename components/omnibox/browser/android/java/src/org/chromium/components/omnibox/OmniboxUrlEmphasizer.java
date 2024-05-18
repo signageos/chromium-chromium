@@ -4,7 +4,7 @@
 
 package org.chromium.components.omnibox;
 
-import android.content.Context;
+import android.content.res.Resources;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StrikethroughSpan;
@@ -13,6 +13,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.annotations.NativeMethods;
 import org.chromium.components.embedder_support.util.UrlConstants;
 import org.chromium.components.security_state.ConnectionSecurityLevel;
@@ -143,7 +144,7 @@ public class OmniboxUrlEmphasizer {
      *
      * @param url The URL spannable to add emphasis to. This variable is
      *            modified.
-     * @param context Context to resolve colors against.
+     * @param resources Resources for the given application context.
      * @param autocompleteSchemeClassifier The autocomplete scheme classifier used to emphasize the
      *         given URL.
      * @param securityLevel A valid ConnectionSecurityLevel for the specified
@@ -153,7 +154,7 @@ public class OmniboxUrlEmphasizer {
      *                      appropriate for use on a light background).
      * @param emphasizeScheme Whether the scheme should be emphasized.
      */
-    public static void emphasizeUrl(Spannable url, Context context,
+    public static void emphasizeUrl(Spannable url, Resources resources,
             AutocompleteSchemeClassifier autocompleteSchemeClassifier, int securityLevel,
             boolean isInternalPage, boolean useDarkForegroundColors, boolean emphasizeScheme) {
         final @ColorRes int nonEmphasizedColorId = useDarkForegroundColors
@@ -168,9 +169,10 @@ public class OmniboxUrlEmphasizer {
                 useDarkForegroundColors ? R.color.default_green_dark : R.color.default_green_light;
 
         emphasizeUrl(url, autocompleteSchemeClassifier, securityLevel, isInternalPage,
-                emphasizeScheme, context.getColor(nonEmphasizedColorId),
-                context.getColor(emphasizedColorId), context.getColor(dangerColorId),
-                context.getColor(secureColorId));
+                emphasizeScheme, ApiCompatibilityUtils.getColor(resources, nonEmphasizedColorId),
+                ApiCompatibilityUtils.getColor(resources, emphasizedColorId),
+                ApiCompatibilityUtils.getColor(resources, dangerColorId),
+                ApiCompatibilityUtils.getColor(resources, secureColorId));
     }
 
     /**

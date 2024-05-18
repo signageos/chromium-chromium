@@ -16,6 +16,7 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -265,24 +266,26 @@ public abstract class AssistantDrawable {
             mIconBridge.getLargeIconForUrl(mUrl, mDiameterSizeInPixel,
                     (@Nullable Bitmap icon, int fallbackColor, boolean isFallbackColorDefault,
                             int iconType) -> {
+                        Resources resources = context.getResources();
                         boolean useMonogram = mForceMonogram || icon == null;
 
                         Drawable drawable = useMonogram
-                                ? getMonogramDrawable(mUrl, fallbackColor, context)
-                                : getDrawableFromFavicon(
-                                        icon, context.getResources(), mDiameterSizeInPixel);
+                                ? getMonogramDrawable(mUrl, fallbackColor, resources)
+                                : getDrawableFromFavicon(icon, resources, mDiameterSizeInPixel);
                         callback.onResult(drawable);
                     });
         }
 
-        private Drawable getMonogramDrawable(GURL url, int fallbackColor, Context context) {
+        private Drawable getMonogramDrawable(GURL url, int fallbackColor, Resources resources) {
             float fontSize = mDiameterSizeInPixel * 7f / 10f;
             RoundedIconGenerator roundedIconGenerator = new RoundedIconGenerator(
                     mDiameterSizeInPixel, mDiameterSizeInPixel, mDiameterSizeInPixel / 2,
-                    context.getColor(R.color.default_favicon_background_color), fontSize);
+                    ApiCompatibilityUtils.getColor(
+                            resources, R.color.default_favicon_background_color),
+                    fontSize);
             roundedIconGenerator.setBackgroundColor(fallbackColor);
             Bitmap icon = roundedIconGenerator.generateIconForUrl(url);
-            return new BitmapDrawable(context.getResources(), icon);
+            return new BitmapDrawable(resources, icon);
         }
 
         private Drawable getDrawableFromFavicon(Bitmap icon, Resources resources, int iconSize) {

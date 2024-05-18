@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.ColorInt;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.chrome.browser.logo.LogoBridge.Logo;
 import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.ui.widget.LoadingView;
@@ -281,7 +282,7 @@ public class LogoView extends FrameLayout implements OnClickListener {
      * @return Whether the default search engine logo is available.
      */
     private boolean maybeShowDefaultLogo() {
-        Bitmap defaultLogo = getDefaultGoogleLogo(getContext());
+        Bitmap defaultLogo = getDefaultGoogleLogo(getResources());
         if (defaultLogo != null) {
             updateLogo(defaultLogo, null, /* isDefaultLogo = */ true, /* isClickable = */ false);
             return true;
@@ -322,16 +323,15 @@ public class LogoView extends FrameLayout implements OnClickListener {
 
     /**
      * Get the default Google logo if available.
-     * @param context Used to load colors and resources.
+     * @param resources Used to load resources.
      * @return The default Google logo.
      */
-    public static Bitmap getDefaultGoogleLogo(Context context) {
+    public static Bitmap getDefaultGoogleLogo(Resources resources) {
         if (!TemplateUrlServiceFactory.get().isDefaultSearchEngineGoogle()) return null;
 
         Bitmap defaultLogo = sDefaultLogo == null ? null : sDefaultLogo.get();
-        final int tint = context.getColor(R.color.google_logo_tint_color);
+        final int tint = ApiCompatibilityUtils.getColor(resources, R.color.google_logo_tint_color);
         if (defaultLogo == null || sDefaultLogoTint != tint) {
-            final Resources resources = context.getResources();
             if (tint == Color.TRANSPARENT) {
                 defaultLogo = BitmapFactory.decodeResource(resources, R.drawable.google_logo);
             } else {
