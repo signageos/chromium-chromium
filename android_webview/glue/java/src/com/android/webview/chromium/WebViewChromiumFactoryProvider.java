@@ -5,12 +5,10 @@
 package com.android.webview.chromium;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
@@ -25,13 +23,14 @@ import android.webkit.ValueCallback;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewDatabase;
-import android.webkit.WebViewDelegate;
 import android.webkit.WebViewFactory;
 import android.webkit.WebViewFactoryProvider;
 import android.webkit.WebViewProvider;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.RequiresApi;
+
+import com.android.webview.chromium.WebViewDelegateFactory.WebViewDelegate;
 
 import org.chromium.android_webview.ApkType;
 import org.chromium.android_webview.AwBrowserContext;
@@ -74,33 +73,6 @@ import java.util.concurrent.FutureTask;
 /**
  * Entry point to the WebView. The system framework talks to this class to get instances of the
  * implementation classes.
- *
- * <p>The exact initialization process depends on the platform OS level:
- * <ul>
- *
- * <li>On API 21 (no longer supported), the platform invoked a parameterless constructor. Since we
- * didn't have a WebViewDelegate instance, this required us to invoke WebViewDelegate methods via
- * reflection. This constructor has been removed from the code as we no longer support Android
- * 21.</li>
- *
- * <li>From API 22 through API 25, the platform instead directly calls the constructor with a
- * WebViewDelegate parameter (See internal CL http://ag/577188 or the public AOSP cherrypick
- * https://r.android.com/114870). API 22 (no longer supported) would fallback to the
- * parameterless constructor if the first constructor call throws an exception, however this
- * fallback was removed in API 23.</li>
- *
- * <li>Starting in API 26, the platform calls {@link #create} instead of calling the constructor
- * directly (see internal CLs http://ag/1334128 and http://ag/1846560).</li>
- *
- * <li>From API 27 onward, the platform code is updated during each release to use the {@code
- * WebViewChromiumFactoryProviderForX} subclass, where "X" is replaced by the actual platform API
- * version (ex. "ForOMR1"). It still invokes the {@link #create} method on the subclass. While the
- * OS version is still under development, the "ForX" subclass implements the new platform APIs (in a
- * private codebase). Once the APIs for that version have been finalized, we eventually roll these
- * implementations into this class and the "ForX" subclass just calls directly into this
- * implementation.</li>
- *
- * </ul>
  */
 @SuppressWarnings("deprecation")
 public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
@@ -211,18 +183,30 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
     }
 
     /**
-     * Entry point for Android 26 (Oreo) and above. See class docs for initialization details.
+     * Entry point for newer versions of Android.
      */
-    public static WebViewChromiumFactoryProvider create(WebViewDelegate delegate) {
+    public static WebViewChromiumFactoryProvider create(android.webkit.WebViewDelegate delegate) {
         return new WebViewChromiumFactoryProvider(delegate);
     }
 
     /**
-     * Entry point for Android 22 (LMR1) through Android 25 (NMR1). Although this is still invoked
-     * by {@link #create}, this constructor was invoked directly before {@link #create} was defined.
-     * See class docs for initialization details.
+     * Constructor called by the API 21 version of {@link WebViewFactory} and earlier.
      */
-    public WebViewChromiumFactoryProvider(WebViewDelegate delegate) {
+    public WebViewChromiumFactoryProvider() {
+        initialize(WebViewDelegateFactory.createApi21CompatibilityDelegate());
+    }
+
+    /**
+     * Constructor called by the API 22 version of {@link WebViewFactory} and later.
+     */
+    public WebViewChromiumFactoryProvider(android.webkit.WebViewDelegate delegate) {
+        initialize(WebViewDelegateFactory.createProxyDelegate(delegate));
+    }
+
+    /**
+     * Constructor for internal use when a proxy delegate has already been created.
+     */
+    WebViewChromiumFactoryProvider(WebViewDelegate delegate) {
         initialize(delegate);
     }
 
@@ -268,29 +252,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
      * This must not be called until {@link #initialize(WebViewDelegate)} has set mWebViewDelegate.
      */
     public void addWebViewAssetPath(Context ctx) {
-        mWebViewDelegate.addWebViewAssetPath(new ContextWrapper(ctx) {
-            // In the Android framework (<= API level 23)
-            // ContextThemeWrapper provides an implementation of
-            // getResources() that may proxy to either the wrapped
-            // context or a newly constructed context, but it does not
-            // provide an implementation of getAssets() that overrides
-            // the ContextWrapper implementation that always proxies
-            // to the wrapped context. This means that getAssets() and
-            // getResources().getAssets() may potentially return
-            // different AssetManagers, confusing WebView.
-            //
-            // To work around this problem, we provide an additional
-            // wrapper here here to avoid calling the getAssets()
-            // proxy chain (which we cannot change because it is in
-            // WebView framework code).
-            //
-            // We should be able to remove this workaround once we
-            // drop support for API 23.
-            @Override
-            public AssetManager getAssets() {
-                return getResources().getAssets();
-            }
-        });
+        mWebViewDelegate.addWebViewAssetPath(ctx);
     }
 
     @SuppressWarnings("NoContextGetApplicationContext")
@@ -368,7 +330,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
             boolean multiProcess = false;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Ask the system if multiprocess should be enabled on O+.
-                multiProcess = GlueApiHelperForO.isMultiProcessEnabled(webViewDelegate);
+                multiProcess = webViewDelegate.isMultiProcessEnabled();
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 // Check the multiprocess developer setting directly on N.
                 multiProcess = Settings.Global.getInt(ctx.getContentResolver(),
@@ -439,8 +401,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
                              "WebViewChromiumFactoryProvider.loadChromiumLibrary")) {
                     String dataDirectorySuffix = null;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        dataDirectorySuffix =
-                                GlueApiHelperForP.getDataDirectorySuffix(webViewDelegate);
+                        dataDirectorySuffix = webViewDelegate.getDataDirectorySuffix();
                     }
                     AwBrowserProcess.loadLibrary(dataDirectorySuffix);
                 }
@@ -511,7 +472,7 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             final long webviewLoadStart =
-                    mWebViewDelegate.getStartupTimestamps().getWebViewLoadStart();
+                    mWebViewDelegate.getTimestamps()[0];
             RecordHistogram.recordTimesHistogram(
                     "Android.WebView.Startup.CreationTime.TotalFactoryInitTime",
                     SystemClock.uptimeMillis() - webviewLoadStart);

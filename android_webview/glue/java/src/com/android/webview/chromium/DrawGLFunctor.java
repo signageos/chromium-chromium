@@ -7,7 +7,8 @@ package com.android.webview.chromium;
 import android.graphics.Canvas;
 import android.os.Build;
 import android.view.View;
-import android.webkit.WebViewDelegate;
+
+import com.android.webview.chromium.WebViewDelegateFactory.WebViewDelegate;
 
 import org.chromium.android_webview.AwContents;
 import org.chromium.base.annotations.JniIgnoreNatives;
@@ -50,9 +51,7 @@ class DrawGLFunctor implements AwContents.NativeDrawGLFunctor {
         assert canvas != null;
         if (sSupportFunctorReleasedCallback) {
             assert releasedCallback != null;
-            GlueApiHelperForN.callDrawGlFunction(
-                    mWebViewDelegate, canvas, mNativeDrawGLFunctor, releasedCallback);
-
+            mWebViewDelegate.callDrawGlFunction(canvas, mNativeDrawGLFunctor, releasedCallback);
         } else {
             assert releasedCallback == null;
             mWebViewDelegate.callDrawGlFunction(canvas, mNativeDrawGLFunctor);
