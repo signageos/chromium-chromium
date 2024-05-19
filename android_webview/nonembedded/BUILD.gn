@@ -165,6 +165,9 @@ jinja_template("system_webview_manifest") {
   input = "java/AndroidManifest.xml"
   output = system_webview_android_manifest
   variables = [ "manifest_package=$system_webview_package_name" ]
+  if (defined(system_webview_library_name)) {
+    variables += [ "library=$shlib_prefix$system_webview_library_name$shlib_extension" ]
+  }
 }
 
 jinja_template("trichrome_webview_manifest") {
