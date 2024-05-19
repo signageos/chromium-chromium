@@ -64,6 +64,8 @@ public class InsetObserverView extends View {
     public static InsetObserverView create(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             return new InsetObserverViewApi28(context);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return new InsetObserverViewApi21(context);
         }
         return new InsetObserverView(context);
     }
@@ -132,11 +134,14 @@ public class InsetObserverView extends View {
         mObservers.removeObserver(observer);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public WindowInsets onApplyWindowInsets(WindowInsets insets) {
-        onInsetChanged(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
-                insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
-        return insets;
+    protected boolean fitSystemWindows(Rect insets) {
+        // For Lollipop and above, onApplyWindowInsets will set the insets.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            onInsetChanged(insets.left, insets.top, insets.right, insets.bottom);
+        }
+        return false;
     }
 
     /**
@@ -160,8 +165,26 @@ public class InsetObserverView extends View {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static class InsetObserverViewApi21 extends InsetObserverView {
+        /**
+         * Creates an instance of {@link InsetObserverView} for Android versions L and above.
+         * @param context The Context to create this {@link InsetObserverView} in.
+         */
+        InsetObserverViewApi21(Context context) {
+            super(context);
+        }
+
+        @Override
+        public WindowInsets onApplyWindowInsets(WindowInsets insets) {
+            onInsetChanged(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                    insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+            return insets;
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.P)
-    private static class InsetObserverViewApi28 extends InsetObserverView {
+    private static class InsetObserverViewApi28 extends InsetObserverViewApi21 {
         private Rect mCurrentSafeArea = new Rect();
 
         /**
