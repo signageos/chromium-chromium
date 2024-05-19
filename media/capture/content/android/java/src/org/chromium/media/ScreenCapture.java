@@ -18,6 +18,7 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.DisplayMetrics;
@@ -97,7 +98,10 @@ public class ScreenCapture extends Fragment {
     // Factory method.
     @CalledByNative
     static ScreenCapture createScreenCaptureMachine(long nativeScreenCaptureMachineAndroid) {
-        return new ScreenCapture(nativeScreenCaptureMachineAndroid);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return new ScreenCapture(nativeScreenCaptureMachineAndroid);
+        }
+        return null;
     }
 
     // Internal class implementing the ImageReader listener. Gets pinged when a
