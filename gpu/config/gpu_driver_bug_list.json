@@ -36,18 +36,6 @@
       ]
     },
     {
-      "id": 7,
-      "cr_bugs": [89557],
-      "description": "Work around a bug in offscreen buffers on NVIDIA GPUs on Macs",
-      "os": {
-        "type": "macosx"
-      },
-      "vendor_id": "0x10de",
-      "features": [
-        "needs_offscreen_buffer_workaround"
-      ]
-    },
-    {
       "id": 17,
       "description": "Some drivers are unable to reset the D3D device in the GPU process sandbox",
       "os": {
@@ -347,19 +335,6 @@
       ]
     },
     {
-      "id": 65,
-      "description": "Linux NVIDIA drivers don't have the correct defaults for vertex attributes",
-      "cr_bugs": [351528],
-      "os": {
-        "type": "linux"
-      },
-      "vendor_id": "0x10de",
-      "gl_vendor": "NVIDIA.*",
-      "features": [
-        "init_vertex_attributes"
-      ]
-    },
-    {
       "id": 68,
       "description": "Disable partial swaps on Mesa drivers (detected with GL_RENDERER)",
       "cr_bugs": [339493],
@@ -418,6 +393,76 @@
       ]
     },
     {
+      "id": 74,
+      "cr_bugs": [278606, 382686],
+      "description": "Testing EGL sync fences was broken on most Qualcomm drivers",
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<=",
+          "value": "4.4.4"
+        }
+      },
+      "gl_vendor": "Qualcomm.*",
+      "disabled_extensions": [
+        "EGL_KHR_fence_sync"
+      ]
+    },
+    {
+      "id": 76,
+      "cr_bugs": [371530],
+      "description": "Testing EGL sync fences was broken on IMG",
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<=",
+          "value": "4.4.4"
+        }
+      },
+      "gl_vendor": "Imagination Technologies.*",
+      "disabled_extensions": [
+        "EGL_KHR_fence_sync"
+      ]
+    },
+    {
+      "id": 77,
+      "cr_bugs": [378691, 373360, 371530, 398964],
+      "description": "Testing fences was broken on Mali ES2 drivers",
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<=",
+          "value": "4.4.4"
+        }
+      },
+      "gl_vendor": "ARM.*",
+      "gl_renderer": "Mali.*",
+      "gl_type": "gles",
+      "gl_version": {
+        "op": "<",
+        "value": "3.0"
+      },
+      "disabled_extensions": [
+        "EGL_KHR_fence_sync"
+      ]
+    },
+    {
+      "id": 78,
+      "cr_bugs": [378691, 373360, 371530],
+      "description": "Testing fences was broken on Broadcom drivers",
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<=",
+          "value": "4.4.4"
+        }
+      },
+      "gl_vendor": "Broadcom.*",
+      "disabled_extensions": [
+        "EGL_KHR_fence_sync"
+      ]
+    },
+    {
       "id": 86,
       "description": "Disable use of Direct3D 11 on Matrox video cards",
       "cr_bugs": [395861],
@@ -458,29 +503,6 @@
       },
       "features": [
         "scalarize_vec_and_mat_constructor_args"
-      ]
-    },
-    {
-      "id": 89,
-      "description": "Mac drivers handle struct scopes incorrectly",
-      "cr_bugs": [403957],
-      "os": {
-        "type": "macosx"
-      },
-      "features": [
-        "regenerate_struct_names"
-      ]
-    },
-    {
-      "id": 90,
-      "description": "Linux AMD drivers handle struct scopes incorrectly",
-      "cr_bugs": [403957],
-      "os": {
-        "type": "linux"
-      },
-      "vendor_id": "0x1002",
-      "features": [
-        "regenerate_struct_names"
       ]
     },
     {
@@ -595,6 +617,22 @@
       ]
     },
     {
+      "id": 99,
+      "description": "Qualcomm driver before Lollipop deletes egl sync objects after context destruction",
+      "cr_bugs": [453857],
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<",
+          "value": "5.0.0"
+        }
+      },
+      "gl_vendor": "Qualcomm.*",
+      "features": [
+        "ignore_egl_sync_failures"
+      ]
+    },
+    {
       "id": 100,
       "description": "Disable Direct3D11 on systems with AMD switchable graphics",
       "cr_bugs": [451420, 721121, 755722],
@@ -641,6 +679,22 @@
       "gl_renderer": "Adreno \\(TM\\) 4.*",
       "features": [
         "disable_discard_framebuffer"
+      ]
+    },
+    {
+      "id": 104,
+      "description": "EXT_occlusion_query_boolean hangs on MediaTek MT8135 pre-Lollipop",
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<",
+          "value": "5.0.0"
+        }
+      },
+      "gl_vendor": "Imagination.*",
+      "gl_renderer": "PowerVR Rogue Han",
+      "disabled_extensions": [
+        "GL_EXT_occlusion_query_boolean"
       ]
     },
     {
@@ -751,7 +805,11 @@
       "cr_bugs": [477514],
       "description": "EXT_disjoint_timer_query fails after 2 queries on adreno 3xx in lollypop",
       "os": {
-        "type": "android"
+        "type": "android",
+        "version": {
+          "op": ">=",
+          "value": "5.0.0"
+        }
       },
       "gl_vendor": "Qualcomm.*",
       "gl_renderer": "Adreno \\(TM\\) 3.*",
@@ -837,6 +895,23 @@
       "gl_renderer": ".*Mali-4.*",
       "features": [
         "exit_on_context_lost"
+      ]
+    },
+    {
+      "id": 120,
+      "description": "CHROMIUM_copy_texture is slow on Mali pre-Lollipop",
+      "cr_bugs": [498443],
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<",
+          "value": "5.0.0"
+        }
+      },
+      "gl_vendor": "ARM.*",
+      "gl_renderer": "Mali.*",
+      "features": [
+        "max_copy_texture_chromium_size_262144"
       ]
     },
     {
@@ -960,6 +1035,20 @@
       ]
     },
     {
+      "id": 134,
+      "description": "glReadPixels fails on FBOs with SRGB_ALPHA textures",
+      "cr_bugs": [550292],
+      "os": {
+        "type": "android",
+        "version": {
+          "op": "<",
+          "value": "5.0"
+        }
+      },
+      "gl_vendor": "Qualcomm.*",
+      "disabled_extensions": ["GL_EXT_sRGB"]
+    },
+    {
       "id": 135,
       "description": "Screen flickers on 2009 iMacs",
       "cr_bugs": [543324],
@@ -970,17 +1059,6 @@
       "device_id": ["0x9440", "0x944a", "0x9488", "0x9490"],
       "features": [
         "disable_post_sub_buffers_for_onscreen_surfaces"
-      ]
-    },
-    {
-      "id": 136,
-      "description": "glGenerateMipmap fails if the zero texture level is not set on some Mac drivers",
-      "cr_bugs": [560499],
-      "os": {
-        "type": "macosx"
-      },
-      "features": [
-        "set_zero_level_before_generating_mipmap"
       ]
     },
     {
@@ -1103,30 +1181,6 @@
       },
       "features": [
         "disable_direct_composition"
-      ]
-    },
-    {
-      "id": 150,
-      "cr_bugs": [563714],
-      "description": "Alignment works incorrectly with unpack buffer bound",
-      "os": {
-        "type": "linux"
-      },
-      "vendor_id": "0x10de",
-      "gl_vendor": "NVIDIA.*",
-      "features": [
-        "unpack_alignment_workaround_with_unpack_buffer"
-      ]
-    },
-    {
-      "id": 151,
-      "cr_bugs": [563714],
-      "description": "Alignment works incorrectly with unpack buffer bound",
-      "os": {
-        "type": "macosx"
-      },
-      "features": [
-        "unpack_alignment_workaround_with_unpack_buffer"
       ]
     },
     {
@@ -1337,15 +1391,20 @@
       ]
     },
     {
-      "id": 179,
-      "description": "glResumeTransformFeedback works incorrectly on Intel GPUs",
-      "cr_bugs": [638514],
+      "id": 178,
+      "description": "GL_KHR_blend_equation_advanced is incorrectly implemented on Intel BayTrail on KitKat",
+      "cr_bugs": [639470],
       "os": {
-        "type": "macosx"
+        "type": "android",
+        "version": {
+          "op": "<",
+          "value": "5.0"
+        }
       },
-      "vendor_id": "0x8086",
+      "gl_vendor": "Intel.*",
+      "gl_renderer": "Intel(R) HD Graphics for BayTrail",
       "features": [
-        "rebind_transform_feedback_before_resume"
+        "disable_blend_equation_advanced"
       ]
     },
     {
@@ -1362,21 +1421,6 @@
       ]
     },
     {
-      "id": 181,
-      "description": "glTexStorage* are buggy when base mipmap level is not 0",
-      "cr_bugs": [640506],
-      "os": {
-        "type": "macosx",
-        "version": {
-          "op": "<",
-          "value": "10.12.4"
-        }
-      },
-      "features": [
-        "reset_base_mipmap_level_before_texstorage"
-      ]
-    },
-    {
       "id": 182,
       "cr_bugs": [638691],
       "description": "Frequent hang in glClear on old android versions on Mali-T7xx",
@@ -1390,18 +1434,6 @@
       "gl_renderer": ".*Mali-T7.*",
       "features": [
         "gl_clear_broken"
-      ]
-    },
-    {
-      "id": 184,
-      "description": "Rewrite texelFetchOffset to texelFetch for Intel Mac",
-      "cr_bugs": [642605],
-      "os": {
-        "type": "macosx"
-      },
-      "vendor_id": "0x8086",
-      "features": [
-        "rewrite_texelfetchoffset_to_texelfetch"
       ]
     },
     {
@@ -1492,29 +1524,6 @@
       ]
     },
     {
-      "id": 195,
-      "description": "Insert statements to reference all members in unused std140/shared blocks on Mac",
-      "cr_bugs": [618464],
-      "os": {
-        "type": "macosx"
-      },
-      "features": [
-        "use_unused_standard_shared_blocks"
-      ]
-    },
-    {
-      "id": 196,
-      "description": "Tex(Sub)Image3D performs incorrectly when uploading from unpack buffer with GL_UNPACK_IMAGE_HEIGHT greater than zero on Intel Macs",
-      "cr_bugs": [654258],
-      "os": {
-        "type": "macosx"
-      },
-      "vendor_id": "0x8086",
-      "features": [
-        "unpack_image_height_workaround_with_unpack_buffer"
-      ]
-    },
-    {
       "id": 197,
       "description": "adjust src/dst region if blitting pixels outside framebuffer on Mac",
       "cr_bugs": [644740],
@@ -1550,30 +1559,18 @@
       ]
     },
     {
-      "id": 202,
-      "cr_bugs": [639760,641129],
-      "description": "Mac driver GL 4.1 requires invariant and centroid to match between shaders",
+      "id": 200,
+      "description": "ES3 support is unreliable on some older drivers",
+      "cr_bugs": [657925],
       "os": {
-        "type": "macosx"
+        "type": "android",
+        "version": {
+          "op": "<",
+          "value": "4.4"
+        }
       },
       "features": [
-        "remove_invariant_and_centroid_for_essl3"
-      ]
-    },
-    {
-      "id": 203,
-      "cr_bugs": [639760,641129],
-      "description": "Mesa driver GL 3.3 requires invariant and centroid to match between shaders",
-      "os": {
-        "type": "linux"
-      },
-      "driver_vendor": "Mesa",
-      "gl_version": {
-        "op": "=",
-        "value": "3.3"
-      },
-      "features": [
-        "remove_invariant_and_centroid_for_essl3"
+        "disable_es3_gl_context"
       ]
     },
     {
@@ -1647,22 +1644,6 @@
       "vendor_id": "0x1002",
       "features": [
         "decode_encode_srgb_for_generatemipmap"
-      ]
-    },
-    {
-      "id": 211,
-      "description": "Rewrite -float to 0.0 - float for Intel Mac",
-      "cr_bugs": [672380],
-      "os": {
-        "type": "macosx",
-        "version": {
-          "op": "<=",
-          "value": "10.11"
-        }
-      },
-      "vendor_id": "0x8086",
-      "features": [
-        "rewrite_float_unary_minus_operator"
       ]
     },
     {
@@ -2295,19 +2276,6 @@
       ]
     },
     {
-      "id": 274,
-      "description": "glTexStorage* are buggy when base mipmap level is not 0",
-      "cr_bugs": [877874],
-      "os": {
-        "type": "linux"
-      },
-      "vendor_id": "0x10de",
-      "gl_vendor": "NVIDIA.*",
-      "features": [
-        "reset_base_mipmap_level_before_texstorage"
-      ]
-    },
-    {
       "id": 277,
       "description": "Direct composition path is buggy on certain AMD devices/drivers",
       "cr_bugs": [800950],
@@ -2731,17 +2699,6 @@
       ]
     },
     {
-      "id": 319,
-      "cr_bugs": [709351],
-      "description": "Remove dynamic indexing for swizzled vectors on Mac",
-      "os": {
-        "type": "macosx"
-      },
-      "features": [
-        "remove_dynamic_indexing_of_swizzled_vector"
-      ]
-    },
-    {
       "id": 320,
       "cr_bugs": [709351],
       "description": "Remove dynamic indexing for swizzled vectors on Android",
@@ -2982,34 +2939,6 @@
       ]
     },
     {
-      "id": 341,
-      "description": "Driver crash deleting FBOs on Mac Intel Broadwell",
-      "cr_bugs": [1090584],
-      "os": {
-        "type": "macosx"
-      },
-      "vendor_id": "0x8086",
-      "intel_gpu_series": [
-        "broadwell"
-      ],
-      "features": [
-        "unbind_attachments_on_bound_render_fbo_delete"
-      ]
-    },
-    {
-      "id": 342,
-      "description": "Driver crash deleting FBOs on Mac nVidia 600/700 series",
-      "cr_bugs": [1090584],
-      "os": {
-        "type": "macosx"
-      },
-      "vendor_id": "0x10de",
-      "device_id": ["0x0fe9", "0x0fd5", "0x0fd8", "0x119e", "0x0fea", "0x11a2"],
-      "features": [
-        "unbind_attachments_on_bound_render_fbo_delete"
-      ]
-    },
-    {
       "id": 343,
       "description": "Disable using GPU backed resource for imageBitmap from video on d3d9",
       "cr_bugs": [1098445, 1105923],
@@ -3167,6 +3096,17 @@
       "vendor_id": "0x10de",
       "features": [
         "force_enable_color_buffer_float"
+      ]
+    },
+    {
+      "id": 358,
+      "cr_bugs": [1127387],
+      "description": "Always assume float formats are renderable on Android except RGB32F",
+      "os": {
+        "type": "android"
+      },
+      "features": [
+        "force_enable_color_buffer_float_except_rgb32f"
       ]
     },
     {
