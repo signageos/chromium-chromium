@@ -11,18 +11,21 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
+import android.os.Build;
 import android.util.StateSet;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
+import androidx.annotation.DeprecatedSinceApi;
 import androidx.annotation.DimenRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.Px;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
 
 import org.chromium.ui.R;
 
@@ -44,8 +47,15 @@ public class RippleBackgroundHelper {
     private @Nullable ColorStateList mStateLayerColorList;
 
     private GradientDrawable mBackgroundGradient;
+    private GradientDrawable mBorderGradient;
     private GradientDrawable mStateLayerGradient;
     private LayerDrawable mBackgroundLayerDrawable;
+
+    // Used for applying tint on pre-L versions.
+    private Drawable mBackgroundDrawablePreL;
+    private Drawable mStateLayerDrawablePreL;
+    private Drawable mRippleDrawablePreL;
+    private Drawable mBorderDrawablePreL;
 
     /**
      * @param view The {@link View} on which background will be applied.
@@ -131,6 +141,11 @@ public class RippleBackgroundHelper {
             @ColorRes int rippleColorResId, float[] cornerRadii, @ColorRes int borderColorResId,
             @DimenRes int borderSizeDimenId, @Px int verticalInset) {
         mView = view;
+
+        int paddingStart = ViewCompat.getPaddingStart(mView);
+        int paddingTop = mView.getPaddingTop();
+        int paddingEnd = ViewCompat.getPaddingEnd(mView);
+        int paddingBottom = mView.getPaddingBottom();
         mView.setBackground(createBackgroundDrawable(
                 AppCompatResources.getColorStateList(view.getContext(), rippleColorResId),
                 AppCompatResources.getColorStateList(view.getContext(), borderColorResId),
@@ -138,6 +153,13 @@ public class RippleBackgroundHelper {
                 verticalInset));
         setBackgroundColor(
                 AppCompatResources.getColorStateList(view.getContext(), backgroundColorResId));
+
+        // On KitKat, setting the background on the view can cause padding reset. Save the padding
+        // and re-apply after background is set.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            ViewCompat.setPaddingRelative(
+                    mView, paddingStart, paddingTop, paddingEnd, paddingBottom);
+        }
     }
 
     /**
@@ -154,21 +176,46 @@ public class RippleBackgroundHelper {
             @Px int verticalInset) {
         mBackgroundGradient = new GradientDrawable();
         mBackgroundGradient.setCornerRadii(cornerRadii);
-        if (borderSize > 0) mBackgroundGradient.setStroke(borderSize, borderColorList);
         mStateLayerGradient = new GradientDrawable();
         mStateLayerGradient.setCornerRadii(cornerRadii);
         mStateLayerGradient.setStroke(borderSize, Color.TRANSPARENT);
-        mBackgroundLayerDrawable =
-                new LayerDrawable(new Drawable[] {mBackgroundGradient, mStateLayerGradient});
-        GradientDrawable mask = new GradientDrawable();
-        mask.setCornerRadii(cornerRadii);
-        mask.setColor(Color.WHITE);
-        // The RippledDrawable must wrap the InsetDrawable (which wraps the content).
-        // The InsetDrawable cannot wrap the RippleDrawable,
-        // otherwise it creates corner artifacts on Android S.
-        // Refer to crbug.com/1233720 for details.
-        return new RippleDrawable(convertToRippleDrawableColorList(rippleColorList),
-                wrapDrawableWithInsets(mBackgroundLayerDrawable, verticalInset), mask);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBorderGradient = mBackgroundGradient;
+            mBorderGradient.setStroke(borderSize, borderColorList);
+            mBackgroundLayerDrawable =
+                    new LayerDrawable(new Drawable[] {mBackgroundGradient, mStateLayerGradient});
+            GradientDrawable mask = new GradientDrawable();
+            mask.setCornerRadii(cornerRadii);
+            mask.setColor(Color.WHITE);
+            // The RippledDrawable must wrap the InsetDrawable (which wraps the content).
+            // The InsetDrawable cannot wrap the RippleDrawable,
+            // otherwise it creates corner artifacts on Android S.
+            // Refer to crbug.com/1233720 for details.
+            return new RippleDrawable(convertToRippleDrawableColorList(rippleColorList),
+                    wrapDrawableWithInsets(mBackgroundLayerDrawable, verticalInset), mask);
+        }
+
+        // Pre-L, create a background drawable and overlay it by a ripple drawable.
+        mBackgroundDrawablePreL = DrawableCompat.wrap(mBackgroundGradient);
+        mStateLayerDrawablePreL = DrawableCompat.wrap(mStateLayerGradient);
+
+        GradientDrawable rippleGradient = new GradientDrawable();
+        rippleGradient.setCornerRadii(cornerRadii);
+        mRippleDrawablePreL = DrawableCompat.wrap(rippleGradient);
+        DrawableCompat.setTintList(mRippleDrawablePreL, rippleColorList);
+
+        // If the background is overlaid by a border. The border is in a separate GradientDrawable
+        // to apply ColorStateLists independently from ripple and background.
+        mBorderGradient = new GradientDrawable();
+        mBorderGradient.setCornerRadii(cornerRadii);
+        mBorderGradient.setColor(mView.getResources().getColor(android.R.color.transparent));
+        mBorderGradient.setStroke(borderSize, Color.WHITE);
+        mBorderDrawablePreL = DrawableCompat.wrap(mBorderGradient);
+        DrawableCompat.setTintList(mBorderDrawablePreL, borderColorList);
+
+        mBackgroundLayerDrawable = new LayerDrawable(new Drawable[]{mBackgroundDrawablePreL,
+                mBorderDrawablePreL, mStateLayerDrawablePreL, mRippleDrawablePreL});
+        return wrapDrawableWithInsets(mBackgroundLayerDrawable, verticalInset);
     }
 
     /**
@@ -181,8 +228,8 @@ public class RippleBackgroundHelper {
      * @return The {@link GradientDrawable}/{@link LayerDrawable} to be used as ripple background.
      */
     private Drawable createBackgroundDrawable(ColorStateList rippleColorList,
-            ColorStateList borderColorList, @Px int borderSize, @Px int cornerRadius,
-            @Px int verticalInset) {
+                                              ColorStateList borderColorList, @Px int borderSize, @Px int cornerRadius,
+                                              @Px int verticalInset) {
         return createBackgroundDrawable(rippleColorList, borderColorList, borderSize,
                 new float[] {cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius,
                         cornerRadius, cornerRadius, cornerRadius},
@@ -207,16 +254,30 @@ public class RippleBackgroundHelper {
         if (color == mBackgroundColorList) return;
 
         mBackgroundColorList = color;
-        // This works around an issue before Android O where the drawable is drawn in the wrong
-        // default state.
-        if (VERSION.SDK_INT < VERSION_CODES.M) {
-            int id = View.generateViewId();
-            mBackgroundLayerDrawable.setId(0, id);
-            mBackgroundLayerDrawable.setDrawableByLayerId(id, mBackgroundGradient);
-        } else if (VERSION.SDK_INT < VERSION_CODES.O) {
-            mBackgroundLayerDrawable.setDrawable(/* index */ 0, mBackgroundGradient);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            resetDrawable(mBackgroundLayerDrawable, 0);
         }
-        mBackgroundGradient.setColor(color);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            DrawableCompat.setTintList(mBackgroundDrawablePreL, color);
+        } else {
+            mBackgroundGradient.setColor(color);
+        }
+    }
+
+    /**
+     * Called from the view when drawable state is changed to update the state of the background
+     * color and the ripple color for pre-L versions.
+     */
+    // TODO(jdemeulenaere): Make this method package-private once it is not accessed by {@link
+    // org.chromium.chrome.browser.autofill_assistant.carousel.ButtonView} anymore.
+    public void onDrawableStateChanged() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) return;
+
+        int[] state = mView.getDrawableState();
+        mBackgroundDrawablePreL.setState(state);
+        mStateLayerDrawablePreL.setState(state);
+        mRippleDrawablePreL.setState(state);
+        mBorderDrawablePreL.setState(state);
     }
 
     /**
@@ -227,23 +288,23 @@ public class RippleBackgroundHelper {
         if (color == mStateLayerColorList) return;
 
         mStateLayerColorList = color;
-        // This works around an issue before Android O where the drawable is drawn in the wrong
-        // default state.
-        if (VERSION.SDK_INT < VERSION_CODES.M) {
-            int id = View.generateViewId();
-            mBackgroundLayerDrawable.setId(1, id);
-            mBackgroundLayerDrawable.setDrawableByLayerId(id, mStateLayerGradient);
-        } else if (VERSION.SDK_INT < VERSION_CODES.O) {
-            mBackgroundLayerDrawable.setDrawable(/* index */ 1, mStateLayerGradient);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Drawable stateLayerDrawable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                    ? mStateLayerGradient : mStateLayerDrawablePreL;
+            resetDrawable(mBackgroundLayerDrawable, stateLayerDrawable);
         }
-        mStateLayerGradient.setColor(color);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            DrawableCompat.setTintList(mStateLayerDrawablePreL, color);
+        } else {
+            mStateLayerGradient.setColor(color);
+        }
     }
 
     /**
      * @param color a single color to be set as the background color on the background drawable.
      */
     public void setBackgroundColor(@ColorInt int color) {
-        mBackgroundGradient.setColor(color);
+        setBackgroundColor(ColorStateList.valueOf(color));
     }
 
     /**
@@ -252,7 +313,17 @@ public class RippleBackgroundHelper {
      * @param color of the border.
      */
     public void setBorder(int width, @ColorInt int color) {
-        mBackgroundGradient.setStroke(width, color);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Drawable borderDrawable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                    ? mBorderGradient : mBorderDrawablePreL;
+            resetDrawable(mBackgroundLayerDrawable, borderDrawable);
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            mBorderGradient.setStroke(width, Color.WHITE);
+            DrawableCompat.setTint(mBorderDrawablePreL, color);
+        } else {
+            mBorderGradient.setStroke(width, color);
+        }
     }
 
     /**
@@ -275,10 +346,47 @@ public class RippleBackgroundHelper {
      * Converts the specified {@link ColorStateList} to one that can be applied to a
      * {@link RippleDrawable}.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static ColorStateList convertToRippleDrawableColorList(ColorStateList colorStateList) {
         return new ColorStateList(new int[][] {STATE_SET_SELECTED, StateSet.NOTHING},
                 new int[] {
                         doubleAlpha(getColorForState(colorStateList, STATE_SET_SELECTED_PRESSED)),
                         doubleAlpha(getColorForState(colorStateList, STATE_SET_PRESSED))});
+    }
+
+    /**
+     * This works around an issue before Android O
+     * where the drawable is drawn in the wrong default state.
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.O)
+    private static void resetDrawable(LayerDrawable ld, Drawable d) {
+        int i = indexOf(ld, d);
+        resetDrawable(ld, i);
+    }
+
+    /**
+     * This works around an issue before Android O
+     * where the drawable is drawn in the wrong default state.
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.O)
+    private static void resetDrawable(LayerDrawable ld, int i) {
+        Drawable d = ld.getDrawable(i);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            int id = ld.getId(i);
+            if (id == View.NO_ID) {
+                id = View.generateViewId();
+                ld.setId(i, id);
+            }
+            ld.setDrawableByLayerId(id, d);
+        } else {
+            ld.setDrawable(i, d);
+        }
+    }
+
+    private static int indexOf(LayerDrawable ld, Drawable d) {
+        for (int i = 0, size = ld.getNumberOfLayers(); i < size; i++) {
+            if (ld.getDrawable(i) == d) return i;
+        }
+        return -1;
     }
 }
