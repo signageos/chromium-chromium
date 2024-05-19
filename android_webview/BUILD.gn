@@ -369,7 +369,7 @@ template("libwebviewchromium_tmpl") {
   }
 }
 
-libwebviewchromium_tmpl("libwebviewchromium") {
+libwebviewchromium_tmpl("lib$system_webview_library_name") {
 }
 
 # This template is used to define WebView's alternate-ABI libraries, which are
