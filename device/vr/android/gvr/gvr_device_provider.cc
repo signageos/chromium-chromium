@@ -15,10 +15,13 @@ GvrDeviceProvider::GvrDeviceProvider() = default;
 GvrDeviceProvider::~GvrDeviceProvider() = default;
 
 void GvrDeviceProvider::Initialize(VRDeviceProviderClient* client) {
+  // Version check should match MIN_SDK_VERSION in VrCoreVersionChecker.java.
   // We only expose GvrDevice if
   //  - we could potentially install VRServices to support presentation, and
   //  - this build is a bundle and, thus, supports installing the VR module.
-  if (base::android::BundleUtils::IsBundle()) {
+  if (base::android::BuildInfo::GetInstance()->sdk_int() >=
+          base::android::SDK_VERSION_LOLLIPOP &&
+      base::android::BundleUtils::IsBundle()) {
     vr_device_ = base::WrapUnique(new GvrDevice());
   }
   if (vr_device_) {

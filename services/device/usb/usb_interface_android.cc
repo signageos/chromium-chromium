@@ -4,6 +4,7 @@
 
 #include "services/device/usb/usb_interface_android.h"
 
+#include "base/android/build_info.h"
 #include "services/device/usb/jni_headers/ChromeUsbInterface_jni.h"
 #include "services/device/usb/usb_endpoint_android.h"
 
@@ -18,8 +19,12 @@ mojom::UsbInterfaceInfoPtr UsbInterfaceAndroid::Convert(
   ScopedJavaLocalRef<jobject> wrapper =
       Java_ChromeUsbInterface_create(env, usb_interface);
 
-  uint8_t alternate_setting =
-      Java_ChromeUsbInterface_getAlternateSetting(env, wrapper);
+  uint8_t alternate_setting = 0;
+  if (base::android::BuildInfo::GetInstance()->sdk_int() >=
+      base::android::SDK_VERSION_LOLLIPOP) {
+    alternate_setting =
+        Java_ChromeUsbInterface_getAlternateSetting(env, wrapper);
+  }
 
   auto interface = BuildUsbInterfaceInfoPtr(
       Java_ChromeUsbInterface_getInterfaceNumber(env, wrapper),
