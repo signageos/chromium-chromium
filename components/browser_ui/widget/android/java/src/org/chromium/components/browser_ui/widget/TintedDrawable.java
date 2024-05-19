@@ -12,6 +12,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
+import android.os.Build;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
@@ -101,6 +102,10 @@ public class TintedDrawable extends BitmapDrawable {
      */
     private static boolean isVectorDrawable(Context context, @DrawableRes int drawableId) {
         Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
-        return drawable instanceof VectorDrawableCompat || drawable instanceof VectorDrawable;
+        if (drawable instanceof VectorDrawableCompat) return true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return drawable instanceof VectorDrawable;
+        }
+        return false;
     }
 }
