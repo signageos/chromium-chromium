@@ -6,6 +6,7 @@ package org.chromium.components.module_installer.util;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.google.android.play.core.splitinstall.SplitInstallManager;
@@ -31,9 +32,12 @@ class CrashKeyRecorder {
         // Get modules that are fully installed as split APKs (excluding base which is always
         // installed). Tree set to have ordered and, thus, deterministic results.
         Set<String> fullyInstalledModules = new TreeSet<>();
-        PackageInfo packageInfo = PackageUtils.getApplicationPackageInfo(0);
-        if (packageInfo.splitNames != null) {
-            fullyInstalledModules.addAll(Arrays.asList(packageInfo.splitNames));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Split APKs are only supported on Android L+.
+            PackageInfo packageInfo = PackageUtils.getApplicationPackageInfo(0);
+            if (packageInfo.splitNames != null) {
+                fullyInstalledModules.addAll(Arrays.asList(packageInfo.splitNames));
+            }
         }
 
         // Create temporary split install manager to retrieve both fully installed and emulated
