@@ -4,12 +4,14 @@
 
 package org.chromium.content.browser;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.LocaleUtils;
@@ -198,12 +200,22 @@ class TtsPlatformImpl {
 
             mTextToSpeech.setSpeechRate(rate);
             mTextToSpeech.setPitch(pitch);
-            Bundle params = new Bundle();
-            if (volume != 1.0) {
-                params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume);
+            final int result;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Bundle params = new Bundle();
+                if (volume != 1.0) {
+                    params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume);
+                }
+                result = Api21.speak(mTextToSpeech,
+                        text, TextToSpeech.QUEUE_FLUSH, params, Integer.toString(utteranceId));
+            } else {
+                HashMap<String, String> params = new HashMap<>();
+                if (volume != 1.0) {
+                    params.put(TextToSpeech.Engine.KEY_PARAM_VOLUME, String.valueOf(volume));
+                }
+                params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, String.valueOf(volume));
+                result = mTextToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, params);
             }
-            int result = mTextToSpeech.speak(
-                    text, TextToSpeech.QUEUE_FLUSH, params, Integer.toString(utteranceId));
             return (result == TextToSpeech.SUCCESS);
         }
 
@@ -413,13 +425,28 @@ class TtsPlatformImpl {
 
             @Override
             @Deprecated
-            public void onError(final String utteranceId) {}
+            public void onError(final String utteranceId) {
+                sendErrorEventOnUiThread(utteranceId);
+            }
 
             @Override
             public void onStart(final String utteranceId) {
                 sendStartEventOnUiThread(utteranceId);
             }
         });
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static final class Api21 {
+
+        static int speak(TextToSpeech tts,
+                         CharSequence text, int queueMode, Bundle params,
+                         String utteranceId) {
+            return tts.speak(text, queueMode, params, utteranceId);
+        }
+
+        private Api21() {
+        }
     }
 
     @NativeMethods
