@@ -4,6 +4,7 @@
 
 package org.chromium.content.browser.input;
 
+import android.os.Build;
 import android.view.inputmethod.CursorAnchorInfo;
 import android.view.inputmethod.InputConnection;
 
@@ -22,6 +23,7 @@ import org.chromium.base.test.util.Criteria;
 import org.chromium.base.test.util.CriteriaHelper;
 import org.chromium.base.test.util.DisabledTest;
 import org.chromium.base.test.util.Feature;
+import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.content_public.browser.test.ContentJUnit4ClassRunner;
 import org.chromium.content_public.browser.test.util.TestThreadUtils;
 
@@ -32,6 +34,7 @@ import java.util.concurrent.Callable;
  */
 @RunWith(ContentJUnit4ClassRunner.class)
 @Batch(ImeTest.IME_BATCH)
+@MinAndroidSdkLevel(Build.VERSION_CODES.LOLLIPOP)
 public class ImeLollipopTest {
     @Rule
     public ImeActivityTestRule mRule = new ImeActivityTestRule();

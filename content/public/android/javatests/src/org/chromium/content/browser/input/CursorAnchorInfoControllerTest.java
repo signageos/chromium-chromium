@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 
 import org.chromium.base.test.util.Batch;
 import org.chromium.base.test.util.Feature;
+import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.content_public.browser.test.ContentJUnit4ClassRunner;
 import org.chromium.content_public.browser.test.util.TestInputMethodManagerWrapper;
 
@@ -27,6 +28,7 @@ import org.chromium.content_public.browser.test.util.TestInputMethodManagerWrapp
  */
 @RunWith(ContentJUnit4ClassRunner.class)
 @Batch(Batch.UNIT_TESTS)
+@MinAndroidSdkLevel(Build.VERSION_CODES.LOLLIPOP)
 public class CursorAnchorInfoControllerTest {
     private static final class TestViewDelegate implements CursorAnchorInfoController.ViewDelegate {
         public int locationX;

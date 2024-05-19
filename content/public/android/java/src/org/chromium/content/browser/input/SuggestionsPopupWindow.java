@@ -7,7 +7,10 @@ package org.chromium.content.browser.input;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.text.SpannableString;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -110,13 +113,22 @@ public abstract class SuggestionsPopupWindow
         mPopupWindow = new PopupWindow();
         mPopupWindow.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         mPopupWindow.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        // Set the background on the PopupWindow instead of on mContentView (where we set it for
-        // pre-Lollipop) since the popup will not properly dismiss on pre-Marshmallow unless it
-        // has a background set.
-        mPopupWindow.setBackgroundDrawable(ApiCompatibilityUtils.getDrawable(
-                mContext.getResources(), R.drawable.floating_popup_background));
-        mPopupWindow.setElevation(mContext.getResources().getDimensionPixelSize(
-                R.dimen.text_suggestion_popup_elevation));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Set the background on the PopupWindow instead of on mContentView (where we set it for
+            // pre-Lollipop) since the popup will not properly dismiss on pre-Marshmallow unless it
+            // has a background set.
+            mPopupWindow.setBackgroundDrawable(ApiCompatibilityUtils.getDrawable(
+                    mContext.getResources(), R.drawable.floating_popup_background));
+            // On Lollipop and later, we use elevation to create a drop shadow effect.
+            // On pre-Lollipop, we instead use a background image on mContentView (in
+            // initContentView).
+            mPopupWindow.setElevation(mContext.getResources().getDimensionPixelSize(
+                    R.dimen.text_suggestion_popup_elevation));
+        } else {
+            // The PopupWindow does not properly dismiss pre-Marshmallow unless it has a background
+            // set.
+            mPopupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
 
         mPopupWindow.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
         mPopupWindow.setFocusable(true);
@@ -129,6 +141,13 @@ public abstract class SuggestionsPopupWindow
                 (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mContentView =
                 (LinearLayout) inflater.inflate(R.layout.text_edit_suggestion_container, null);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // Set this on the content view instead of on the PopupWindow so we can retrieve the
+            // padding later.
+            mContentView.setBackground(ApiCompatibilityUtils.getDrawable(
+                    mContext.getResources(), R.drawable.popup_bg));
+        }
 
         // mPopupVerticalMargin is the minimum amount of space we want to have between the popup
         // and the top or bottom of the window.
