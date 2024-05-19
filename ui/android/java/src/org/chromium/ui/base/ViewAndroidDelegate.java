@@ -18,6 +18,7 @@ import android.view.inputmethod.InputConnection;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.view.MarginLayoutParamsCompat;
 
@@ -523,6 +524,7 @@ public class ViewAndroidDelegate {
     }
 
     @CalledByNative
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private void requestUnbufferedDispatch(MotionEvent event) {
         ViewGroup container = getContainerViewGroup();
         if (container != null) {
