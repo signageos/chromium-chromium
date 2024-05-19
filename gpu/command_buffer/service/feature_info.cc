@@ -1602,6 +1602,12 @@ void FeatureInfo::InitializeFeatures() {
     validators_.g_l_state.AddValue(GL_MAX_DUAL_SOURCE_DRAW_BUFFERS_EXT);
   }
 
+#if !BUILDFLAG(IS_MAC)
+  if (workarounds_.ignore_egl_sync_failures) {
+    gl::GLFenceEGL::SetIgnoreFailures();
+  }
+#endif
+
   if (gl_version_info_->IsLowerThanGL(4, 3)) {
     // crbug.com/481184.
     // GL_PRIMITIVE_RESTART_FIXED_INDEX is only available on Desktop GL 4.3+,

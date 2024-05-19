@@ -161,7 +161,7 @@ def get_feature_set(features, total_feature_set):
         else:
           raise KeyError('only exceptions are allowed')
     else:
-      assert feature in total_feature_set
+      assert feature in total_feature_set, feature
       feature_set[feature] = 1
   return feature_set
 
