@@ -3516,17 +3516,6 @@
       ]
     },
     {
-      "id": 358,
-      "cr_bugs": [1127387],
-      "description": "Always assume float formats are renderable on Android except RGB32F",
-      "os": {
-        "type": "android"
-      },
-      "features": [
-        "force_enable_color_buffer_float_except_rgb32f"
-      ]
-    },
-    {
       "id": 359,
       "comment": "Corresponds to software rendering list #140",
       "description": "Disable depth textures on Adreno 3xx Qualcomm GPUs pre-Android 9 (legacy blocklist entry, original problem unclear)",
