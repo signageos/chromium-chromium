@@ -252,9 +252,15 @@ _webview_jinja_variables = [ "manifest_package=$system_webview_package_name" ] +
                            webview_jinja_variables
 
 jinja_template("system_webview_manifest") {
+  if (defined(system_webview_library_name)) {
+    _library = "lib$system_webview_library_name.so"
+  }
+
   input = "java/AndroidManifest.xml"
   output = system_webview_android_manifest
-  variables = _webview_jinja_variables
+  variables = _webview_jinja_variables + [
+                "library=$_library",
+              ]
 }
 
 jinja_template("trichrome_webview_manifest") {
@@ -268,9 +274,16 @@ jinja_template("trichrome_webview_manifest") {
 
 if (android_64bit_target_cpu) {
   jinja_template("system_webview_64_manifest") {
+    if (defined(system_webview_library_name)) {
+      _library = "lib$system_webview_library_name.so"
+    }
+
     input = "java/AndroidManifest.xml"
     output = system_webview_64_android_manifest
-    variables = _webview_jinja_variables + [ "use32bitAbi=" ]
+    variables = _webview_jinja_variables + [
+                  "use32bitAbi=",
+                  "library=$_library",
+                ]
   }
 
   jinja_template("trichrome_webview_64_manifest") {
