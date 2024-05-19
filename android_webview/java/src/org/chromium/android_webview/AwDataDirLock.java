@@ -11,6 +11,8 @@ import android.system.ErrnoException;
 import android.system.Os;
 import android.system.OsConstants;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
 import org.chromium.base.PathUtils;
@@ -133,6 +135,25 @@ abstract class AwDataDirLock {
             String processName = file.readUTF();
             error.append(processName).append(" (pid ").append(pid).append(")");
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Api21.appendLockFailureReason(error, pid);
+            } else {
+                throw new IOException();
+            }
+        } catch (IOException e) {
+            // We'll get IOException if we failed to read the pid and process name; e.g. if the
+            // lockfile is from an old version of WebView or an IO error occurred somewhere.
+            error.append(" unknown");
+        }
+        return error.toString();
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static final class Api21 {
+
+        private Api21() {}
+
+        static void appendLockFailureReason(StringBuilder error, int pid) {
             // Check the status of the pid holding the lock by sending it a null signal.
             // This doesn't actually send a signal, just runs the kernel access checks.
             try {
@@ -155,11 +176,6 @@ abstract class AwDataDirLock {
                     error.append(" status unknown!");
                 }
             }
-        } catch (IOException e) {
-            // We'll get IOException if we failed to read the pid and process name; e.g. if the
-            // lockfile is from an old version of WebView or an IO error occurred somewhere.
-            error.append(" unknown");
         }
-        return error.toString();
     }
 }
