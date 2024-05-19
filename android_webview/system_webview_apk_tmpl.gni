@@ -28,6 +28,7 @@ declare_args() {
   target_sdk_version = android_sdk_version
   max_sdk_version = android_sdk_version
   enable_lint = false
+  system_webview_library_name = "webviewchromium"
 }
 
 template("system_webview_apk_or_module_tmpl") {
@@ -141,11 +142,11 @@ template("system_webview_apk_or_module_tmpl") {
 
       if ((!android_64bit_target_cpu && _include_32_bit_webview) ||
           (android_64bit_target_cpu && !_pure_32_bit)) {
-        shared_libraries = [ "//android_webview:libwebviewchromium" ]
+        shared_libraries = [ "//android_webview:lib$system_webview_library_name" ]
         _include_primary_support = true
       }
       if (android_64bit_target_cpu && !_pure_64_bit) {
-        secondary_abi_shared_libraries = [ "//android_webview:libwebviewchromium($android_secondary_abi_toolchain)" ]
+        secondary_abi_shared_libraries = [ "//android_webview:lib$system_webview_library_name($android_secondary_abi_toolchain)" ]
         _include_secondary_support = true
       }
       deps += [ "//third_party/icu:icu_assets" ]
