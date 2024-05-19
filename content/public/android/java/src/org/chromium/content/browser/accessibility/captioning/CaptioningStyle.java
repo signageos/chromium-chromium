@@ -5,6 +5,7 @@
 package org.chromium.content.browser.accessibility.captioning;
 
 import android.graphics.Typeface;
+import android.os.Build;
 import android.view.accessibility.CaptioningManager.CaptionStyle;
 
 /**
@@ -111,20 +112,27 @@ public class CaptioningStyle {
         Integer edgeType = null;
         Integer foregroundColor = null;
         Integer windowColor = null;
-        if (captionStyle.hasBackgroundColor()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (captionStyle.hasBackgroundColor()) {
+                backgroundColor = Integer.valueOf(captionStyle.backgroundColor);
+            }
+            if (captionStyle.hasEdgeColor()) {
+                edgeColor = Integer.valueOf(captionStyle.edgeColor);
+            }
+            if (captionStyle.hasEdgeType()) {
+                edgeType = Integer.valueOf(captionStyle.edgeType);
+            }
+            if (captionStyle.hasForegroundColor()) {
+                foregroundColor = Integer.valueOf(captionStyle.foregroundColor);
+            }
+            if (captionStyle.hasWindowColor()) {
+                windowColor = Integer.valueOf(captionStyle.windowColor);
+            }
+        } else {
             backgroundColor = Integer.valueOf(captionStyle.backgroundColor);
-        }
-        if (captionStyle.hasEdgeColor()) {
             edgeColor = Integer.valueOf(captionStyle.edgeColor);
-        }
-        if (captionStyle.hasEdgeType()) {
             edgeType = Integer.valueOf(captionStyle.edgeType);
-        }
-        if (captionStyle.hasForegroundColor()) {
             foregroundColor = Integer.valueOf(captionStyle.foregroundColor);
-        }
-        if (captionStyle.hasWindowColor()) {
-            windowColor = Integer.valueOf(captionStyle.windowColor);
         }
 
         return new CaptioningStyle(backgroundColor, edgeColor, edgeType, foregroundColor,
