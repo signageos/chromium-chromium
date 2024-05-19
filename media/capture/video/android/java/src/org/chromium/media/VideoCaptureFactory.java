@@ -8,6 +8,8 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
+
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
 import org.chromium.base.annotations.CalledByNative;
@@ -46,16 +48,25 @@ class VideoCaptureFactory {
                     Log.w(TAG, "Missing android.permission.CAMERA permission, "
                                     + "no system camera available.");
                 } else {
-                    sNumberOfSystemCameras = VideoCaptureCamera2.getNumberOfCameras();
+                    if (isLReleaseOrLater()) {
+                        sNumberOfSystemCameras = VideoCaptureCamera2.getNumberOfCameras();
+                    } else {
+                        sNumberOfSystemCameras = VideoCaptureCamera.getNumberOfCameras();
+                    }
                 }
             }
             return sNumberOfSystemCameras;
         }
     }
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.LOLLIPOP)
+    private static boolean isLReleaseOrLater() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+    }
+
     @CalledByNative
     static boolean isLegacyOrDeprecatedDevice(int id) {
-        return VideoCaptureCamera2.isLegacyDevice(id);
+        return !isLReleaseOrLater() || VideoCaptureCamera2.isLegacyDevice(id);
     }
 
     // Factory methods.
