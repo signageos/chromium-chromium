@@ -8,8 +8,11 @@ import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.Context;
+import android.os.Build;
 import android.os.PersistableBundle;
 import android.os.SystemClock;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
@@ -18,6 +21,7 @@ import org.chromium.build.BuildConfig;
 /**
  * Class that interacts with the Android JobScheduler to upload Minidumps at appropriate times.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public abstract class MinidumpUploadJobService extends JobService {
     private static final String TAG = "MinidumpJobService";
 

@@ -6,6 +6,7 @@ package org.chromium.components.policy;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
 
@@ -47,6 +48,8 @@ public class AppRestrictionsProvider extends AbstractAppRestrictionsProvider {
 
     @Override
     protected String getRestrictionChangeIntentAction() {
+        // Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED was introduced in LOLLIPOP.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return null;
         return Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED;
     }
 }

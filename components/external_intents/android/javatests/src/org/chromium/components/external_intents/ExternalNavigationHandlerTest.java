@@ -48,6 +48,7 @@ import org.chromium.base.ThreadUtils;
 import org.chromium.base.supplier.Supplier;
 import org.chromium.base.test.BaseJUnit4ClassRunner;
 import org.chromium.base.test.util.Batch;
+import org.chromium.base.test.util.DisableIf;
 import org.chromium.base.test.util.MaxAndroidSdkLevel;
 import org.chromium.base.test.util.MinAndroidSdkLevel;
 import org.chromium.components.external_intents.ExternalNavigationDelegate.IntentToAutofillAllowingAppResult;
@@ -75,6 +76,8 @@ import java.util.regex.Pattern;
  */
 @RunWith(BaseJUnit4ClassRunner.class)
 // clang-format off
+@DisableIf.Build(message = "Flaky on K - see https://crbug.com/851444",
+        sdk_is_less_than = Build.VERSION_CODES.LOLLIPOP)
 @Batch(Batch.UNIT_TESTS)
 public class ExternalNavigationHandlerTest {
     // clang-format on
