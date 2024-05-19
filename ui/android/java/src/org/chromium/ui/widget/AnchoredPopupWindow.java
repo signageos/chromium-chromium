@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.annotation.VisibleForTesting;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ObserverList;
 import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.ui.R;
@@ -456,10 +457,10 @@ public class AnchoredPopupWindow implements OnTouchListener, RectProvider.Observ
     }
 
     /**
-     * Sets the elevation of the popup.
+     * Sets the elevation of the popup, if elevation is supported.
      */
     public void setElevation(float elevation) {
-        mPopupWindow.setElevation(elevation);
+        ApiCompatibilityUtils.setElevation(mPopupWindow, elevation);
     }
 
     /**
