@@ -19,6 +19,8 @@
 
 namespace media {
 
+class MediaCodecBridge;
+
 // WARNING: Not all methods on this class can be used in the renderer process,
 // only those which do not attempt to use MediaCodec or MediaCodecList.
 //
@@ -124,6 +126,15 @@ class MEDIA_EXPORT MediaCodecUtil {
   // create a MediaCodec (which requires permissions) to get the codec name.
   static bool IsKnownUnaccelerated(VideoCodec codec,
                                    MediaCodecDirection direction);
+
+  // Indicates if the decoder is known to fail when flushed. (b/8125974,
+  // b/8347958)
+  // When true, the client should work around the issue by releasing the
+  // decoder and instantiating a new one rather than flushing the current one.
+  //
+  // WARNING: This can't be used from the renderer process since it attempts to
+  // create a MediaCodec (which requires permissions) to get the codec name.
+  static bool CodecNeedsFlushWorkaround(MediaCodecBridge* codec);
 };
 
 }  // namespace media
