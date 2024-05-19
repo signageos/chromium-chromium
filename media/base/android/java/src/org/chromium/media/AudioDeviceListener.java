@@ -15,6 +15,7 @@ import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
@@ -148,6 +149,10 @@ class AudioDeviceListener {
      * and higher in the order of wired headset first, then USB audio device and earpiece at last.
      */
     private boolean hasUsbAudio() {
+        // Android 5.0 (API level 21) and above supports USB audio class 1 (UAC1) features for
+        // audio functions, capture and playback, in host mode.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return false;
+
         // UsbManager fails internally with NullPointerException on the emulator created without
         // Google APIs.
         Map<String, UsbDevice> devices;

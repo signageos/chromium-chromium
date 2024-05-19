@@ -57,6 +57,10 @@ class MediaCodecBridge {
     private static final String KEY_CROP_TOP = "crop-top";
 
     protected MediaCodec mMediaCodec;
+
+    private ByteBuffer[] mInputBuffers;
+    private ByteBuffer[] mOutputBuffers;
+
     private @BitrateAdjuster.Type int mBitrateAdjuster;
 
     // The maximum input size this codec was configured with.
@@ -404,6 +408,10 @@ class MediaCodecBridge {
             }
 
             mMediaCodec.start();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                mInputBuffers = mMediaCodec.getInputBuffers();
+                mOutputBuffers = mMediaCodec.getOutputBuffers();
+            }
         } catch (IllegalStateException e) {
             Log.e(TAG, "Cannot start the media codec", e);
             return false;
@@ -521,23 +529,29 @@ class MediaCodecBridge {
                 if (mPendingError) return null;
             }
         }
-        try {
-            return mMediaCodec.getInputBuffer(index);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Failed to get input buffer", e);
-            return null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                return mMediaCodec.getInputBuffer(index);
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Failed to get input buffer", e);
+                return null;
+            }
         }
+        return mInputBuffers[index];
     }
 
     /** Returns null if MediaCodec throws IllegalStateException. */
     @CalledByNative
     protected ByteBuffer getOutputBuffer(int index) {
-        try {
-            return mMediaCodec.getOutputBuffer(index);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Failed to get output buffer", e);
-            return null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                return mMediaCodec.getOutputBuffer(index);
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Failed to get output buffer", e);
+                return null;
+            }
         }
+        return mOutputBuffers[index];
     }
 
     @CalledByNative
@@ -681,6 +695,7 @@ class MediaCodecBridge {
                 status = MediaCodecStatus.OK;
                 index = indexOrStatus;
             } else if (indexOrStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                mOutputBuffers = mMediaCodec.getOutputBuffers();
                 status = MediaCodecStatus.OUTPUT_BUFFERS_CHANGED;
             } else if (indexOrStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 status = MediaCodecStatus.OUTPUT_FORMAT_CHANGED;
@@ -807,7 +822,11 @@ class MediaCodecBridge {
             case 6:
                 return AudioFormat.CHANNEL_OUT_5POINT1;
             case 8:
-                return AudioFormat.CHANNEL_OUT_7POINT1_SURROUND;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    return AudioFormat.CHANNEL_OUT_7POINT1_SURROUND;
+                } else {
+                    return AudioFormat.CHANNEL_OUT_7POINT1;
+                }
             default:
                 return AudioFormat.CHANNEL_OUT_DEFAULT;
         }
