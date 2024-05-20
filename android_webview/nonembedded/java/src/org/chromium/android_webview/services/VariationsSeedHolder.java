@@ -4,6 +4,7 @@
 
 package org.chromium.android_webview.services;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.ParcelFileDescriptor;
@@ -148,7 +149,9 @@ public class VariationsSeedHolder {
 
     @VisibleForTesting
     public void scheduleFetchIfNeeded() {
-        AwVariationsSeedFetcher.scheduleIfNeeded();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AwVariationsSeedFetcher.scheduleIfNeeded();
+        }
     }
 
     // overridden by tests
