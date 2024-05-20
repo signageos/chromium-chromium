@@ -978,6 +978,10 @@ public final class WebLayerImpl extends IWebLayer.Stub {
      * to force a dex compile if necessary.
      */
     private static void performDexFixIfNecessary(PackageInfo packageInfo) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return; // No splits before Lollipop.
+        }
+
         if (Build.VERSION.SDK_INT != Build.VERSION_CODES.O_MR1) {
             return;
         }

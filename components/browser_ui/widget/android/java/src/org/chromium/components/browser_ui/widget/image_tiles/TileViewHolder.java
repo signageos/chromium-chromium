@@ -7,10 +7,12 @@ package org.chromium.components.browser_ui.widget.image_tiles;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
+import android.os.Build;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import org.chromium.components.browser_ui.widget.R;
@@ -19,6 +21,7 @@ import org.chromium.ui.modelutil.PropertyModel;
 /**
  * A {@link ViewHolder} responsible for building and setting properties on the tiles.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class TileViewHolder extends ViewHolder {
     /** Creates an instance of a {@link TileViewHolder}. */
     protected TileViewHolder(View itemView) {

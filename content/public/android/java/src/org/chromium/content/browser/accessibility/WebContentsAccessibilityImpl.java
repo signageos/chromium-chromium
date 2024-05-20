@@ -81,6 +81,7 @@ import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat;
 
 import org.chromium.base.ContextUtils;
+import org.chromium.base.LocaleUtils;
 import org.chromium.base.Log;
 import org.chromium.base.UserData;
 import org.chromium.base.annotations.CalledByNative;
@@ -398,7 +399,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
         mBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mSystemLanguageTag = Locale.getDefault().toLanguageTag();
+                mSystemLanguageTag = LocaleUtils.toLanguageTag(Locale.getDefault());
             }
         };
 
@@ -535,7 +536,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
             // WebView may be running inside a BroadcastReceiver, in which case registerReceiver is
             // not allowed.
         }
-        mSystemLanguageTag = Locale.getDefault().toLanguageTag();
+        mSystemLanguageTag = LocaleUtils.toLanguageTag(Locale.getDefault());
     }
 
     @Override
@@ -1883,7 +1884,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
             } else {
                 spannable = new SpannableString(charSequence);
             }
-            Locale locale = Locale.forLanguageTag(language);
+            Locale locale = LocaleUtils.forLanguageTag(language);
             spannable.setSpan(new LocaleSpan(locale), 0, spannable.length(), 0);
             charSequence = spannable;
         }

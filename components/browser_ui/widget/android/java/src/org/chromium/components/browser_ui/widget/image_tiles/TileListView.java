@@ -7,6 +7,7 @@ package org.chromium.components.browser_ui.widget.image_tiles;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -15,6 +16,7 @@ import android.view.animation.LayoutAnimationController;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration;
@@ -29,6 +31,7 @@ import org.chromium.ui.modelutil.RecyclerViewAdapter;
  * The View component of the tiles UI.  This takes the {@link TileListModel} and creates the
  * glue to display it on the screen.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class TileListView {
     private final TileListModel mModel;
     private final RecyclerView mView;

@@ -5,7 +5,10 @@
 package org.chromium.components.browser_ui.widget.image_tiles;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Callback;
 
@@ -15,6 +18,7 @@ import java.util.List;
 /**
  * The top level coordinator for the tiles UI.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class TileCoordinatorImpl implements ImageTileCoordinator {
     private final TileListModel mModel;
     private final TileListView mView;

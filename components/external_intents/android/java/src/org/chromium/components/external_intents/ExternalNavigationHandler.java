@@ -2183,7 +2183,7 @@ public class ExternalNavigationHandler {
             // This will throw a Resources.NotFoundException if the package uses resource
             // name collapsing/stripping. The ActivityPicker fails to handle this exception, we have
             // have to check for it here to avoid crashes.
-            resources.getDrawable(resources.getIdentifier(resource.resourceName, null, null), null);
+            resources.getDrawable(resources.getIdentifier(resource.resourceName, null, null));
         } catch (NameNotFoundException | Resources.NotFoundException e) {
             Log.w(TAG, "No icon resource found for package: " + packageName);
             // Most likely the app doesn't have an icon and is just a test

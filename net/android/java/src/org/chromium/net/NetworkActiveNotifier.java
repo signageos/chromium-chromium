@@ -6,6 +6,9 @@ package org.chromium.net;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.annotations.CalledByNative;
@@ -28,6 +31,7 @@ import org.chromium.base.annotations.NativeMethods;
  * loading this class will fail on older Android versions (no sdk checks are needed for this
  * reason).
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 @JNINamespace("net")
 public class NetworkActiveNotifier implements ConnectivityManager.OnNetworkActiveListener {
     private final ConnectivityManager mConnectivityManager;

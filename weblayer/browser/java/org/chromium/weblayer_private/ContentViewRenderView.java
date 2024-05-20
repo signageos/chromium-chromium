@@ -11,7 +11,6 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.os.SystemClock;
-import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -853,30 +852,30 @@ public class ContentViewRenderView
 
     private void updateWebContentsSize() {
         if (mWebContents == null) return;
-        Size size = getViewportSize();
-        mWebContents.setSize(size.getWidth(), size.getHeight() - mWebContentsHeightDelta);
+        Rect size = getViewportSize();
+        mWebContents.setSize(size.width(), size.height() - mWebContentsHeightDelta);
     }
 
     /** {@link CompositorViewHolder#getViewportSize()} for explanation. */
-    private Size getViewportSize() {
+    private Rect getViewportSize() {
         if (mWebContents.isFullscreenForCurrentTab()
                 && mWindowAndroid.getKeyboardDelegate().isKeyboardShowing(getContext(), this)) {
             Rect visibleRect = new Rect();
             getWindowVisibleDisplayFrame(visibleRect);
-            return new Size(Math.min(visibleRect.width(), getWidth()),
+            return new Rect(0, 0, Math.min(visibleRect.width(), getWidth()),
                     Math.min(visibleRect.height(), getHeight()));
         }
 
-        return new Size(getWidth(), getHeight());
+        return new Rect(0, 0, getWidth(), getHeight());
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         if (mWebContents == null) return;
         updateWebContentsSize();
-        Size viewportSize = getViewportSize();
+        Rect viewportSize = getViewportSize();
         ContentViewRenderViewJni.get().onViewportSizeChanged(
-                mNativeContentViewRenderView, viewportSize.getWidth(), viewportSize.getHeight());
+                mNativeContentViewRenderView, viewportSize.width(), viewportSize.height());
     }
 
     /**

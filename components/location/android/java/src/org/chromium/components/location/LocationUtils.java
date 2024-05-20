@@ -75,9 +75,11 @@ public class LocationUtils {
     public boolean isSystemLocationSettingEnabled() {
         Context context = ContextUtils.getApplicationContext();
 
-        UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        if (userManager.hasUserRestriction(UserManager.DISALLOW_SHARE_LOCATION)) {
-            return false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
+            if (userManager.hasUserRestriction(UserManager.DISALLOW_SHARE_LOCATION)) {
+                return false;
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

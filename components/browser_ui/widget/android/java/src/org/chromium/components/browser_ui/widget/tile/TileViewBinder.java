@@ -4,10 +4,13 @@
 package org.chromium.components.browser_ui.widget.tile;
 
 import android.content.res.Resources;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.components.browser_ui.widget.R;
@@ -15,6 +18,7 @@ import org.chromium.ui.modelutil.PropertyKey;
 import org.chromium.ui.modelutil.PropertyModel;
 
 /** Binder wiring for the TileView. */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class TileViewBinder {
     /** @see PropertyModelChangeProcessor.ViewBinder#bind(Object, Object, Object) */
     public static void bind(PropertyModel model, TileView view, PropertyKey propertyKey) {

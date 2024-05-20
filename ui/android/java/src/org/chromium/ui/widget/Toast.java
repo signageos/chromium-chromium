@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.SysUtils;
@@ -254,7 +256,14 @@ public class Toast {
                 textView.announceForAccessibility(mText);
             }
             if (mBackgroundColor != null) {
-                textView.getBackground().setTint(mBackgroundColor);
+                Drawable d = textView.getBackground();
+                if (d != null) {
+                    // unhook original Drawable.Callbacks
+                    textView.setBackground(null);
+                    d = DrawableCompat.wrap(d);
+                    DrawableCompat.setTint(d, mBackgroundColor);
+                    textView.setBackground(d);
+                }
             }
             if (mTextAppearance != null) {
                 ApiCompatibilityUtils.setTextAppearance(textView, mTextAppearance);

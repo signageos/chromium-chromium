@@ -91,7 +91,9 @@ public class NotificationWrapperStandardBuilder implements NotificationWrapperBu
 
     @Override
     public NotificationWrapperBuilder setColor(int argb) {
-        mBuilder.setColor(argb);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setColor(argb);
+        }
         return this;
     }
 
@@ -103,25 +105,33 @@ public class NotificationWrapperStandardBuilder implements NotificationWrapperBu
 
     @Override
     public NotificationWrapperBuilder setLocalOnly(boolean localOnly) {
-        mBuilder.setLocalOnly(localOnly);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            mBuilder.setLocalOnly(localOnly);
+        }
         return this;
     }
 
     @Override
     public NotificationWrapperBuilder setGroup(String group) {
-        mBuilder.setGroup(group);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            mBuilder.setGroup(group);
+        }
         return this;
     }
 
     @Override
     public NotificationWrapperBuilder setGroupSummary(boolean isGroupSummary) {
-        mBuilder.setGroupSummary(isGroupSummary);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            mBuilder.setGroupSummary(isGroupSummary);
+        }
         return this;
     }
 
     @Override
     public NotificationWrapperBuilder addExtras(Bundle extras) {
-        mBuilder.addExtras(extras);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            mBuilder.addExtras(extras);
+        }
         return this;
     }
 
@@ -133,7 +143,9 @@ public class NotificationWrapperStandardBuilder implements NotificationWrapperBu
 
     @Override
     public NotificationWrapperBuilder setVisibility(int visibility) {
-        mBuilder.setVisibility(visibility);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setVisibility(visibility);
+        }
         return this;
     }
 
@@ -168,7 +180,9 @@ public class NotificationWrapperStandardBuilder implements NotificationWrapperBu
 
     @Override
     public NotificationWrapperBuilder addAction(Notification.Action action) {
-        mBuilder.addAction(action);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            mBuilder.addAction(action);
+        }
         return this;
     }
 
@@ -282,7 +296,9 @@ public class NotificationWrapperStandardBuilder implements NotificationWrapperBu
 
     @Override
     public NotificationWrapperBuilder setPublicVersion(Notification publicNotification) {
-        mBuilder.setPublicVersion(publicNotification);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setPublicVersion(publicNotification);
+        }
         return this;
     }
 
@@ -319,16 +335,20 @@ public class NotificationWrapperStandardBuilder implements NotificationWrapperBu
 
     @Override
     public NotificationWrapperBuilder setMediaStyle(MediaSessionCompat session, int[] actions) {
-        Notification.MediaStyle style = new Notification.MediaStyle();
-        style.setMediaSession(((MediaSession) session.getMediaSession()).getSessionToken());
-        style.setShowActionsInCompactView(actions);
-        mBuilder.setStyle(style);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Notification.MediaStyle style = new Notification.MediaStyle();
+            style.setMediaSession(((MediaSession) session.getMediaSession()).getSessionToken());
+            style.setShowActionsInCompactView(actions);
+            mBuilder.setStyle(style);
+        }
         return this;
     }
 
     @Override
     public NotificationWrapperBuilder setCategory(String category) {
-        mBuilder.setCategory(category);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mBuilder.setCategory(category);
+        }
         return this;
     }
 

@@ -4,8 +4,10 @@
 
 package org.chromium.components.browser_ui.settings;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -72,9 +74,14 @@ public class ExpandablePreferenceGroup extends PreferenceGroup {
                                 ? R.string.accessibility_expanded_group
                                 : R.string.accessibility_collapsed_group);
         view.setContentDescription(description);
-        if (view.isAccessibilityFocused()) {
+        if (isAccessibilityFocusedCompat(view)) {
             view.sendAccessibilityEvent(AccessibilityEvent.CONTENT_CHANGE_TYPE_CONTENT_DESCRIPTION);
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) // @hide on Kitkat.
+    private static boolean isAccessibilityFocusedCompat(View view) {
+        return view.isAccessibilityFocused();
     }
 
     private static Drawable createDrawable(Context context) {

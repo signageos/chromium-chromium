@@ -26,6 +26,7 @@ import android.view.Display;
 import android.view.Surface;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ApplicationStatus;
 import org.chromium.base.ContextUtils;
@@ -43,6 +44,7 @@ import java.nio.ByteBuffer;
  * API 21 (L Release). Capture takes place in the current Looper, while pixel
  * download takes place in another thread used by ImageReader.
  **/
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 @JNINamespace("media")
 @SuppressWarnings("ValidFragment") // This fragment is created by native.
 public class ScreenCapture extends Fragment {

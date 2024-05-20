@@ -280,7 +280,7 @@ class DirectWritingTrigger
     }
 
     private boolean handleButtonEvent(MotionEvent me) {
-        if (me.isButtonPressed(MotionEvent.BUTTON_STYLUS_PRIMARY)) {
+        if (isButtonPressedCompat(me, MotionEvent.BUTTON_STYLUS_PRIMARY)) {
             if (me.getAction() == MotionEvent.ACTION_DOWN) {
                 mWasButtonPressed = true;
             }
@@ -292,6 +292,16 @@ class DirectWritingTrigger
             return true;
         }
         return false;
+    }
+
+    public final boolean isButtonPressedCompat(MotionEvent me, int button) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return me.isButtonPressed(button);
+        }
+        if (button == 0) {
+            return false;
+        }
+        return (me.getButtonState() & button) == button;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.P)

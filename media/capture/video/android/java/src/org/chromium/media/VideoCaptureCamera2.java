@@ -1339,7 +1339,6 @@ public class VideoCaptureCamera2 extends VideoCapture {
         return matchedTemperature;
     }
 
-    @RequiresApi(0)
     @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.LOLLIPOP)
     public static boolean isLegacyDevice(int id) {
         final CameraCharacteristics cameraCharacteristics = getCameraCharacteristics(id);
@@ -1348,7 +1347,6 @@ public class VideoCaptureCamera2 extends VideoCapture {
                 == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY;
     }
 
-    @RequiresApi(0)
     public static int getNumberOfCameras() {
         CameraManager manager = null;
         try {

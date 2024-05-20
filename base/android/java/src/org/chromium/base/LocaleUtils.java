@@ -244,7 +244,7 @@ public class LocaleUtils {
     @SuppressWarnings("deprecation")
     public static String getConfigurationLanguage(Configuration config) {
         Locale locale = config.locale;
-        return (locale != null) ? locale.toLanguageTag() : "";
+        return (locale != null) ? toLanguageTag(locale) : "";
     }
 
     /**
@@ -266,7 +266,7 @@ public class LocaleUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             ApisN.setConfigLocales(base, config, languageTag);
         } else {
-            config.setLocale(Locale.forLanguageTag(languageTag));
+            config.setLocale(forLanguageTag(languageTag));
         }
     }
 

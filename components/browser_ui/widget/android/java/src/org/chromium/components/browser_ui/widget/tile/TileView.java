@@ -7,12 +7,14 @@ package org.chromium.components.browser_ui.widget.tile;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ApiCompatibilityUtils;
@@ -24,6 +26,7 @@ import org.chromium.components.browser_ui.widget.RoundedCornerOutlineProvider;
  *
  * Displays the title of the site beneath a large icon.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class TileView extends FrameLayout {
     private ImageView mBadgeView;
     private TextView mTitleView;

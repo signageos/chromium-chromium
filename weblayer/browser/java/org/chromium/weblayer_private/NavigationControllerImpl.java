@@ -4,8 +4,11 @@
 
 package org.chromium.weblayer_private;
 
+import android.os.Build;
 import android.os.RemoteException;
 import android.webkit.WebResourceResponse;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -89,9 +92,14 @@ public final class NavigationControllerImpl extends INavigationController.Stub {
 
             WebResourceResponse response =
                     ObjectWrapper.unwrap(params.getResponse(), WebResourceResponse.class);
-            responseInfo = new WebResourceResponseInfo(response.getMimeType(),
-                    response.getEncoding(), response.getData(), response.getStatusCode(),
-                    response.getReasonPhrase(), response.getResponseHeaders());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                responseInfo = new WebResourceResponseInfo(response.getMimeType(),
+                        response.getEncoding(), response.getData(), Api21.getStatusCode(response),
+                        Api21.getReasonPhrase(response), Api21.getResponseHeaders(response));
+            } else {
+                responseInfo = new WebResourceResponseInfo(response.getMimeType(),
+                        response.getEncoding(), response.getData());
+            }
         }
 
         NavigationControllerImplJni.get().navigate(mNativeNavigationController, uri,
@@ -354,6 +362,25 @@ public final class NavigationControllerImpl extends INavigationController.Stub {
 
         IObjectWrapper getResponse() {
             return mResponse;
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static final class Api21 {
+
+        // No instances.
+        private Api21() {}
+
+        static String getReasonPhrase(WebResourceResponse response) {
+            return response.getReasonPhrase();
+        }
+
+        static Map<String, String> getResponseHeaders(WebResourceResponse response) {
+            return response.getResponseHeaders();
+        }
+
+        static int getStatusCode(WebResourceResponse response) {
+            return response.getStatusCode();
         }
     }
 

@@ -7,6 +7,9 @@ package org.chromium.components.browser_ui.widget.image_tiles;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.supplier.Supplier;
 import org.chromium.components.browser_ui.widget.R;
@@ -16,6 +19,7 @@ import org.chromium.ui.modelutil.RecyclerViewAdapter;
 /**
  * A factory class to create view holders for the tiles.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class TileViewHolderFactory implements RecyclerViewAdapter.ViewHolderFactory<TileViewHolder> {
     private final Supplier<TileSize> mTileSizeSupplier;
 

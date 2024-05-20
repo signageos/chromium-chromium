@@ -136,12 +136,14 @@ public class ContextMenuDialog extends AlwaysDismissedDialog {
                 UiUtils.setNavigationBarIconColor(dialogWindow.getDecorView(),
                         mActivity.getResources().getBoolean(R.bool.window_light_navigation_bar));
             }
-            // Apply the status bar color in case the website had override them.
-            ApiCompatibilityUtils.setStatusBarColor(
-                    dialogWindow, mActivity.getWindow().getStatusBarColor());
-            ApiCompatibilityUtils.setStatusBarIconColor(dialogWindow.getDecorView().getRootView(),
-                    !ColorUtils.shouldUseLightForegroundOnBackground(
-                            mActivity.getWindow().getStatusBarColor()));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Apply the status bar color in case the website had override them.
+                int statusBarColor = ApiCompatibilityUtils.getStatusBarColor(mActivity.getWindow());
+                ApiCompatibilityUtils.setStatusBarColor(dialogWindow, statusBarColor);
+                ApiCompatibilityUtils.setStatusBarIconColor(
+                        dialogWindow.getDecorView().getRootView(),
+                        !ColorUtils.shouldUseLightForegroundOnBackground(statusBarColor));
+            }
         }
 
         // Both bottom margin and top margin must be set together to ensure default

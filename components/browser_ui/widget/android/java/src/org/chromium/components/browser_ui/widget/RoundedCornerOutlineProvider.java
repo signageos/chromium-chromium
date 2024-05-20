@@ -5,9 +5,11 @@
 package org.chromium.components.browser_ui.widget;
 
 import android.graphics.Outline;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 /**
@@ -22,6 +24,7 @@ import androidx.annotation.VisibleForTesting;
  *     myView.setOutlineProvider(new RoundedCornerOutlineProvider(r));
  *     myView.setClipToOutline(true);
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class RoundedCornerOutlineProvider extends ViewOutlineProvider {
     /** Radius of each corner. */
     private int mRadius;

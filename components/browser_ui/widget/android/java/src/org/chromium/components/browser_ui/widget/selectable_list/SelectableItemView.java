@@ -241,7 +241,8 @@ public abstract class SelectableItemView<E> extends SelectableItemViewBase<E> {
         if (isSelected) {
             drawable = TintedDrawable.constructTintedDrawable(
                     imageView.getContext(), R.drawable.ic_check_googblue_24dp);
-            drawable.setTint(SemanticColorUtils.getDefaultIconColorInverse(imageView.getContext()));
+            ((TintedDrawable) drawable).setTint(
+                    SemanticColorUtils.getDefaultIconColorInverse(imageView.getContext()));
         } else {
             drawable = defaultIcon;
         }

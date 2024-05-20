@@ -4,14 +4,17 @@
 
 package org.chromium.components.browser_ui.widget.selectable_list;
 
+import android.os.Build;
 import android.view.View;
 
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 /**
  * An ViewHolder for a {@link SelectableItemView}.
  * @param <E> The type of the item associated with the {@link SelectableItemView}.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class SelectableItemViewHolder<E> extends ViewHolder {
     private SelectableItemView<E> mItemView;
 

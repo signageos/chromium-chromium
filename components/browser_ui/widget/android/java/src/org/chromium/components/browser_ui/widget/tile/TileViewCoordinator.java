@@ -5,11 +5,13 @@ package org.chromium.components.browser_ui.widget.tile;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.LayoutRes;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.ui.modelutil.PropertyModel;
 import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
@@ -17,6 +19,7 @@ import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
 /**
  * Coordinator for the TileView.
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class TileViewCoordinator {
     private final TileView mView;
     private final TileViewMediator mMediator;

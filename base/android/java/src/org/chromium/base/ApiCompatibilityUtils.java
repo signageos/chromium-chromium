@@ -217,6 +217,11 @@ public class ApiCompatibilityUtils {
             window.setStatusBarColor(statusBarColor);
         }
 
+        @ColorInt
+        static int getStatusBarColor(Window window) {
+            return window.getStatusBarColor();
+        }
+
         static Drawable getDrawableForDensity(Resources res, int id, int density) {
             // For Android Oreo+, Resources.getDrawable(id, null) delegates to
             // Resources.getDrawableForDensity(id, 0, null), but before that the two functions are
@@ -367,6 +372,7 @@ public class ApiCompatibilityUtils {
         return intent;
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static class FinishAndRemoveTaskWithRetry implements Runnable {
         private static final long RETRY_DELAY_MS = 500;
         private static final long MAX_TRY_COUNT = 3;
@@ -439,6 +445,17 @@ public class ApiCompatibilityUtils {
     }
 
     /**
+     * @see android.view.Window#getStatusBarColor().
+     */
+    @ColorInt
+    public static int getStatusBarColor(Window window) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return ApisL.getStatusBarColor(window);
+        }
+        return Color.BLACK;
+    }
+
+    /**
      * Sets the status bar icons to dark or light. Note that this is only valid for
      * Android M+.
      *
@@ -461,7 +478,11 @@ public class ApiCompatibilityUtils {
     }
 
     public static void setImageTintList(ImageView view, @Nullable ColorStateList tintList) {
-        ApisL.setImageTintList(view, tintList);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ApisL.setImageTintList(view, tintList);
+        } else {
+            ImageViewCompat.setImageTintList(view, tintList);
+        }
     }
 
     /**

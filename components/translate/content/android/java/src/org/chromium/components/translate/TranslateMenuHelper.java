@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
-import android.util.Size;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -185,7 +184,7 @@ public class TranslateMenuHelper implements AdapterView.OnItemClickListener {
             mAdapter.refreshMenu(menuType);
         }
 
-        Size menuSize = null;
+        Rect menuSize = null;
         Point anchor = getLocationInWindow(mAnchorView);
         Rect appRect = mAppRect.get();
         if (menuType == TranslateMenu.MENU_OVERFLOW) {
@@ -193,7 +192,7 @@ public class TranslateMenuHelper implements AdapterView.OnItemClickListener {
             menuSize = measureMenuSize(mAdapter, 0);
             Rect bgPadding = new Rect();
             mPopup.getBackground().getPadding(bgPadding);
-            int measuredWidth = menuSize.getWidth() + bgPadding.left + bgPadding.right;
+            int measuredWidth = menuSize.width() + bgPadding.left + bgPadding.right;
             mPopup.setWidth((maxWidth > 0 && measuredWidth > maxWidth) ? maxWidth : measuredWidth);
         } else {
             // Use fixed width otherwise.
@@ -216,7 +215,7 @@ public class TranslateMenuHelper implements AdapterView.OnItemClickListener {
 
             int appHeight = appRect.height();
             assert menuSize != null;
-            int menuHeight = menuSize.getHeight();
+            int menuHeight = menuSize.height();
             if (anchor.y + menuHeight > appHeight) {
                 // Menu should fit between (top - anchorView). In such case, specify the menu
                 // height explicitly to keep PopupWindow from computing the height/vertical
@@ -253,9 +252,9 @@ public class TranslateMenuHelper implements AdapterView.OnItemClickListener {
      * @param maxHeight Maximum height of the menu. 0 to measure all items. Otherwise measuring is
      *        is stopped when the accumulated height goes over the maximum to avoid a performance
      *        issue that can happen when measuring the height of a very long menu.
-     * @return {@link Size} of the menu.
+     * @return Size of the menu as {@link Rect}.
      */
-    private Size measureMenuSize(TranslateMenuAdapter adapter, int maxHeight) {
+    private Rect measureMenuSize(TranslateMenuAdapter adapter, int maxHeight) {
         final int widthMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         final int heightMeasureSpec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
 
@@ -280,7 +279,7 @@ public class TranslateMenuHelper implements AdapterView.OnItemClickListener {
             // are fixed with.
             if (maxHeight > 0 && height >= maxHeight) break;
         }
-        return new Size(width, height);
+        return new Rect(0, 0, width, height);
     }
 
     @Override

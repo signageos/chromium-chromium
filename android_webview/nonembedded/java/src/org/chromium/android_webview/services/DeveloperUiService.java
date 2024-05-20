@@ -265,9 +265,11 @@ public final class DeveloperUiService extends Service {
                         .setSmallIcon(org.chromium.android_webview.devui.R.drawable.ic_flag)
                         .setContentIntent(pendingIntent)
                         .setOngoing(true)
-                        .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setTicker(NOTIFICATION_TICKER);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             builder = builder
                               // No sound, vibration, or lights.

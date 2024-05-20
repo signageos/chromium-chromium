@@ -504,6 +504,7 @@ class MediaCodecBridge {
         return null;
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     @CalledByNative
     private MediaFormatWrapper getInputFormat() {
         try {

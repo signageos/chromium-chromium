@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.AttrRes;
@@ -22,8 +24,11 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IdRes;
 import androidx.annotation.Px;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 
 import org.chromium.base.ApiCompatibilityUtils;
@@ -49,37 +54,47 @@ public class ChipView extends LinearLayout {
     public static final int INVALID_ICON_ID = -1;
     private static final int MAX_LINES = 2;
 
-    private final RippleBackgroundHelper mRippleBackgroundHelper;
-    private final AppCompatTextView mPrimaryText;
-    private final ChromeImageView mStartIcon;
-    private final boolean mUseRoundedStartIcon;
-    private final LoadingView mLoadingView;
-    private final @IdRes int mSecondaryTextAppearanceId;
-    private final int mEndIconWidth;
-    private final int mEndIconHeight;
-    private final int mEndIconStartPadding;
-    private final int mEndIconEndPadding;
-    private final int mCornerRadius;
+    private RippleBackgroundHelper mRippleBackgroundHelper;
+    private AppCompatTextView mPrimaryText;
+    private ChromeImageView mStartIcon;
+    private boolean mUseRoundedStartIcon;
+    private LoadingView mLoadingView;
+    private @IdRes int mSecondaryTextAppearanceId;
+    private int mEndIconWidth;
+    private int mEndIconHeight;
+    private int mEndIconStartPadding;
+    private int mEndIconEndPadding;
+    private int mCornerRadius;
 
     private ViewGroup mEndIconWrapper;
     private AppCompatTextView mSecondaryText;
 
     /** Constructor for applying a theme overlay. */
     public ChipView(Context context, @StyleRes int themeOverlay) {
-        this(new ContextThemeWrapper(context, themeOverlay), null, R.attr.chipStyle, 0);
+        this(new ContextThemeWrapper(context, themeOverlay), null, R.attr.chipStyle);
     }
 
     /** Constructor for inflating from XML. */
     public ChipView(Context context, AttributeSet attrs) {
         this(new ContextThemeWrapper(context, R.style.SuggestionChipThemeOverlay), attrs,
-                R.attr.chipStyle, 0);
+                R.attr.chipStyle);
     }
 
     /** Constructor for base classes and programmatic creation. */
+    public ChipView(Context context, AttributeSet attrs, @AttrRes int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initialize(attrs, defStyleAttr, 0);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public ChipView(Context context, AttributeSet attrs, @AttrRes int defStyleAttr,
             @StyleRes int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        initialize(attrs, defStyleAttr, defStyleRes);
+    }
 
+    private void initialize(AttributeSet attrs, @AttrRes int defStyleAttr,
+                            @StyleRes int defStyleRes) {
         TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.ChipView, defStyleAttr, defStyleRes);
 
@@ -160,8 +175,8 @@ public class ChipView extends LinearLayout {
         int loadingViewWidthPadding = (iconWidth - loadingViewSize) / 2;
         mLoadingView = new LoadingView(getContext());
         mLoadingView.setVisibility(GONE);
-        mLoadingView.setIndeterminateTintList(ColorStateList.valueOf(ApiCompatibilityUtils.getColor(
-                getResources(), R.color.default_icon_color_accent1_baseline)));
+        setIndeterminateTintListCompat(mLoadingView, ContextCompat.getColorStateList(
+                getContext(), R.color.default_icon_color_accent1_baseline));
         mLoadingView.setPaddingRelative(loadingViewWidthPadding, loadingViewHeightPadding,
                 loadingViewWidthPadding, loadingViewHeightPadding);
         addView(mLoadingView, new LayoutParams(iconWidth, iconHeight));
@@ -394,5 +409,20 @@ public class ChipView extends LinearLayout {
      */
     public @Px int getCornerRadius() {
         return mCornerRadius;
+    }
+
+    private static void setIndeterminateTintListCompat(ProgressBar p, ColorStateList c) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            p.setIndeterminateTintList(c);
+        } else {
+            Drawable d = p.getIndeterminateDrawable();
+            if (d != null) {
+                // unhook original Drawable.Callbacks
+                p.setIndeterminateDrawable(null);
+                d = DrawableCompat.wrap(d);
+                DrawableCompat.setTintList(d, c);
+                p.setIndeterminateDrawable(d);
+            }
+        }
     }
 }
