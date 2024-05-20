@@ -50,7 +50,7 @@
       "comment": "Corresponds to software rendering list #140",
       "description": "Disable depth textures on older Adreno 2xx Qualcomm GPUs (legacy blocklist entry, original problem unclear)",
       "cr_bugs": [682075, 1042214],
-      "gl_renderer": "Adreno \\(TM\\) 2.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 2.*",
       "features": [
         "disable_depth_texture"
       ],
@@ -664,7 +664,7 @@
           "value": "5.0.2"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "features": [
         "unbind_attachments_on_bound_render_fbo_delete"
       ]
@@ -676,7 +676,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "features": [
         "disable_discard_framebuffer"
       ]
@@ -778,7 +778,7 @@
         "type": "android"
       },
       "gl_vendor": "Qualcomm.*",
-      "gl_renderer": "Adreno \\(TM\\) [23].*",
+      "gl_renderer": ".*Adreno \\(TM\\) [23].*",
       "driver_version": {
         "op": "<",
         "value": "95"
@@ -812,7 +812,7 @@
         }
       },
       "gl_vendor": "Qualcomm.*",
-      "gl_renderer": "Adreno \\(TM\\) 3.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 3.*",
       "features": [
         "disable_timestamp_queries"
       ],
@@ -828,7 +828,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "disabled_extensions": [
         "GL_EXT_disjoint_timer_query",
         "GL_EXT_disjoint_timer_query_webgl2"
@@ -863,7 +863,7 @@
           "value": "5.1"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "disabled_extensions": [
         "GL_EXT_multisampled_render_to_texture"
       ],
@@ -935,7 +935,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno.*",
+      "gl_renderer": ".*Adreno.*",
       "features": [
         "unbind_egl_context_to_flush_driver_caches"
       ]
@@ -959,7 +959,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno.*",
+      "gl_renderer": ".*Adreno.*",
       "features": [
         "force_cube_map_positive_x_allocation"
       ]
@@ -1029,7 +1029,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno.*",
+      "gl_renderer": ".*Adreno.*",
       "features": [
         "max_copy_texture_chromium_size_1048576"
       ]
@@ -1117,7 +1117,7 @@
         "comment": "Originally on Android 6.0. Expect it to fail in later versions."
       },
       "gl_vendor": "Qualcomm",
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "comment": "Originally on 418.",
       "disabled_extensions": ["GL_EXT_sRGB"]
     },
@@ -1153,7 +1153,7 @@
         "type": "android"
       },
       "gl_vendor": "Qualcomm.*",
-      "gl_renderer": "Adreno \\(TM\\) [45].*",
+      "gl_renderer": ".*Adreno \\(TM\\) [45].*",
       "features": [
         "broken_egl_image_ref_counting"
       ]
@@ -1356,7 +1356,7 @@
           "comment": "Only initial version of N."
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "disabled_extensions": [
         "GL_EXT_multisampled_render_to_texture"
       ]
@@ -1372,7 +1372,7 @@
           "value": "7.0"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 5.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 5.*",
       "disabled_extensions": [
         "GL_EXT_multisampled_render_to_texture"
       ]
@@ -1584,7 +1584,7 @@
           "value": "7.1.0"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 5.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 5.*",
       "disabled_extensions": [
         "GL_EXT_multisampled_render_to_texture"
       ]
@@ -1653,7 +1653,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno.*",
+      "gl_renderer": ".*Adreno.*",
       "features": [
         "disable_program_caching_for_transform_feedback"
       ]
@@ -1677,7 +1677,7 @@
       ],
       "description": "Some Adreno 3xx don't setup scissor state correctly when FBO0 is bound, nor support MSAA properly.",
       "cr_bugs": [670607, 682075, 696627, 698197, 707839, 1042214],
-      "gl_renderer": "Adreno \\(TM\\) 3.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 3.*",
       "os": {
         "type": "android",
         "version": {
@@ -1734,7 +1734,7 @@
         "op": ">=",
         "value": "103.0"
       },
-      "gl_renderer": "Adreno \\(TM\\) [45].*",
+      "gl_renderer": ".*Adreno \\(TM\\) [45].*",
       "features": [
         "disable_program_disk_cache"
       ]
@@ -1778,7 +1778,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) 3.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 3.*",
       "features": [
         "disallow_large_instanced_draw"
       ]
@@ -1891,7 +1891,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) [45].*",
+      "gl_renderer": ".*Adreno \\(TM\\) [45].*",
       "features": [
         "multisample_renderbuffer_resize_emulation"
       ]
@@ -1919,7 +1919,7 @@
           "value": "8.1"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) [345].*",
+      "gl_renderer": ".*Adreno \\(TM\\) [345].*",
       "disabled_extensions": [
         "GL_EXT_disjoint_timer_query",
         "GL_EXT_disjoint_timer_query_webgl2"
@@ -1948,7 +1948,7 @@
           "value": "7.0"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "features": [
         "dont_initialize_uninitialized_locals"
       ]
@@ -1991,7 +1991,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) *",
+      "gl_renderer": ".*Adreno \\(TM\\) .*",
       "features": [
         "dont_use_loops_to_initialize_variables"
       ]
@@ -2130,7 +2130,7 @@
           "value": "8.0"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 540",
+      "gl_renderer": ".*Adreno \\(TM\\) 540",
       "features": [
         "dont_use_eglclientwaitsync_with_timeout"
       ]
@@ -2315,7 +2315,7 @@
         "op": ">",
         "value": "237.0"
       },
-      "gl_renderer": "Adreno \\(TM\\) .*",
+      "gl_renderer": ".*Adreno \\(TM\\) .*",
       "features": [
         "use_copyteximage2d_instead_of_readpixels_on_multisampled_textures"
       ]
@@ -2398,7 +2398,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) .*",
+      "gl_renderer": ".*Adreno \\(TM\\) .*",
       "features": [
         "round_down_uniform_bind_buffer_range_size"
       ]
@@ -3114,7 +3114,7 @@
       "comment": "Corresponds to software rendering list #140",
       "description": "Disable depth textures on Adreno 3xx Qualcomm GPUs pre-Android 9 (legacy blocklist entry, original problem unclear)",
       "cr_bugs": [682075, 1042214],
-      "gl_renderer": "Adreno \\(TM\\) 3.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 3.*",
       "os": {
         "type": "android",
         "version": {
@@ -3198,7 +3198,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno.*",
+      "gl_renderer": ".*Adreno.*",
       "features": [
         "exit_on_context_lost"
       ]
