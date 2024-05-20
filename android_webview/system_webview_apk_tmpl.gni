@@ -29,6 +29,7 @@ declare_args() {
   max_sdk_version = ""
   enable_lint = false
   system_webview_library_name = "webviewchromium"
+  system_webview_icon_name = ""
 }
 
 template("system_webview_apk_or_module_tmpl") {

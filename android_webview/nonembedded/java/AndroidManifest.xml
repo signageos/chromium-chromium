@@ -35,7 +35,7 @@ by a child template that "extends" this file.
 
 
     <application android:label="{{ application_label|default('Android System WebView') }}"
-                 android:icon="@{{manifest_package|default('com.android.webview')}}:drawable/icon_webview"
+                 android:icon="@{{manifest_package|default('com.android.webview')}}:drawable/{{icon_name|default('icon_webview')}}"
                  android:name="{{ application_name|default('org.chromium.android_webview.nonembedded.WebViewApkApplication') }}"
                  android:multiArch="true"
                  {{ use32bitAbi|default('android:use32bitAbi="true"') }}
