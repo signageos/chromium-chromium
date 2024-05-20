@@ -8,9 +8,11 @@ import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.ResultReceiver;
 import android.os.SystemClock;
 
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.android_webview.devui.ComponentsListFragment;
@@ -34,6 +36,7 @@ import java.io.File;
  */
 // TODO(ntfschr): consider using BackgroundTaskScheduler
 @JNINamespace("android_webview")
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class AwComponentUpdateService extends JobService {
     private static final String TAG = "AwCUS";
 
