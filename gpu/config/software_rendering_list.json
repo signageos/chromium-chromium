@@ -726,7 +726,7 @@
           "os": {
             "type": "android"
           },
-          "gl_renderer": "Adreno \\(TM\\) 3.*"
+          "gl_renderer": ".*Adreno \\(TM\\) 3.*"
         },
         {
           "os": {
@@ -839,7 +839,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": "Adreno \\(TM\\) 3.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 3.*",
       "gl_version": {
          "op": "<=",
          "value": "2.0"
@@ -891,7 +891,7 @@
           "value": "4.2.2"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 330",
+      "gl_renderer": ".*Adreno \\(TM\\) 330",
       "driver_version": {
         "op": "=",
         "value": "45.0"
@@ -1336,7 +1336,7 @@
       "comment": "Corresponds to GPU driver bugs #19, #214",
       "description": "MSAA and depth texture buggy on Adreno 3xx, also disable WebGL2",
       "cr_bugs": [449116, 698197],
-      "gl_renderer": "Adreno \\(TM\\) 3.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 3.*",
       "features": [
         "accelerated_webgl2"
       ]
@@ -1477,7 +1477,7 @@
           "value": "5.1"
         }
       },
-      "gl_renderer": "Adreno \\(TM\\) 4.*",
+      "gl_renderer": ".*Adreno \\(TM\\) 4.*",
       "features": [
         "accelerated_webgl2"
       ]
