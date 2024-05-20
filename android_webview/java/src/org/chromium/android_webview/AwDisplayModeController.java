@@ -5,12 +5,20 @@
 package org.chromium.android_webview;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.graphics.Matrix;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
+import android.view.ViewParent;
+
+import androidx.annotation.DeprecatedSinceApi;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Log;
 import org.chromium.blink.mojom.DisplayMode;
+
+import java.lang.reflect.Field;
 
 /**
  * Display mode controller for WebView.
@@ -108,15 +116,15 @@ public class AwDisplayModeController {
                 sCachedLocationOnScreen[0] + width, sCachedLocationOnScreen[1] + height);
     }
 
-    @SuppressLint("NewApi") // need this exception since we will try using Q API in P
     private boolean hasTransform() {
         sCachedMatrix.reset(); // set to identity
-        // Check if a view coordinates transforms to screen coordinates that is not an identity
-        // matrix, which means that view is rotated or scaled in regards to the screen.
-        // This API got hidden from L, and readded in API 29 (Q). It seems that we can call this
-        // on P most of the time, but adding try-catch just in case.
+        // It seems that we can call this on P most of the time, but adding try-catch just in case.
         try {
-            mContainerView.transformMatrixToGlobal(sCachedMatrix);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Api21.transformMatrixToGlobal(mContainerView, sCachedMatrix);
+            } else {
+                Api19.transformMatrixToGlobal(mContainerView, sCachedMatrix);
+            }
         } catch (Throwable e) {
             Log.w(TAG, "Error checking transform for display mode: ", e);
             return true;
@@ -132,5 +140,100 @@ public class AwDisplayModeController {
     public void setCurrentContainerView(View containerView) {
         if (DEBUG) Log.i(TAG, "setCurrentContainerView: " + containerView);
         mContainerView = containerView;
+    }
+
+    /**
+     * Check if a view coordinates transforms to screen coordinates that is not an identity
+     * matrix, which means that view is rotated or scaled in regards to the screen.
+     * This API got hidden from L, and readded in API 29 (Q).
+     */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    @TargetApi(Build.VERSION_CODES.Q) // need this exception since we will try using Q API in P
+    private static final class Api21 {
+
+        static void transformMatrixToGlobal(View v, Matrix m) {
+            v.transformMatrixToGlobal(m);
+        }
+
+        private Api21() {
+        }
+    }
+
+    /**
+     * @deprecated Use {@link android.view.View#transformMatrixToGlobal(Matrix)} instead,
+     * which was {@code @hide} since API level 21 and is public since API level 29.
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint("PrivateApi")
+    private final static class Api19 {
+
+        private static final Class<?> mViewRootImplClass;
+        private static final Field mCurScrollYField;
+        private static final Field mAttachInfoField;
+        private static final Field mWindowLeftField;
+        private static final Field mWindowTopField;
+
+        static {
+            try {
+                mViewRootImplClass = Class.forName("android.view.ViewRootImpl");
+                mCurScrollYField = mViewRootImplClass.getDeclaredField("mCurScrollY");
+                mCurScrollYField.setAccessible(true);
+                mAttachInfoField = mViewRootImplClass.getDeclaredField("mAttachInfo");
+                mAttachInfoField.setAccessible(true);
+                Class<?> attachInfoClass = mAttachInfoField.getType();
+                mWindowLeftField = attachInfoClass.getDeclaredField("mWindowLeft");
+                mWindowLeftField.setAccessible(true);
+                mWindowTopField = attachInfoClass.getDeclaredField("mWindowTop");
+                mWindowTopField.setAccessible(true);
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        static void transformMatrixToGlobal(View v, Matrix m) {
+            final ViewParent parent = v.getParent();
+            if (parent instanceof View) {
+                final View vp = (View) parent;
+                transformMatrixToGlobal(vp, m);
+                m.preTranslate(-vp.getScrollX(), -vp.getScrollY());
+            } else if (mViewRootImplClass.isInstance(parent)) {
+                final Object vr = parent;
+                transformMatrixToGlobalViewRootImpl(vr, m);
+                m.preTranslate(0, -getCurScrollYViewRootImpl(vr));
+            }
+
+            m.preTranslate(v.getLeft(), v.getTop());
+
+            if (!hasIdentityMatrix(v)) {
+                m.preConcat(v.getMatrix());
+            }
+        }
+
+        private static void transformMatrixToGlobalViewRootImpl(Object vr, Matrix m) {
+            try {
+                Object attachInfo = mAttachInfoField.get(vr);
+                int windowLeft = mWindowLeftField.getInt(attachInfo);
+                int windowTop = mWindowTopField.getInt(attachInfo);
+                m.preTranslate(windowLeft, windowTop);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private static int getCurScrollYViewRootImpl(Object vr) {
+            try {
+                return mCurScrollYField.getInt(vr);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private static boolean hasIdentityMatrix(View v) {
+            return v.getMatrix().isIdentity();
+        }
+
+        private Api19() {
+            // No instances.
+        }
     }
 }
