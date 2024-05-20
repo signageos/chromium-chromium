@@ -259,6 +259,9 @@ jinja_template("system_webview_manifest") {
   if (defined(system_webview_library_name)) {
     _library = "lib$system_webview_library_name.so"
   }
+  if (defined(system_webview_label)) {
+    _application_label = system_webview_label
+  }
   if (defined(system_webview_icon_name)) {
     _icon_name = system_webview_icon_name
   }
@@ -268,6 +271,7 @@ jinja_template("system_webview_manifest") {
   variables = _webview_jinja_variables + [
                 "library=$_library",
                 "icon_name=$_icon_name",
+                "application_label=$_application_label",
               ]
 }
 
@@ -285,6 +289,9 @@ if (android_64bit_target_cpu) {
     if (defined(system_webview_library_name)) {
       _library = "lib$system_webview_library_name.so"
     }
+    if (defined(system_webview_label)) {
+      _application_label = system_webview_label
+    }
     if (defined(system_webview_icon_name)) {
       _icon_name = system_webview_icon_name
     }
@@ -294,6 +301,7 @@ if (android_64bit_target_cpu) {
     variables = _webview_jinja_variables + [
                   "use32bitAbi=",
                   "library=$_library",
+                  "application_label=$_application_label",
                   "icon_name=$_icon_name",
                 ]
   }
