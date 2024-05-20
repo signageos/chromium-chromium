@@ -175,10 +175,7 @@ public class ComponentsProviderService extends Service {
     public void onCreate() {
         mDirectory = new File(ComponentsProviderPathUtil.getComponentsServingDirectoryPath());
         if (ComponentUpdaterSafeModeUtils.executeSafeModeIfEnabled(mDirectory)) {
-            JobScheduler jobScheduler =
-                    (JobScheduler) ContextUtils.getApplicationContext().getSystemService(
-                            Context.JOB_SCHEDULER_SERVICE);
-            jobScheduler.cancel(JOB_ID);
+            cancelComponentUpdateService();
             return;
         }
 
@@ -191,6 +188,15 @@ public class ComponentsProviderService extends Service {
         maybeScheduleComponentUpdateService();
 
         ServicesStatsHelper.recordServiceLaunch(NonembeddedService.COMPONENTS_PROVIDER_SERVICE);
+    }
+
+    private void cancelComponentUpdateService() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
+
+        JobScheduler jobScheduler =
+                (JobScheduler) ContextUtils.getApplicationContext().getSystemService(
+                        Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.cancel(JOB_ID);
     }
 
     private void cleanupOlderFiles() {
@@ -263,6 +269,8 @@ public class ComponentsProviderService extends Service {
      */
     @VisibleForTesting
     public static void maybeScheduleComponentUpdateService() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
+
         Context context = ContextUtils.getApplicationContext();
         JobScheduler jobScheduler =
                 (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
@@ -302,6 +310,8 @@ public class ComponentsProviderService extends Service {
     // TODO(crbug.com/1189126): move this to utils class
     @VisibleForTesting
     public static boolean isJobScheduled(JobScheduler scheduler, int jobId) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return false;
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             for (JobInfo info : scheduler.getAllPendingJobs()) {
                 if (info.getId() == jobId) return true;
