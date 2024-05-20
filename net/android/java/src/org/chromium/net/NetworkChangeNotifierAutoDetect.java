@@ -43,6 +43,7 @@ import org.chromium.base.compat.ApiHelperForM;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.concurrent.GuardedBy;
 
@@ -748,15 +749,15 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
     private final Observer mObserver;
     private final RegistrationPolicy mRegistrationPolicy;
     // Starting with Android Pie, used to detect changes in default network.
-    private DefaultNetworkCallback mDefaultNetworkCallback;
+    private final AtomicReference<NetworkCallback> mDefaultNetworkCallback = new AtomicReference<>(null);
 
     // mConnectivityManagerDelegates and mWifiManagerDelegate are only non-final for testing.
     private ConnectivityManagerDelegate mConnectivityManagerDelegate;
     private WifiManagerDelegate mWifiManagerDelegate;
     // mNetworkCallback and mNetworkRequest are only non-null in Android L and above.
     // mNetworkCallback will be null if ConnectivityManager.registerNetworkCallback() ever fails.
-    private MyNetworkCallback mNetworkCallback;
-    private NetworkRequest mNetworkRequest;
+    private final AtomicReference<MyNetworkCallback> mNetworkCallback = new AtomicReference<>(null);
+    private final AtomicReference<NetworkRequest> mNetworkRequest = new AtomicReference<>(null);
     private boolean mRegistered;
     private NetworkState mNetworkState;
     // When a BroadcastReceiver is registered for a sticky broadcast that has been sent out at
@@ -839,19 +840,16 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
             mWifiManagerDelegate = new WifiManagerDelegate(ContextUtils.getApplicationContext());
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mNetworkCallback = new MyNetworkCallback();
-            mNetworkRequest = new NetworkRequest.Builder()
-                                      .addCapability(NET_CAPABILITY_INTERNET)
-                                      // Need to hear about VPNs too.
-                                      .removeCapability(NET_CAPABILITY_NOT_VPN)
-                                      .build();
-        } else {
-            mNetworkCallback = null;
-            mNetworkRequest = null;
+            mNetworkCallback.set(new MyNetworkCallback());
+            mNetworkRequest.set(new NetworkRequest.Builder()
+                    .addCapability(NET_CAPABILITY_INTERNET)
+                    // Need to hear about VPNs too.
+                    .removeCapability(NET_CAPABILITY_NOT_VPN)
+                    .build());
         }
-        mDefaultNetworkCallback = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P
-                ? new DefaultNetworkCallback()
-                : null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            mDefaultNetworkCallback.set(new DefaultNetworkCallback());
+        }
         mNetworkState = getCurrentNetworkState();
         mIntentFilter = new NetworkConnectivityIntentFilter();
         mIgnoreNextBroadcast = false;
@@ -929,17 +927,17 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
         if (mShouldSignalObserver) {
             connectionTypeChanged();
         }
-        if (mDefaultNetworkCallback != null) {
+        if (mDefaultNetworkCallback.get() != null) {
             try {
                 mConnectivityManagerDelegate.registerDefaultNetworkCallback(
-                        mDefaultNetworkCallback, mHandler);
+                        mDefaultNetworkCallback.get(), mHandler);
             } catch (RuntimeException e) {
                 // If registering a default network callback failed, fallback to
                 // listening for CONNECTIVITY_ACTION broadcast.
-                mDefaultNetworkCallback = null;
+                mDefaultNetworkCallback.set(null);
             }
         }
-        if (mDefaultNetworkCallback == null) {
+        if (mDefaultNetworkCallback.get() == null) {
             // When registering for a sticky broadcast, like CONNECTIVITY_ACTION, if
             // registerReceiver returns non-null, it means the broadcast was previously issued and
             // onReceive() will be immediately called with this previous Intent. Since this initial
@@ -951,11 +949,11 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
         }
         mRegistered = true;
 
-        if (mNetworkCallback != null) {
-            mNetworkCallback.initializeVpnInPlace();
+        if (mNetworkCallback.get() != null) {
+            mNetworkCallback.get().initializeVpnInPlace();
             try {
                 mConnectivityManagerDelegate.registerNetworkCallback(
-                        mNetworkRequest, mNetworkCallback, mHandler);
+                        mNetworkRequest.get(), mNetworkCallback.get(), mHandler);
             } catch (RuntimeException e) {
                 mRegisterNetworkCallbackFailed = true;
                 // If Android thinks this app has used up all available NetworkRequests, don't
@@ -963,7 +961,7 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
                 // all available NetworkRequests are used up and fail again needlessly.
                 // Also don't bother unregistering as this call didn't actually register.
                 // See crbug.com/791025 for more info.
-                mNetworkCallback = null;
+                mNetworkCallback.set(null);
             }
             if (!mRegisterNetworkCallbackFailed && mShouldSignalObserver) {
                 // registerNetworkCallback() will rematch the NetworkRequest
@@ -990,11 +988,11 @@ public class NetworkChangeNotifierAutoDetect extends BroadcastReceiver {
         assertOnThread();
         if (!mRegistered) return;
         mRegistered = false;
-        if (mNetworkCallback != null) {
-            mConnectivityManagerDelegate.unregisterNetworkCallback(mNetworkCallback);
+        if (mNetworkCallback.get() != null) {
+            mConnectivityManagerDelegate.unregisterNetworkCallback(mNetworkCallback.get());
         }
-        if (mDefaultNetworkCallback != null) {
-            mConnectivityManagerDelegate.unregisterNetworkCallback(mDefaultNetworkCallback);
+        if (mDefaultNetworkCallback.get() != null) {
+            mConnectivityManagerDelegate.unregisterNetworkCallback(mDefaultNetworkCallback.get());
         } else {
             ContextUtils.getApplicationContext().unregisterReceiver(this);
         }
