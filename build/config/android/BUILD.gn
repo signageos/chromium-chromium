@@ -74,6 +74,16 @@ config("compiler") {
     compile_api_level = android32_ndk_api_level
   }
 
+  # We have an option to build a 32-bit only APK if we target a 64-bit device.
+  # Having 64-bit target elevates compile API level to at least 21
+  # which makes the 32-bit library broken on older devices.
+  # We need to lower the 32-bit compile API level to the preferred 32-bit value.
+  # That also makes our huge multiarch APK run on Kitkat.
+  _android_64bit_current_cpu = string_replace(current_cpu, "64", "") != current_cpu
+  if (!_android_64bit_current_cpu && compile_api_level > android32_ndk_api_level) {
+    compile_api_level = android32_ndk_api_level
+  }
+
   cflags += [ "--target=$android_abi_target$compile_api_level" ]
   ldflags += [ "--target=$android_abi_target$compile_api_level" ]
 
