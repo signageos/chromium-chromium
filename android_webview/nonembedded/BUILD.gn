@@ -213,6 +213,23 @@ android_resources("canary_icon_resources") {
   ]
 }
 
+android_resources("sos_icon_resources") {
+  sources = [
+    "java/res_icon_sos/mipmap-anydpi-v26/icon_webview_sos.xml",
+    "java/res_icon_sos/mipmap-hdpi/icon_webview_sos.webp",
+    "java/res_icon_sos/mipmap-hdpi/icon_webview_sos_foreground.webp",
+    "java/res_icon_sos/mipmap-mdpi/icon_webview_sos.webp",
+    "java/res_icon_sos/mipmap-mdpi/icon_webview_sos_foreground.webp",
+    "java/res_icon_sos/mipmap-xhdpi/icon_webview_sos.webp",
+    "java/res_icon_sos/mipmap-xhdpi/icon_webview_sos_foreground.webp",
+    "java/res_icon_sos/mipmap-xxhdpi/icon_webview_sos.webp",
+    "java/res_icon_sos/mipmap-xxhdpi/icon_webview_sos_foreground.webp",
+    "java/res_icon_sos/mipmap-xxxhdpi/icon_webview_sos.webp",
+    "java/res_icon_sos/mipmap-xxxhdpi/icon_webview_sos_foreground.webp",
+    "java/res_icon_sos/values/icon_webview_sos_background.xml",
+  ]
+}
+
 android_resources("devui_resources") {
   sources = [
     "java/res_devui/drawable/blue_circle.xml",
