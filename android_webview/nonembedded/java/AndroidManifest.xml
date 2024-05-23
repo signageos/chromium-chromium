@@ -35,7 +35,7 @@ by a child template that "extends" this file.
 
 
     <application android:label="{{ application_label|default('Android System WebView') }}"
-                 android:icon="@{{manifest_package|default('com.android.webview')}}:drawable/{{icon_name|default('icon_webview')}}"
+                 android:icon="@{{manifest_package|default('com.android.webview')}}:{{icon_resource_id|default('drawable/icon_webview')}}"
                  android:name="{{ application_name|default('org.chromium.android_webview.nonembedded.WebViewApkApplication') }}"
                  android:multiArch="true"
                  {{ use32bitAbi|default('android:use32bitAbi="true"') }}
@@ -52,7 +52,6 @@ by a child template that "extends" this file.
                       android:windowSoftInputMode="adjustPan"
                       android:visibleToInstantApps="true"
                       android:label="WebView DevTools"
-                      android:icon="@drawable/icon_webview"
                       android:theme="@style/Theme.DevUi.DayNight"
                       android:launchMode="singleTask"
                       android:taskAffinity="{{ manifest_package }}.org.chromium.android_webview.devui" {# Explicit taskAffinity to distinguish from monochrome browser task. #}

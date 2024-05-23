@@ -29,7 +29,6 @@ declare_args() {
   enable_lint = false
   system_webview_library_name = "webviewchromium"
   system_webview_label = ""
-  system_webview_icon_name = ""
 }
 
 declare_args() {

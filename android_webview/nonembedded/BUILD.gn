@@ -202,10 +202,15 @@ android_resources("icon_resources") {
     "java/res_icon/drawable-mdpi/icon_webview.png",
     "java/res_icon/drawable-xhdpi/icon_webview.png",
     "java/res_icon/drawable-xxhdpi/icon_webview.png",
-    "java/res_icon/drawable-hdpi/icon_webview_canary.webp",
-    "java/res_icon/drawable-mdpi/icon_webview_canary.webp",
-    "java/res_icon/drawable-xhdpi/icon_webview_canary.webp",
-    "java/res_icon/drawable-xxhdpi/icon_webview_canary.webp",
+  ]
+}
+
+android_resources("canary_icon_resources") {
+  sources = [
+    "java/res_icon_canary/drawable-hdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-mdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-xhdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-xxhdpi/icon_webview.webp",
   ]
 }
 
@@ -263,16 +268,16 @@ jinja_template("system_webview_manifest") {
   if (defined(system_webview_label)) {
     _application_label = system_webview_label
   }
-  if (defined(system_webview_icon_name)) {
-    _icon_name = system_webview_icon_name
+  if (defined(webview_icon_resource_id)) {
+    _icon_resource_id = webview_icon_resource_id
   }
 
   input = "java/AndroidManifest.xml"
   output = system_webview_android_manifest
   variables = _webview_jinja_variables + [
                 "library=$_library",
-                "icon_name=$_icon_name",
                 "application_label=$_application_label",
+                "icon_resource_id=$_icon_resource_id",
               ]
 }
 
@@ -293,8 +298,8 @@ if (android_64bit_target_cpu) {
     if (defined(system_webview_label)) {
       _application_label = system_webview_label
     }
-    if (defined(system_webview_icon_name)) {
-      _icon_name = system_webview_icon_name
+    if (defined(webview_icon_resource_id)) {
+      _icon_resource_id = webview_icon_resource_id
     }
 
     input = "java/AndroidManifest.xml"
@@ -303,7 +308,7 @@ if (android_64bit_target_cpu) {
                   "use32bitAbi=",
                   "library=$_library",
                   "application_label=$_application_label",
-                  "icon_name=$_icon_name",
+                  "icon_resource_id=$_icon_resource_id",
                 ]
   }
 
