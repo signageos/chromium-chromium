@@ -17,6 +17,7 @@ import android.view.Display;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -50,25 +51,31 @@ public final class DisplayCompat {
     public static ModeCompat[] getSupportedModes(
             @NonNull Context context, @NonNull Display display) {
         Point physicalDisplaySize = getPhysicalDisplaySize(context, display);
-        // Display.Mode class and display.getSupportedModes() exist
-        Display.Mode[] supportedModes = display.getSupportedModes();
-        ArrayList<ModeCompat> supportedModesCompat = new ArrayList<>(supportedModes.length);
-        boolean nativeModeExists = false;
-        for (int i = 0; i < supportedModes.length; i++) {
-            if (physicalSizeEquals(supportedModes[i], physicalDisplaySize)) {
-                // Current mode has native resolution, flag it accordingly
-                supportedModesCompat.add(i, new ModeCompat(supportedModes[i], true));
-                nativeModeExists = true;
-            } else {
-                supportedModesCompat.add(i, new ModeCompat(supportedModes[i], false));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Display.Mode class and display.getSupportedModes() exist
+            Display.Mode[] supportedModes = display.getSupportedModes();
+            ArrayList<ModeCompat> supportedModesCompat = new ArrayList<>(supportedModes.length);
+            boolean nativeModeExists = false;
+            for (int i = 0; i < supportedModes.length; i++) {
+                if (physicalSizeEquals(supportedModes[i], physicalDisplaySize)) {
+                    // Current mode has native resolution, flag it accordingly
+                    supportedModesCompat.add(i, new ModeCompat(supportedModes[i], true));
+                    nativeModeExists = true;
+                } else {
+                    supportedModesCompat.add(i, new ModeCompat(supportedModes[i], false));
+                }
             }
+            if (!nativeModeExists) {
+                // If no mode with physicalDisplaySize dimension exists, add the mode with the
+                // native display resolution
+                supportedModesCompat.add(new ModeCompat(physicalDisplaySize));
+            }
+            return supportedModesCompat.toArray(new ModeCompat[0]);
+        } else {
+            // previous to Android M Display.Mode and Display.getSupportedModes() did not exist,
+            // hence the only supported mode is the native display resolution
+            return new ModeCompat[] {new ModeCompat(physicalDisplaySize)};
         }
-        if (!nativeModeExists) {
-            // If no mode with physicalDisplaySize dimension exists, add the mode with the
-            // native display resolution
-            supportedModesCompat.add(new ModeCompat(physicalDisplaySize));
-        }
-        return supportedModesCompat.toArray(new ModeCompat[0]);
     }
 
     /**
@@ -129,6 +136,7 @@ public final class DisplayCompat {
      * @param mode a Display.Mode object
      * @param size a Point object representing the size in horizontal and vertical direction
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private static boolean physicalSizeEquals(Display.Mode mode, Point size) {
         return (mode.getPhysicalWidth() == size.x && mode.getPhysicalHeight() == size.y)
                 || (mode.getPhysicalWidth() == size.y && mode.getPhysicalHeight() == size.x);
@@ -189,9 +197,15 @@ public final class DisplayCompat {
             // size from the framework API. Note that this might not be the actual physical
             // display size but the, possibly down-scaled, UI size.
             displaySize = new Point();
-            Display.Mode mode = display.getMode();
-            displaySize.x = mode.getPhysicalWidth();
-            displaySize.y = mode.getPhysicalHeight();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Display.Mode mode = display.getMode();
+                displaySize.x = mode.getPhysicalWidth();
+                displaySize.y = mode.getPhysicalHeight();
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                display.getRealSize(displaySize);
+            } else {
+                display.getSize(displaySize);
+            }
         }
         return displaySize;
     }
@@ -240,6 +254,7 @@ public final class DisplayCompat {
          *
          * @param mode a Display.Mode object
          */
+        @RequiresApi(Build.VERSION_CODES.M)
         ModeCompat(@NonNull Display.Mode mode, boolean isNative) {
             if (mode == null) {
                 throw new NullPointerException("Display.Mode == null, can't wrap a null reference");
@@ -275,6 +290,7 @@ public final class DisplayCompat {
          * @return the wrapped Display.Mode object or null if there was no matching mode for the
          * native resolution.
          */
+        @RequiresApi(Build.VERSION_CODES.M)
         @Nullable
         public Display.Mode toMode() {
             return mMode;

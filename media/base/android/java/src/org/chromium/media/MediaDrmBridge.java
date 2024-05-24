@@ -7,6 +7,9 @@ package org.chromium.media;
 import android.annotation.SuppressLint;
 import android.media.MediaCrypto;
 import android.media.MediaDrm;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
@@ -267,6 +270,7 @@ public class MediaDrmBridge {
         return mSchemeUUID.equals(CLEARKEY_UUID);
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private MediaDrmBridge(UUID schemeUUID, boolean requiresMediaCrypto, long nativeMediaDrmBridge,
             long nativeMediaDrmStorageBridge) throws android.media.UnsupportedSchemeException {
         mSchemeUUID = schemeUUID;
@@ -282,8 +286,10 @@ public class MediaDrmBridge {
         mProvisioningPending = false;
 
         mMediaDrm.setOnEventListener(new EventListener());
-        mMediaDrm.setOnExpirationUpdateListener(new ExpirationUpdateListener(), null);
-        mMediaDrm.setOnKeyStatusChangeListener(new KeyStatusChangeListener(), null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mMediaDrm.setOnExpirationUpdateListener(new ExpirationUpdateListener(), null);
+            mMediaDrm.setOnKeyStatusChangeListener(new KeyStatusChangeListener(), null);
+        }
 
         if (isWidevine()) {
             mMediaDrm.setPropertyString(PRIVACY_MODE, ENABLE);
@@ -496,6 +502,7 @@ public class MediaDrmBridge {
      * origins, e.g. certificates, licenses.
      */
     private boolean setOrigin(String origin) {
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
         Log.d(TAG, "Set origin: %s", origin);
 
         if (!isWidevine()) {
@@ -997,6 +1004,7 @@ public class MediaDrmBridge {
      * Load persistent license from storage.
      */
     @CalledByNative
+    @RequiresApi(Build.VERSION_CODES.M)
     private void loadSession(byte[] emeId, final long promiseId) {
         Log.d(TAG, "loadSession()");
         assert !mProvisioningPending;
@@ -1018,6 +1026,7 @@ public class MediaDrmBridge {
      * Load session back to memory with MediaDrm. Load persistent storage
      * before calling this. It will fail if persistent storage isn't loaded.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private void loadSessionWithLoadedStorage(SessionId sessionId, final long promiseId) {
         byte[] drmId = null;
         try {
@@ -1375,10 +1384,21 @@ public class MediaDrmBridge {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private void onSessionMessage(final SessionId sessionId, final MediaDrm.KeyRequest request) {
         if (!isNativeMediaDrmBridgeValid()) return;
 
-        int requestType = request.getRequestType();
+        int requestType = MediaDrm.KeyRequest.REQUEST_TYPE_INITIAL;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestType = request.getRequestType();
+        } else {
+            // Prior to M, getRequestType() is not supported. Do our best guess here: Assume
+            // requests with a URL are renewals and all others are initial requests.
+            requestType = request.getDefaultUrl().isEmpty()
+                    ? MediaDrm.KeyRequest.REQUEST_TYPE_INITIAL
+                    : MediaDrm.KeyRequest.REQUEST_TYPE_RENEWAL;
+        }
+
         MediaDrmBridgeJni.get().onSessionMessage(mNativeMediaDrmBridge, MediaDrmBridge.this,
                 sessionId.emeId(), requestType, request.getData());
     }
@@ -1431,12 +1451,23 @@ public class MediaDrmBridge {
                     if (request != null) {
                         onSessionMessage(sessionId, request);
                     } else {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                            onSessionKeysChange(sessionId,
+                                    getDummyKeysInfo(MediaDrm.KeyStatus.STATUS_INTERNAL_ERROR)
+                                            .toArray(),
+                                    false, false);
+                        }
                         Log.e(TAG, "EventListener: getKeyRequest failed.");
                         return;
                     }
                     break;
                 case MediaDrm.EVENT_KEY_EXPIRED:
                     Log.d(TAG, "MediaDrm.EVENT_KEY_EXPIRED");
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        onSessionKeysChange(sessionId,
+                                getDummyKeysInfo(MediaDrm.KeyStatus.STATUS_EXPIRED).toArray(),
+                                false, sessionInfo.keyType() == MediaDrm.KEY_TYPE_RELEASE);
+                    }
                     break;
                 // (b/271451225) This event is generated during ClearKey implementation in Android.
                 case MediaDrm.EVENT_VENDOR_DEFINED:
@@ -1457,6 +1488,7 @@ public class MediaDrmBridge {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private class KeyStatusChangeListener implements MediaDrm.OnKeyStatusChangeListener {
         private List<KeyStatus> getKeysInfo(List<MediaDrm.KeyStatus> keyInformation) {
             List<KeyStatus> keysInfo = new ArrayList<KeyStatus>();
@@ -1499,6 +1531,7 @@ public class MediaDrmBridge {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private class ExpirationUpdateListener implements MediaDrm.OnExpirationUpdateListener {
         @Override
         public void onExpirationUpdate(
@@ -1544,6 +1577,12 @@ public class MediaDrmBridge {
             Log.d(TAG, "Key successfully %s for session %s", mIsKeyRelease ? "released" : "added",
                     mSessionId.toHexString());
             onPromiseResolved(mPromiseId);
+
+            if (!mIsKeyRelease && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                onSessionKeysChange(mSessionId,
+                        getDummyKeysInfo(MediaDrm.KeyStatus.STATUS_USABLE).toArray(), true,
+                        mIsKeyRelease);
+            }
         }
     }
 

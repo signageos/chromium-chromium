@@ -7,6 +7,9 @@ package org.chromium.midi;
 import android.media.midi.MidiDevice;
 import android.media.midi.MidiOutputPort;
 import android.media.midi.MidiReceiver;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -20,6 +23,7 @@ import java.io.IOException;
  * A MidiInputPortAndroid provides data to the associated midi::MidiInputPortAndroid object.
  */
 @JNINamespace("midi")
+@RequiresApi(Build.VERSION_CODES.M)
 class MidiInputPortAndroid {
     /**
      * The underlying port.

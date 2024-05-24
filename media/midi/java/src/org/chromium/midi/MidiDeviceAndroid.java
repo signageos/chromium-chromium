@@ -6,6 +6,9 @@ package org.chromium.midi;
 
 import android.media.midi.MidiDevice;
 import android.media.midi.MidiDeviceInfo;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -14,6 +17,7 @@ import org.chromium.base.annotations.JNINamespace;
 /**
  * A class implementing midi::MidiDeviceAndroid functionality.
  */
+@RequiresApi(Build.VERSION_CODES.M)
 class MidiDeviceAndroid {
     /**
      * The underlying device.

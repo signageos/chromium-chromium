@@ -318,6 +318,10 @@ class MediaCodecUtil {
                 // https://developer.android.com/reference/android/media/MediaCodecInfo.CodecProfileLevel.html
                 try {
                     CodecCapabilities codecCapabilities = info.getCapabilitiesForType(mime);
+                    if (mime.endsWith("vp9") && Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
+                        addVp9CodecProfileLevels(profileLevels, codecCapabilities);
+                        continue;
+                    }
                     for (CodecProfileLevel profileLevel : codecCapabilities.profileLevels) {
                         profileLevels.addCodecProfileLevel(mime, profileLevel);
                     }
@@ -552,12 +556,14 @@ class MediaCodecUtil {
             case HWEncoder.QcomVp8:
             case HWEncoder.QcomH264:
             case HWEncoder.ExynosH264:
-            case HWEncoder.HisiH264:
+                return Build.VERSION_CODES.LOLLIPOP;
             case HWEncoder.ExynosVp8:
             case HWEncoder.ExynosVp9:
-                return Build.VERSION_CODES.N;
+                return Build.VERSION_CODES.M;
             case HWEncoder.MediatekH264:
                 return Build.VERSION_CODES.O_MR1;
+            case HWEncoder.HisiH264:
+                return Build.VERSION_CODES.N;
             case HWEncoder.SpreadtrumH264:
                 return Build.VERSION_CODES.R;
         }
@@ -625,7 +631,8 @@ class MediaCodecUtil {
         // MediaCodec.setOutputSurface().  http://crbug.com/683401
         // Huawei P9 lite will, eventually, get the decoder into a bad state if SetSurface is called
         // enough times (https://crbug.com/792261).
-        return !Build.HARDWARE.equalsIgnoreCase("hi6210sft")
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !Build.HARDWARE.equalsIgnoreCase("hi6210sft")
                 && !Build.HARDWARE.equalsIgnoreCase("hi6250");
     }
 
