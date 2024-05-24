@@ -11,6 +11,7 @@ import android.app.job.JobScheduler;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.media.MediaCodec.CryptoInfo;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -54,6 +55,16 @@ public final class ApiHelperForN {
     public static boolean startDragAndDrop(View view, ClipData data,
             DragShadowBuilder shadowBuilder, Object myLocalState, int flags) {
         return view.startDragAndDrop(data, shadowBuilder, myLocalState, flags);
+    }
+
+    /** See {@link View#setPointerIcon(PointerIcon)}. */
+    public static void setPointerIcon(View view, PointerIcon icon) {
+        view.setPointerIcon(icon);
+    }
+
+    /** See {@link PointerIcon#create(Bitmap, float, float)}. */
+    public static PointerIcon createPointerIcon(Bitmap bitmap, float width, float height) {
+        return PointerIcon.create(bitmap, width, height);
     }
 
     /** See {@link CryptoInfo#setPattern(Pattern)}. */

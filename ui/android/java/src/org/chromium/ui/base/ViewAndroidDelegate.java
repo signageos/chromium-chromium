@@ -6,6 +6,7 @@ package org.chromium.ui.base;
 
 import android.content.ClipData;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.PointerIcon;
@@ -25,6 +26,7 @@ import org.chromium.base.ObserverList;
 import org.chromium.base.ResettersForTesting;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
+import org.chromium.base.compat.ApiHelperForN;
 import org.chromium.ui.dragdrop.DragAndDropDelegate;
 import org.chromium.ui.dragdrop.DragAndDropDelegateImpl;
 import org.chromium.ui.dragdrop.DragStateTracker;
@@ -253,14 +255,18 @@ public class ViewAndroidDelegate {
     @VisibleForTesting
     @CalledByNative
     public void onCursorChangedToCustom(Bitmap customCursorBitmap, int hotspotX, int hotspotY) {
-        PointerIcon icon = PointerIcon.create(customCursorBitmap, hotspotX, hotspotY);
-
-        getContainerViewGroup().setPointerIcon(icon);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PointerIcon icon =
+                    ApiHelperForN.createPointerIcon(customCursorBitmap, hotspotX, hotspotY);
+            ApiHelperForN.setPointerIcon(getContainerViewGroup(), icon);
+        }
     }
 
     @VisibleForTesting
     @CalledByNative
     public void onCursorChanged(int cursorType) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
+
         int pointerIconType = PointerIcon.TYPE_ARROW;
         switch (cursorType) {
             case CursorType.NONE:
@@ -384,8 +390,7 @@ public class ViewAndroidDelegate {
         }
         ViewGroup containerView = getContainerViewGroup();
         PointerIcon icon = PointerIcon.getSystemIcon(containerView.getContext(), pointerIconType);
-
-        containerView.setPointerIcon(icon);
+        ApiHelperForN.setPointerIcon(containerView, icon);
     }
 
     @VisibleForTesting
