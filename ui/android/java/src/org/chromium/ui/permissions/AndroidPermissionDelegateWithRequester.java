@@ -50,6 +50,8 @@ public abstract class AndroidPermissionDelegateWithRequester implements AndroidP
 
     @Override
     public final boolean canRequestPermission(String permission) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
+
         if (hasPermission(permission)) {
             // There is no need to call clearPermissionWasDenied - hasPermission already cleared
             // the shared pref if needed.
@@ -78,6 +80,7 @@ public abstract class AndroidPermissionDelegateWithRequester implements AndroidP
 
     @Override
     public final boolean isPermissionRevokedByPolicy(String permission) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
         return isPermissionRevokedByPolicyInternal(permission);
     }
 
@@ -158,6 +161,8 @@ public abstract class AndroidPermissionDelegateWithRequester implements AndroidP
      * Issues the permission request and returns whether it was sent successfully.
      */
     private boolean requestPermissionsInternal(String[] permissions, PermissionCallback callback) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
+
         int requestCode = REQUEST_CODE_PREFIX + mNextRequestCode;
         mNextRequestCode = (mNextRequestCode + 1) % REQUEST_CODE_RANGE_SIZE;
         mOutstandingPermissionRequests.put(
