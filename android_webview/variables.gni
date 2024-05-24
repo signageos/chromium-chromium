@@ -16,6 +16,8 @@ declare_args() {
   webview_icon_resources = "icon_resources"
   # Icon resource ID without the leading '@', e.g. `drawable/icon_webview`.
   webview_icon_resource_id = ""
+  # Application label, e.g. `Android System WebView`.
+  webview_application_label = ""
 }
 
 system_webview_android_manifest =

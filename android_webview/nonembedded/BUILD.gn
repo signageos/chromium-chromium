@@ -171,6 +171,9 @@ jinja_template("system_webview_manifest") {
   if (defined(webview_icon_resource_id)) {
     variables += [ "icon_resource_id=$webview_icon_resource_id" ]
   }
+  if (defined(webview_application_label)) {
+    variables += [ "application_label=$webview_application_label" ]
+  }
 }
 
 jinja_template("trichrome_webview_manifest") {
