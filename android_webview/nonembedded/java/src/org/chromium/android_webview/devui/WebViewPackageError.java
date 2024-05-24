@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.os.Build;
 import android.provider.Settings;
 
 import org.chromium.android_webview.devui.util.SafeIntentUtils;
@@ -182,7 +183,9 @@ public class WebViewPackageError {
         // Switching WebView providers is possible from API >= 24.
         // The activity to change WebView provider is only enabled for admin user, see
         // https://crbug.com/1347418#comment8.
-        return PackageManagerUtils.canResolveActivity(new Intent(Settings.ACTION_WEBVIEW_SETTINGS));
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                && PackageManagerUtils.canResolveActivity(
+                        new Intent(Settings.ACTION_WEBVIEW_SETTINGS));
     }
 
     private void openChangeWebViewProviderSettings() {

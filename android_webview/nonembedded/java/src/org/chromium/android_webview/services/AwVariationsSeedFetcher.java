@@ -10,6 +10,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
+import android.os.Build;
 import android.os.PersistableBundle;
 
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import org.chromium.base.CommandLine;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
 import org.chromium.base.ResettersForTesting;
+import org.chromium.base.compat.ApiHelperForN;
 import org.chromium.base.task.AsyncTask;
 import org.chromium.base.task.BackgroundOnlyAsyncTask;
 import org.chromium.base.task.PostTask;
@@ -106,8 +108,16 @@ public class AwVariationsSeedFetcher extends JobService {
         }
     }
 
+    // Use JobScheduler.getPendingJob() if it's available. Otherwise, fall back to iterating over
+    // all jobs to find the one we want.
     private static JobInfo getPendingJob(JobScheduler scheduler) {
-        return scheduler.getPendingJob(JOB_ID);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            for (JobInfo info : scheduler.getAllPendingJobs()) {
+                if (info.getId() == JOB_ID) return info;
+            }
+            return null;
+        }
+        return ApiHelperForN.getPendingJob(scheduler, JOB_ID);
     }
 
     private static JobScheduler getScheduler() {
@@ -507,7 +517,7 @@ public class AwVariationsSeedFetcher extends JobService {
     public static boolean periodicFastModeJobScheduled() {
         JobScheduler scheduler = getScheduler();
         if (scheduler == null) return false;
-        JobInfo job = scheduler.getPendingJob(JOB_ID);
+        JobInfo job = getPendingJob(scheduler);
         if (job == null) return false;
         PersistableBundle extras = job.getExtras();
         if (extras == null) return false;

@@ -312,7 +312,8 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.options_menu_switch_provider) {
+        if (item.getItemId() == R.id.options_menu_switch_provider
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             logMenuSelection(MenuChoice.SWITCH_PROVIDER);
             SafeIntentUtils.startActivityOrShowError(this,
                     new Intent(Settings.ACTION_WEBVIEW_SETTINGS),
