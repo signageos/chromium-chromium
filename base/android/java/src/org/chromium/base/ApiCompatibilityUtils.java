@@ -16,7 +16,9 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.ImageDecoder;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
@@ -26,9 +28,17 @@ import android.os.StrictMode;
 import android.os.UserManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodSubtype;
 import android.view.textclassifier.TextClassifier;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -113,7 +123,6 @@ public class ApiCompatibilityUtils {
         }
     }
 
-    // This class is sufficiently small that it's fine if it doesn't verify for N devices.
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private static class ApisNMR1 {
         static boolean isDemoUser() {
@@ -121,6 +130,40 @@ public class ApiCompatibilityUtils {
                     (UserManager) ContextUtils.getApplicationContext().getSystemService(
                             Context.USER_SERVICE);
             return userManager.isDemoUser();
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private static class ApisN {
+        static String toHtml(Spanned spanned, int option) {
+            return Html.toHtml(spanned, option);
+        }
+
+        static String getLocale(InputMethodSubtype inputMethodSubType) {
+            return inputMethodSubType.getLanguageTag();
+        }
+
+        static boolean isInMultiWindowMode(Activity activity) {
+            return activity.isInMultiWindowMode();
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private static class ApisM {
+        public static void setStatusBarIconColor(View rootView, boolean useDarkIcons) {
+            int systemUiVisibility = rootView.getSystemUiVisibility();
+            if (useDarkIcons) {
+                systemUiVisibility |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            } else {
+                systemUiVisibility &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            }
+            rootView.setSystemUiVisibility(systemUiVisibility);
+        }
+    }
+
+    private static class ApisLmr1 {
+        static void setAccessibilityTraversalBefore(View view, int viewFocusedAfter) {
+            view.setAccessibilityTraversalBefore(viewFocusedAfter);
         }
     }
 
@@ -156,6 +199,18 @@ public class ApiCompatibilityUtils {
     }
 
     /**
+     * @see android.text.Html#toHtml(Spanned, int)
+     * @param option is ignored on below N
+     */
+    @SuppressWarnings("deprecation")
+    public static String toHtml(Spanned spanned, int option) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return ApisN.toHtml(spanned, option);
+        }
+        return Html.toHtml(spanned);
+    }
+
+    /**
      *  Gets an intent to start the Android system notification settings activity for an app.
      *
      */
@@ -174,6 +229,36 @@ public class ApiCompatibilityUtils {
     }
 
     /**
+     * @see android.view.Window#setStatusBarColor(int color).
+     */
+    public static void setStatusBarColor(Window window, int statusBarColor) {
+        // If both system bars are black, we can remove these from our layout,
+        // removing or shrinking the SurfaceFlinger overlay required for our views.
+        // This benefits battery usage on L and M.  However, this no longer provides a battery
+        // benefit as of N and starts to cause flicker bugs on O, so don't bother on O and up.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && statusBarColor == Color.BLACK
+                && window.getNavigationBarColor() == Color.BLACK) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        }
+        window.setStatusBarColor(statusBarColor);
+    }
+
+    /**
+     * Sets the status bar icons to dark or light. Note that this is only valid for
+     * Android M+.
+     *
+     * @param rootView The root view used to request updates to the system UI theming.
+     * @param useDarkIcons Whether the status bar icons should be dark.
+     */
+    public static void setStatusBarIconColor(View rootView, boolean useDarkIcons) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ApisM.setStatusBarIconColor(rootView, useDarkIcons);
+        }
+    }
+
+    /**
      * @see android.content.res.Resources#getDrawable(int id).
      * TODO(ltian): use {@link AppCompatResources} to parse drawable to prevent fail on
      * {@link VectorDrawable}. (http://crbug.com/792129)
@@ -183,7 +268,20 @@ public class ApiCompatibilityUtils {
     }
 
     public static void setImageTintList(ImageView view, @Nullable ColorStateList tintList) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
+            // Work around broken workaround in ImageViewCompat, see
+            // https://crbug.com/891609#c3.
+            if (tintList != null && view.getImageTintMode() == null) {
+                view.setImageTintMode(PorterDuff.Mode.SRC_IN);
+            }
+        }
         ImageViewCompat.setImageTintList(view, tintList);
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP) {
+            // Work around that the tint list is not cleared when setting tint list to null on L
+            // in some cases. See https://crbug.com/983686.
+            if (tintList == null) view.refreshDrawableState();
+        }
     }
 
     /**
@@ -246,11 +344,25 @@ public class ApiCompatibilityUtils {
     }
 
     /**
+     * @see android.view.inputmethod.InputMethodSubType#getLocate()
+     */
+    @SuppressWarnings("deprecation")
+    public static String getLocale(InputMethodSubtype inputMethodSubType) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return ApisN.getLocale(inputMethodSubType);
+        }
+        return inputMethodSubType.getLocale();
+    }
+
+    /**
      * @param activity The {@link Activity} to check.
      * @return Whether or not {@code activity} is currently in Android N+ multi-window mode.
      */
     public static boolean isInMultiWindowMode(Activity activity) {
-        return activity.isInMultiWindowMode();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return ApisN.isInMultiWindowMode(activity);
+        }
+        return false;
     }
 
     /**
@@ -289,6 +401,40 @@ public class ApiCompatibilityUtils {
             return ApisO.createLaunchDisplayIdActivityOptions(displayId);
         }
         return null;
+    }
+
+    /**
+     * @see View#setAccessibilityTraversalBefore(int)
+     */
+    public static void setAccessibilityTraversalBefore(View view, int viewFocusedAfter) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            ApisLmr1.setAccessibilityTraversalBefore(view, viewFocusedAfter);
+        }
+    }
+
+    /**
+     * Adds a content description to the provided EditText password field on versions of Android
+     * where the hint text is not used for accessibility. Does nothing if the EditText field does
+     * not have a password input type or the hint text is empty.  See https://crbug.com/911762.
+     *
+     * @param view The EditText password field.
+     */
+    public static void setPasswordEditTextContentDescription(EditText view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) return;
+
+        if (isPasswordInputType(view.getInputType()) && !TextUtils.isEmpty(view.getHint())) {
+            view.setContentDescription(view.getHint());
+        }
+    }
+
+    private static boolean isPasswordInputType(int inputType) {
+        final int variation =
+                inputType & (EditorInfo.TYPE_MASK_CLASS | EditorInfo.TYPE_MASK_VARIATION);
+        return variation == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD)
+                || variation
+                == (EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_WEB_PASSWORD)
+                || variation
+                == (EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_VARIATION_PASSWORD);
     }
 
     /**

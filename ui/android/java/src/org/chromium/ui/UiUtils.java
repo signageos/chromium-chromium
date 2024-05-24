@@ -36,6 +36,7 @@ import androidx.annotation.StyleableRes;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.BuildInfo;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
@@ -71,6 +72,9 @@ public class UiUtils {
      */
     private static final Map<String, Integer> sAndroidUiThemeBlocklist = new HashMap<>();
     static {
+        // Xiaomi doesn't support SYSTEM_UI_FLAG_LIGHT_STATUS_BAR until Android N; more info at
+        // https://crbug.com/823264.
+        sAndroidUiThemeBlocklist.put("xiaomi", Build.VERSION_CODES.N);
         // HTC doesn't respect theming flags on activity restart until Android O; this affects both
         // the system nav and status bar. More info at https://crbug.com/831737.
         sAndroidUiThemeBlocklist.put("htc", Build.VERSION_CODES.O);
@@ -100,7 +104,7 @@ public class UiUtils {
                     imManager.getEnabledInputMethodSubtypeList(enabledMethods.get(i), true);
             if (subtypes == null) continue;
             for (int j = 0; j < subtypes.size(); j++) {
-                String locale = subtypes.get(j).getLanguageTag();
+                String locale = ApiCompatibilityUtils.getLocale(subtypes.get(j));
                 if (!TextUtils.isEmpty(locale)) locales.add(locale);
             }
         }
@@ -320,6 +324,21 @@ public class UiUtils {
     }
 
     /**
+     * Iterates through all items in the specified ListAdapter (including header and footer views)
+     * and returns the width of the widest item (when laid out with height and width set to
+     * WRAP_CONTENT).
+     *
+     * WARNING: do not call this on a ListAdapter with more than a handful of items, the performance
+     * will be terrible since it measures every single item.
+     *
+     * @param adapter The ListAdapter whose widest item's width will be returned.
+     * @return The measured width (in pixels) of the widest item in the passed-in ListAdapter.
+     */
+    public static int computeMaxWidthOfListAdapterItems(ListAdapter adapter) {
+        return computeMaxWidthOfListAdapterItems(adapter, null);
+    }
+
+    /**
      * Get the index of a child {@link View} in a {@link ViewGroup}.
      * @param child The child to find the index of.
      * @return The index of the child in its parent. -1 if the child has no parent.
@@ -419,6 +438,8 @@ public class UiUtils {
      * @see android.view.Window#setStatusBarColor(int color).
      */
     public static void setStatusBarColor(Window window, int statusBarColor) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return;
+
         if (0
                 == (window.getAttributes().flags
                         & WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)) {
@@ -427,9 +448,9 @@ public class UiUtils {
         // The status bar should always be black in automotive devices to match the black back
         // button toolbar.
         if (BuildInfo.getInstance().isAutomotive) {
-            window.setStatusBarColor(Color.BLACK);
+            ApiCompatibilityUtils.setStatusBarColor(window, Color.BLACK);
         } else {
-            window.setStatusBarColor(statusBarColor);
+            ApiCompatibilityUtils.setStatusBarColor(window, statusBarColor);
         }
     }
 
@@ -443,6 +464,8 @@ public class UiUtils {
      * @param useDarkIcons Whether the status bar icons should be dark.
      */
     public static void setStatusBarIconColor(View rootView, boolean useDarkIcons) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+
         int systemUiVisibility = rootView.getSystemUiVisibility();
         // The status bar should always be black in automotive devices to match the black back
         // button toolbar, so we should use dark theme icons.
