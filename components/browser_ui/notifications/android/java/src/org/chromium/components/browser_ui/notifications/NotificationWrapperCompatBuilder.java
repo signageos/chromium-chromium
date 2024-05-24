@@ -140,7 +140,7 @@ public class NotificationWrapperCompatBuilder implements NotificationWrapperBuil
     @Override
     public NotificationWrapperBuilder addAction(
             int icon, CharSequence title, PendingIntent intent) {
-        if (icon != 0) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && icon != 0) {
             mBuilder.addAction(
                     new NotificationCompat.Action
                             .Builder(IconCompat.createWithResource(mContext, icon), title, intent)
@@ -275,9 +275,11 @@ public class NotificationWrapperCompatBuilder implements NotificationWrapperBuil
             Bitmap bigPicture, CharSequence summaryText) {
         NotificationCompat.BigPictureStyle style =
                 new NotificationCompat.BigPictureStyle().bigPicture(bigPicture);
-        // Android N doesn't show content text when expanded, so duplicate body text as a  summary
-        // for the big picture.
-        style.setSummaryText(summaryText);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Android N doesn't show content text when expanded, so duplicate body text as a
+            // summary for the big picture.
+            style.setSummaryText(summaryText);
+        }
         mBuilder.setStyle(style);
         return this;
     }
