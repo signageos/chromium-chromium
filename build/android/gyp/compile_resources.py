@@ -198,6 +198,9 @@ def _ParseArgs(args):
   output_opts.add_argument(
       '--proguard-file', help='Path to proguard.txt generated file.')
   output_opts.add_argument(
+      '--proguard-file-main-dex',
+      help='Path to proguard.txt generated file for main dex.')
+  output_opts.add_argument(
       '--emit-ids-out', help='Path to file produced by aapt2 --emit-ids.')
 
   diff_utils.AddCommandLineFlags(parser)
@@ -759,6 +762,8 @@ def _PackageApk(options, build):
   if options.proguard_file:
     link_command += ['--proguard', build.proguard_path]
     link_command += ['--proguard-minimal-keep-rules']
+  if options.proguard_file_main_dex:
+    link_command += ['--proguard-main-dex', build.proguard_main_dex_path]
   if options.emit_ids_out:
     link_command += ['--emit-ids', build.emit_ids_path]
 
@@ -898,6 +903,7 @@ def _WriteOutputs(options, build):
       (options.arsc_path, build.arsc_path),
       (options.proto_path, build.proto_path),
       (options.proguard_file, build.proguard_path),
+      (options.proguard_file_main_dex, build.proguard_main_dex_path),
       (options.emit_ids_out, build.emit_ids_path),
       (options.info_path, build.info_path),
   ]
