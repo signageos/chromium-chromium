@@ -4,6 +4,7 @@
 
 package com.android.webview.chromium;
 
+import android.net.WebAddress;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
@@ -126,6 +127,17 @@ public class CookieManagerAdapter extends CookieManager {
     @Override
     public String getCookie(String url, boolean privateBrowsing) {
         return getCookie(url);
+    }
+
+    // TODO(igsolla): remove this override once the WebView apk does not longer need
+    // to be binary compatibility with the API 21 version of the framework
+    /**
+     * IMPORTANT: This override is required for compatibility with the API 21 version of
+     * {@link CookieManager}.
+     */
+    @Override
+    public synchronized String getCookie(WebAddress uri) {
+        return mChromeCookieManager.getCookie(uri.toString());
     }
 
     @Override
