@@ -121,6 +121,16 @@ android_resources("icon_resources") {
   custom_package = "org.chromium.android_webview.icon"
 }
 
+android_resources("canary_icon_resources") {
+  sources = [
+    "java/res_icon_canary/drawable-hdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-mdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-xhdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-xxhdpi/icon_webview.webp",
+  ]
+  custom_package = "org.chromium.android_webview.canary_icon"
+}
+
 android_resources("devui_resources") {
   sources = [
     "java/res_devui/drawable/blue_circle.xml",
