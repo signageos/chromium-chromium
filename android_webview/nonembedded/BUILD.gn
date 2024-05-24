@@ -168,6 +168,9 @@ jinja_template("system_webview_manifest") {
   if (defined(system_webview_library_name)) {
     variables += [ "library=$shlib_prefix$system_webview_library_name$shlib_extension" ]
   }
+  if (defined(webview_icon_resource_id)) {
+    variables += [ "icon_resource_id=$webview_icon_resource_id" ]
+  }
 }
 
 jinja_template("trichrome_webview_manifest") {

@@ -12,6 +12,10 @@ declare_args() {
   # dynamically at runtime if Monochrome is the current selected system WebView
   # implementation or hidden otherwise.
   webview_devui_show_icon = android_channel != "stable"
+  # `android_resources` dependency that contains the application icon.
+  webview_icon_resources = "icon_resources"
+  # Icon resource ID without the leading '@', e.g. `drawable/icon_webview`.
+  webview_icon_resource_id = ""
 }
 
 system_webview_android_manifest =
@@ -24,7 +28,7 @@ trichrome_webview_32_android_manifest =
 
 upstream_only_webview_deps = [
   "//android_webview:platform_service_bridge_upstream_implementation_java",
-  "//android_webview/nonembedded:icon_resources",
+  "//android_webview/nonembedded:$webview_icon_resources",
 ]
 
 if (webview_includes_weblayer) {
