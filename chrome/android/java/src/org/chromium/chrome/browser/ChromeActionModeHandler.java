@@ -7,6 +7,7 @@ package org.chromium.chrome.browser;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.ActionMode;
@@ -160,7 +161,7 @@ public class ChromeActionModeHandler {
                 }
             }
             if (menu.findItem(R.id.select_action_menu_share) != null
-                    && mode.getType() == ActionMode.TYPE_FLOATING) {
+                    && isFloatingActionMode(mode)) {
                 showShareIph();
             }
             return res;
@@ -181,6 +182,11 @@ public class ChromeActionModeHandler {
                                                         .setAnchorView(view)
                                                         .setRemoveArrow(true)
                                                         .build());
+        }
+
+        private boolean isFloatingActionMode(ActionMode mode) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;
+            return mode.getType() == ActionMode.TYPE_FLOATING;
         }
 
         @Override

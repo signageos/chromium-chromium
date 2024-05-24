@@ -19,6 +19,9 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
+import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.PowerManager;
 
 import org.junit.After;
@@ -28,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.annotation.Config;
+import org.robolectric.util.ReflectionHelpers;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.test.BaseRobolectricTestRunner;
@@ -52,6 +56,29 @@ public class DeviceConditionsTest {
     private KeyguardManager mKeyguardManager;
 
     private Intent mBatteryStatus;
+
+    /** Helps change the SDK version in testing to one of the supported versions. */
+    private static class BuildVersionHelper implements AutoCloseable {
+        private int mOriginalSdkInt;
+
+        public BuildVersionHelper() {
+            mOriginalSdkInt = VERSION.SDK_INT;
+        }
+
+        /**
+         * Sets Build.VERSION.SDK_INT to provided version Code.
+         * @param versionCode Version code to set.
+         */
+        public void setSdkVersion(int versionCode) {
+            ReflectionHelpers.setStaticField(Build.VERSION.class, "SDK_INT", versionCode);
+        }
+
+        /** Reverts the SDK version to original value. */
+        @Override
+        public void close() {
+            setSdkVersion(mOriginalSdkInt);
+        }
+    }
 
     @Before
     public void setUp() {
@@ -242,11 +269,31 @@ public class DeviceConditionsTest {
 
     @Test
     public void testIsInIdleMode() {
-        setDeviceInIdleMode(false);
-        assertFalse(DeviceConditions.isCurrentlyInIdleMode(mContext));
+        try (BuildVersionHelper sdkHelper = new BuildVersionHelper()) {
+            // We expect LOLLIPOP to never indicate being in idle mode.
+            sdkHelper.setSdkVersion(VERSION_CODES.LOLLIPOP);
+            setDeviceInIdleMode(false);
+            assertFalse(DeviceConditions.isCurrentlyInIdleMode(mContext));
 
-        setDeviceInIdleMode(true);
-        assertTrue(DeviceConditions.isCurrentlyInIdleMode(mContext));
+            setDeviceInIdleMode(true);
+            assertFalse(DeviceConditions.isCurrentlyInIdleMode(mContext));
+
+            // We expect LOLLIPOP to never indicate being in idle mode.
+            sdkHelper.setSdkVersion(VERSION_CODES.LOLLIPOP_MR1);
+            setDeviceInIdleMode(false);
+            assertFalse(DeviceConditions.isCurrentlyInIdleMode(mContext));
+
+            setDeviceInIdleMode(true);
+            assertFalse(DeviceConditions.isCurrentlyInIdleMode(mContext));
+
+            // But it should be on MARSHMALLOW+.
+            sdkHelper.setSdkVersion(VERSION_CODES.M);
+            setDeviceInIdleMode(false);
+            assertFalse(DeviceConditions.isCurrentlyInIdleMode(mContext));
+
+            setDeviceInIdleMode(true);
+            assertTrue(DeviceConditions.isCurrentlyInIdleMode(mContext));
+        }
     }
 
     @Test
