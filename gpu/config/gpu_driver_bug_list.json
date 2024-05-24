@@ -2389,7 +2389,7 @@
       "os": {
         "type": "android"
       },
-      "gl_renderer": ".*Adreno \\(TM\\) *",
+      "gl_renderer": ".*Adreno \\(TM\\) .*",
       "features": [
         "dont_use_loops_to_initialize_variables"
       ]
