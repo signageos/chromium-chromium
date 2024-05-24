@@ -140,7 +140,7 @@ public class CronetTestRule implements TestRule {
 
         // Find the API version required by the test.
         int requiredApiVersion = getMaximumAvailableApiLevel();
-        int requiredAndroidApiVersion = Build.VERSION_CODES.LOLLIPOP;
+        int requiredAndroidApiVersion = Build.VERSION_CODES.KITKAT;
         for (Annotation a : desc.getTestClass().getAnnotations()) {
             if (a instanceof RequiresMinApi) {
                 requiredApiVersion = ((RequiresMinApi) a).value();

@@ -560,6 +560,7 @@ android_library("cronet_sample_apk_java") {
     "//third_party/androidx:androidx_appcompat_appcompat_java",
     "//third_party/androidx:androidx_fragment_fragment_java",
     "//third_party/androidx:androidx_lifecycle_lifecycle_viewmodel_java",
+    "//third_party/androidx:androidx_multidex_multidex_java",
     "//third_party/androidx:androidx_preference_preference_java",
     "//third_party/androidx:androidx_recyclerview_recyclerview_java",
   ]
@@ -580,6 +581,7 @@ android_apk("cronet_sample_apk") {
   # Cronet jars will include this, so don't duplicate.
   generate_buildconfig_java = false
 
+  enable_multidex = true
   if (!is_java_debug) {
     proguard_enabled = true
     proguard_configs = [
@@ -1013,6 +1015,7 @@ android_library("cronet_test_apk_java") {
     "//net/android:net_java_test_support",
     "//third_party/android_sdk:android_test_base_java",
     "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/androidx:androidx_multidex_multidex_java",
     "//third_party/google-truth:google_truth_java",
     "//third_party/junit",
     "//third_party/netty4:netty_all_java",
@@ -1201,7 +1204,8 @@ instrumentation_test_apk("cronet_test_instrumentation_apk") {
   lint_baseline_file = "lint-baseline.xml"
   lint_suppressions_file = "lint-suppressions.xml"
 
-  lint_min_sdk_version = 21
+  # Still needs to support KitKat. See crbug.com/1042122.
+  lint_min_sdk_version = 19
 
   apk_name = "CronetTestInstrumentation"
   android_manifest = "test/javatests/AndroidManifest.xml"
@@ -1243,6 +1247,7 @@ instrumentation_test_apk("cronet_test_instrumentation_apk") {
 
   data_deps = [ "//net:test_support" ]
 
+  enable_multidex = true
   if (!is_java_debug) {
     proguard_enabled = true
 
@@ -1286,6 +1291,7 @@ instrumentation_test_apk(
            "//base:base_java_test_support",
            "//third_party/android_sdk:android_test_base_java",
            "//third_party/android_sdk:android_test_mock_java",
+           "//third_party/androidx:androidx_multidex_multidex_java",
            "//third_party/google-truth:google_truth_java",
            "//third_party/junit",
            "//third_party/netty4:netty_all_java",
@@ -1330,6 +1336,7 @@ instrumentation_test_apk(
            "//third_party/netty4:netty_all_java",
          ] + cronet_tests_androidx_common_srcs
 
+  enable_multidex = true
   if (!is_java_debug) {
     proguard_enabled = true
     proguard_configs = [
@@ -1370,6 +1377,7 @@ android_apk("cronet_perf_test_apk") {
     "//third_party/junit",
   ]
 
+  enable_multidex = true
   if (!is_java_debug) {
     proguard_enabled = true
     proguard_configs = [
