@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,10 @@ public class Toast {
                 @Override
                 public ApplicationInfo getApplicationInfo() {
                     ApplicationInfo info = new ApplicationInfo(super.getApplicationInfo());
+                    // On Lollipop the condition we need to fail is
+                    // "targetSdkVersion >= Build.VERSION_CODES.LOLLIPOP"
+                    // (and for Chrome targetSdkVersion is always the latest)
+                    info.targetSdkVersion = Build.VERSION_CODES.KITKAT;
 
                     // On M+ the condition we need to fail is
                     // "flags & ApplicationInfo.FLAG_HARDWARE_ACCELERATED"
