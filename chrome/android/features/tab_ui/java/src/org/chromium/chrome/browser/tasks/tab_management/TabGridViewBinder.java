@@ -18,9 +18,9 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.ImageViewCompat;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.ResettersForTesting;
 import org.chromium.chrome.browser.tab.TabUtils;
@@ -367,7 +367,7 @@ class TabGridViewBinder {
     private static void updateColorForActionButton(
             ViewLookupCachingFrameLayout rootView, boolean isIncognito, boolean isSelected) {
         ImageView actionButton = (ImageView) rootView.fastFindViewById(R.id.action_button);
-        ImageViewCompat.setImageTintList(actionButton,
+        ApiCompatibilityUtils.setImageTintList(actionButton,
                 TabUiThemeProvider.getActionButtonTintList(
                         actionButton.getContext(), isIncognito, isSelected));
     }
@@ -387,7 +387,7 @@ class TabGridViewBinder {
 
         // The check should be invisible if not selected.
         actionButton.getDrawable().setAlpha(isSelected ? 255 : 0);
-        ImageViewCompat.setImageTintList(actionButton,
+        ApiCompatibilityUtils.setImageTintList(actionButton,
                 isSelected ? TabUiThemeProvider.getToggleActionButtonCheckedDrawableTintList(
                         rootView.getContext(), isIncognito)
                            : null);

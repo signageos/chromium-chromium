@@ -12,8 +12,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.core.widget.ImageViewCompat;
-
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.chrome.R;
 import org.chromium.ui.base.ViewUtils;
 import org.chromium.ui.modelutil.PropertyKey;
@@ -44,9 +43,9 @@ class SearchBoxViewBinder
         } else if (SearchBoxProperties.BACKGROUND == propertyKey) {
             searchBoxContainer.setBackground(model.get(SearchBoxProperties.BACKGROUND));
         } else if (SearchBoxProperties.VOICE_SEARCH_COLOR_STATE_LIST == propertyKey) {
-            ImageViewCompat.setImageTintList(voiceSearchButton,
+            ApiCompatibilityUtils.setImageTintList(voiceSearchButton,
                     model.get(SearchBoxProperties.VOICE_SEARCH_COLOR_STATE_LIST));
-            ImageViewCompat.setImageTintList(
+            ApiCompatibilityUtils.setImageTintList(
                     lensButton, model.get(SearchBoxProperties.VOICE_SEARCH_COLOR_STATE_LIST));
         } else if (SearchBoxProperties.VOICE_SEARCH_DRAWABLE == propertyKey) {
             voiceSearchButton.setImageDrawable(

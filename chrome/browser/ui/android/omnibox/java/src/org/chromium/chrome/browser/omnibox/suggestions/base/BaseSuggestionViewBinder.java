@@ -29,8 +29,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.ImageViewCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.chrome.browser.omnibox.OmniboxFeatures;
 import org.chromium.chrome.browser.omnibox.R;
 import org.chromium.chrome.browser.omnibox.styles.OmniboxDrawableState;
@@ -350,7 +350,7 @@ public final class BaseSuggestionViewBinder<T extends View>
         }
 
         view.setImageDrawable(sds.drawable);
-        ImageViewCompat.setImageTintList(view, tint);
+        ApiCompatibilityUtils.setImageTintList(view, tint);
     }
 
     /**

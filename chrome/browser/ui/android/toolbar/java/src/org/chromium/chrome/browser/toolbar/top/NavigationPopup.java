@@ -23,8 +23,8 @@ import android.widget.TextView;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.widget.ImageViewCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.metrics.RecordHistogram;
 import org.chromium.base.metrics.RecordUserAction;
@@ -322,11 +322,11 @@ public class NavigationPopup implements AdapterView.OnItemClickListener {
             viewHolder.mImageView.setImageBitmap(entry.getFavicon());
 
             if (entry.getIndex() == FULL_HISTORY_ENTRY_INDEX) {
-                ImageViewCompat.setImageTintList(viewHolder.mImageView,
+                ApiCompatibilityUtils.setImageTintList(viewHolder.mImageView,
                         AppCompatResources.getColorStateList(
                                 mContext, R.color.default_icon_color_accent1_tint_list));
             } else {
-                ImageViewCompat.setImageTintList(viewHolder.mImageView, null);
+                ApiCompatibilityUtils.setImageTintList(viewHolder.mImageView, null);
             }
 
             if (mType == Type.ANDROID_SYSTEM_BACK) {

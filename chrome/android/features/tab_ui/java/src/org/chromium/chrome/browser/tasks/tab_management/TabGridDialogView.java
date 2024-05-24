@@ -722,7 +722,7 @@ public class TabGridDialogView extends FrameLayout {
         ImageView actionButton = mAnimationCardView.findViewById(R.id.action_button);
         actionButton.setImageDrawable(
                 ((ImageView) (view.findViewById(R.id.action_button))).getDrawable());
-        ImageViewCompat.setImageTintList(actionButton,
+        ApiCompatibilityUtils.setImageTintList(actionButton,
                 ImageViewCompat.getImageTintList((view.findViewById(R.id.action_button))));
 
         mAnimationCardView.findViewById(R.id.background_view).setBackground(null);

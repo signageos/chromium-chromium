@@ -14,7 +14,6 @@ import androidx.annotation.ColorRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.core.widget.ImageViewCompat;
 
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.components.browser_ui.widget.R;
@@ -94,16 +93,16 @@ public class ListMenuItemViewBinder {
             @ColorRes
             int tintColorId = model.get(ListMenuItemProperties.TINT_COLOR_ID);
             if (tintColorId != 0) {
-                ImageViewCompat.setImageTintList(startIcon,
+                ApiCompatibilityUtils.setImageTintList(startIcon,
                         AppCompatResources.getColorStateList(view.getContext(),
                                 model.get(ListMenuItemProperties.TINT_COLOR_ID)));
-                ImageViewCompat.setImageTintList(endIcon,
+                ApiCompatibilityUtils.setImageTintList(endIcon,
                         AppCompatResources.getColorStateList(view.getContext(),
                                 model.get(ListMenuItemProperties.TINT_COLOR_ID)));
             } else {
                 // No tint.
-                ImageViewCompat.setImageTintList(startIcon, null);
-                ImageViewCompat.setImageTintList(endIcon, null);
+                ApiCompatibilityUtils.setImageTintList(startIcon, null);
+                ApiCompatibilityUtils.setImageTintList(endIcon, null);
             }
         } else if (propertyKey == ListMenuItemProperties.TEXT_APPEARANCE_ID) {
             ApiCompatibilityUtils.setTextAppearance(

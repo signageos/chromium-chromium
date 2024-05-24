@@ -24,7 +24,6 @@ import android.widget.ImageView;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.ImageViewCompat;
 
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.supplier.Supplier;
@@ -312,7 +311,7 @@ public class MenuButton extends FrameLayout implements TintObserver {
 
     @Override
     public void onTintChanged(ColorStateList tintList, @BrandedColorScheme int brandedColorScheme) {
-        ImageViewCompat.setImageTintList(mMenuImageButton, tintList);
+        ApiCompatibilityUtils.setImageTintList(mMenuImageButton, tintList);
         mBrandedColorScheme = brandedColorScheme;
         updateImageResources();
         updateMenuButtonHighlightDrawable();

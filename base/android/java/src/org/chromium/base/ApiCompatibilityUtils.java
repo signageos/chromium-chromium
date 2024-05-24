@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Bitmap;
@@ -28,6 +29,7 @@ import android.provider.Settings;
 import android.view.Display;
 import android.view.View;
 import android.view.textclassifier.TextClassifier;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -35,6 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.annotation.RequiresApi;
 import androidx.core.os.BuildCompat;
+import androidx.core.widget.ImageViewCompat;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -177,6 +180,10 @@ public class ApiCompatibilityUtils {
      */
     public static Drawable getDrawable(Resources res, int id) throws NotFoundException {
         return getDrawableForDensity(res, id, 0);
+    }
+
+    public static void setImageTintList(ImageView view, @Nullable ColorStateList tintList) {
+        ImageViewCompat.setImageTintList(view, tintList);
     }
 
     /**

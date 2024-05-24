@@ -35,10 +35,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.TooltipCompat;
 import androidx.core.view.ViewCompat;
-import androidx.core.widget.ImageViewCompat;
 
 import com.google.android.material.color.MaterialColors;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.ThreadUtils;
 import org.chromium.chrome.browser.toolbar.ButtonData;
@@ -299,8 +299,8 @@ class OptionalButtonView extends FrameLayout implements TransitionListener {
         return mBackground;
     }
     void setColorStateList(ColorStateList colorStateList) {
-        ImageViewCompat.setImageTintList(mButton, colorStateList);
-        ImageViewCompat.setImageTintList(mAnimationImage, colorStateList);
+        ApiCompatibilityUtils.setImageTintList(mButton, colorStateList);
+        ApiCompatibilityUtils.setImageTintList(mAnimationImage, colorStateList);
         if (colorStateList != null) {
             mActionChipLabel.setTextColor(colorStateList);
         }

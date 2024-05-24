@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.widget.ImageViewCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ResettersForTesting;
 import org.chromium.components.browser_ui.util.TraceEventVectorDrawableCompat;
 import org.chromium.components.browser_ui.widget.selectable_list.SelectableItemViewBase;
@@ -391,7 +392,7 @@ public class PickerBitmapView extends SelectableItemViewBase<PickerBitmap> {
         }
 
         mSpecialTileIcon.setImageDrawable(image);
-        ImageViewCompat.setImageTintList(mSpecialTileIcon,
+        ApiCompatibilityUtils.setImageTintList(mSpecialTileIcon,
                 AppCompatResources.getColorStateList(
                         mContext, R.color.default_icon_color_secondary_tint_list));
         ImageViewCompat.setImageTintMode(mSpecialTileIcon, PorterDuff.Mode.SRC_IN);
@@ -534,8 +535,8 @@ public class PickerBitmapView extends SelectableItemViewBase<PickerBitmap> {
                 || mBitmapDetails.type() == PickerBitmap.TileTypes.VIDEO;
     }
 
+    @VisibleForTesting
     public static void setAnimationListenerForTest(AnimationListener listener) {
         sAnimationListenerForTest = listener;
-        ResettersForTesting.register(() -> sAnimationListenerForTest = null);
     }
 }

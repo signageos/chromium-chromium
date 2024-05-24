@@ -15,8 +15,8 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.core.widget.ImageViewCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.components.browser_ui.widget.R;
 
 /**
@@ -102,7 +102,7 @@ public abstract class SelectableItemView<E> extends CheckableSelectableItemView<
 
         if (mStartIconView != null) {
             mStartIconView.setBackgroundResource(mStartIconBackgroundRes);
-            ImageViewCompat.setImageTintList(mStartIconView, getDefaultIconTint());
+            ApiCompatibilityUtils.setImageTintList(mStartIconView, getDefaultIconTint());
         }
     }
 
