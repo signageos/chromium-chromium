@@ -26,6 +26,8 @@ import org.chromium.ui.base.WindowAndroid;
 import org.chromium.ui.display.DisplayAndroid;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Wrapper around Android's InputMethodManager
@@ -208,6 +210,23 @@ public class InputMethodManagerWrapperImpl implements InputMethodManagerWrapper 
         InputMethodManager manager = getInputMethodManager();
         if (manager == null) return;
         manager.updateExtractedText(view, token, text);
+    }
+
+    @Override
+    public void notifyUserAction() {
+        // On N and above, this is not needed.
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) return;
+        if (DEBUG_LOGS) Log.i(TAG, "notifyUserAction");
+        InputMethodManager manager = getInputMethodManager();
+        if (manager == null) return;
+        try {
+            Method method = InputMethodManager.class.getMethod("notifyUserAction");
+            method.invoke(manager);
+        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            if (DEBUG_LOGS) Log.i(TAG, "notifyUserAction failed");
+            return;
+        }
     }
 
     @Override

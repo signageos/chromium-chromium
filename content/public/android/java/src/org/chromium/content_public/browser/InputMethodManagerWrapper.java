@@ -61,6 +61,12 @@ public interface InputMethodManagerWrapper {
     void updateExtractedText(View view, int token, android.view.inputmethod.ExtractedText text);
 
     /**
+     * Notify that a user took some action with the current input method. Without this call
+     * an input method app may wait longer when the user switches methods within the app.
+     */
+    void notifyUserAction();
+
+    /**
      * Call this when WindowAndroid object has changed.
      * @param newWindowAndroid The new WindowAndroid object.
      */
