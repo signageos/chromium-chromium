@@ -250,6 +250,9 @@ android_resources("monochrome_devui_launcher_icon_resources") {
 
 _webview_jinja_variables = [ "manifest_package=$system_webview_package_name" ] +
                            webview_jinja_variables
+if (defined(webview_icon_resource_id)) {
+  _webview_jinja_variables += [ "icon_resource_id=$webview_icon_resource_id" ]
+}
 
 jinja_template("system_webview_manifest") {
   input = "java/AndroidManifest.xml"
