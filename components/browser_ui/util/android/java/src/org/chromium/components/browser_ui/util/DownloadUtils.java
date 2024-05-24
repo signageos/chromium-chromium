@@ -85,11 +85,16 @@ public class DownloadUtils {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         boolean useSystemNotification = !notificationManager.areNotificationsEnabled();
         try {
-            // OriginalUri has to be null or non-empty http(s) scheme.
-            Uri originalUri = parseOriginalUrl(originalUrl.getSpec());
-            Uri refererUri = GURL.isEmptyOrInvalid(referer) ? null : Uri.parse(referer.getSpec());
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+                // OriginalUri has to be null or non-empty http(s) scheme.
+                Uri originalUri = parseOriginalUrl(originalUrl.getSpec());
+                Uri refererUri = GURL.isEmptyOrInvalid(referer) ? null : Uri.parse(referer.getSpec());
+                return manager.addCompletedDownload(fileName, description, true, mimeType, filePath,
+                        fileSizeBytes, useSystemNotification, originalUri, refererUri);
+            }
+
             return manager.addCompletedDownload(fileName, description, true, mimeType, filePath,
-                    fileSizeBytes, useSystemNotification, originalUri, refererUri);
+                    fileSizeBytes, useSystemNotification);
         } catch (Exception e) {
             return INVALID_SYSTEM_DOWNLOAD_ID;
         }
