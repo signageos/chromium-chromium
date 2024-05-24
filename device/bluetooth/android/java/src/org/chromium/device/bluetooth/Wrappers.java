@@ -24,6 +24,8 @@ import android.os.Build;
 import android.os.ParcelUuid;
 import android.util.SparseArray;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
 import org.chromium.base.ThreadUtils;
@@ -45,6 +47,7 @@ import java.util.UUID;
  * pass through to the Android object and instead provide fake implementations.
  */
 @JNINamespace("device")
+@RequiresApi(Build.VERSION_CODES.M)
 class Wrappers {
     private static final String TAG = "Bluetooth";
 

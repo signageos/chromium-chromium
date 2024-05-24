@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.ParcelUuid;
 import android.util.SparseArray;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
 import org.chromium.base.annotations.CalledByNative;
@@ -35,6 +37,7 @@ import java.util.Map;
  * Lifetime is controlled by device::BluetoothAdapterAndroid.
  */
 @JNINamespace("device")
+@RequiresApi(Build.VERSION_CODES.M)
 final class ChromeBluetoothAdapter extends BroadcastReceiver {
     private static final String TAG = "Bluetooth";
 

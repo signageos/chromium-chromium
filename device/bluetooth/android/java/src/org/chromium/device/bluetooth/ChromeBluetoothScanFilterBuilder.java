@@ -5,7 +5,10 @@
 package org.chromium.device.bluetooth;
 
 import android.bluetooth.le.ScanFilter;
+import android.os.Build;
 import android.os.ParcelUuid;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -16,6 +19,7 @@ import org.chromium.base.annotations.JNINamespace;
  * BluetoothAdapterAndroid::CreateAndroidFilter()
  */
 @JNINamespace("device")
+@RequiresApi(Build.VERSION_CODES.M)
 final class ChromeBluetoothScanFilterBuilder {
     private ScanFilter.Builder mBuilder;
 
