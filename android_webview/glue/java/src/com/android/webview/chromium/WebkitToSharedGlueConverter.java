@@ -51,6 +51,7 @@ public class WebkitToSharedGlueConverter {
         return WebViewChromiumFactoryProvider.getSingleton().getAwInit();
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     public static AwServiceWorkerSettings getServiceWorkerSettings(
             ServiceWorkerWebSettings settings) {
         ServiceWorkerSettingsAdapter adapter = (ServiceWorkerSettingsAdapter) settings;
