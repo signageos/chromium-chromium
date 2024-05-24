@@ -37,6 +37,10 @@ scoped_refptr<UsbDeviceAndroid> UsbDeviceAndroid::Create(
   ScopedJavaLocalRef<jobject> wrapper =
       Java_ChromeUsbDevice_create(env, usb_device);
 
+  uint16_t device_version = 0;
+  if (build_info->sdk_int() >= base::android::SDK_VERSION_MARSHMALLOW)
+    device_version = Java_ChromeUsbDevice_getDeviceVersion(env, wrapper);
+
   std::u16string manufacturer_string;
   ScopedJavaLocalRef<jstring> manufacturer_jstring =
       Java_ChromeUsbDevice_getManufacturerName(env, wrapper);
@@ -67,8 +71,7 @@ scoped_refptr<UsbDeviceAndroid> UsbDeviceAndroid::Create(
       Java_ChromeUsbDevice_getDeviceSubclass(env, wrapper),
       Java_ChromeUsbDevice_getDeviceProtocol(env, wrapper),
       Java_ChromeUsbDevice_getVendorId(env, wrapper),
-      Java_ChromeUsbDevice_getProductId(env, wrapper),
-      Java_ChromeUsbDevice_getDeviceVersion(env, wrapper),
+      Java_ChromeUsbDevice_getProductId(env, wrapper), device_version,
       manufacturer_string, product_string, serial_number, wrapper));
 }
 
