@@ -204,6 +204,15 @@ android_resources("icon_resources") {
   ]
 }
 
+android_resources("canary_icon_resources") {
+  sources = [
+    "java/res_icon_canary/drawable-hdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-mdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-xhdpi/icon_webview.webp",
+    "java/res_icon_canary/drawable-xxhdpi/icon_webview.webp",
+  ]
+}
+
 android_resources("devui_resources") {
   sources = [
     "java/res_devui/drawable/blue_circle.xml",
