@@ -89,6 +89,9 @@ template("system_webview_apk_or_module_tmpl") {
         variables += [ "library=lib$system_webview_library_name.so" ]
       }
     }
+    if (defined(webview_icon_resource_id)) {
+      variables += [ "icon_resource_id=$webview_icon_resource_id" ]
+    }
     includes = []
     if (defined(invoker.jinja_input)) {
       includes += [ input ]
