@@ -276,6 +276,12 @@ bool MediaDrmBridge::IsKeySystemSupported(const std::string& key_system) {
 }
 
 // static
+bool MediaDrmBridge::IsPerOriginProvisioningSupported() {
+  return base::android::BuildInfo::GetInstance()->sdk_int() >=
+         base::android::SDK_VERSION_MARSHMALLOW;
+}
+
+// static
 bool MediaDrmBridge::IsPerApplicationProvisioningSupported() {
   // Start by checking "ro.product.first_api_level", which may not exist.
   // If it is non-zero, then it is the API level.
@@ -298,7 +304,9 @@ bool MediaDrmBridge::IsPersistentLicenseTypeSupported(
     const std::string& /* key_system */) {
   // TODO(yucliu): Check |key_system| if persistent license is supported by
   // MediaDrm.
-  return base::FeatureList::IsEnabled(kMediaDrmPersistentLicense);
+  return  // In development. See http://crbug.com/493521
+      base::FeatureList::IsEnabled(kMediaDrmPersistentLicense) &&
+      IsPerOriginProvisioningSupported();
 }
 
 // static
@@ -860,12 +868,15 @@ MediaDrmBridge::MediaDrmBridge(
   ScopedJavaLocalRef<jstring> j_security_level =
       ConvertUTF8ToJavaString(env, security_level_str);
 
-  // origin id can be empty when MediaDrmBridge is created by
-  // CreateWithoutSessionSupport, which is used for unprovisioning, or for
-  // some key systems (like Clear Key) that don't support origin isolated
-  // storage.
-  ScopedJavaLocalRef<jstring> j_security_origin =
-      ConvertUTF8ToJavaString(env, origin_id);
+    bool use_origin_isolated_storage =
+        // Per-origin provisioning must be supported for origin isolated storage.
+        IsPerOriginProvisioningSupported() &&
+        // origin id can be empty when MediaDrmBridge is created by
+        // CreateWithoutSessionSupport, which is used for unprovisioning.
+        !origin_id.empty();
+
+    ScopedJavaLocalRef<jstring> j_security_origin = ConvertUTF8ToJavaString(
+        env, use_origin_isolated_storage ? origin_id : "");
 
   j_media_drm_.Reset(Java_MediaDrmBridge_create(
       env, j_scheme_uuid, j_security_origin, j_security_level,

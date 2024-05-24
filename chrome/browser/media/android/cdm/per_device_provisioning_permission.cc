@@ -135,6 +135,9 @@ void RequestPerDeviceProvisioningPermission(
   DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
   DCHECK(render_frame_host);
   DCHECK(callback);
+  DCHECK(media::MediaDrmBridge::IsPerOriginProvisioningSupported())
+      << "RequestPerDeviceProvisioningPermission() should only be called when "
+         "per-origin provisioning is supported.";
 
   // Return the previous response if it was for the same origin.
   bool last_response = false;
