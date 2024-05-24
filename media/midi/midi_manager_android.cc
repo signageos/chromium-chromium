@@ -4,6 +4,7 @@
 
 #include "media/midi/midi_manager_android.h"
 
+#include "base/android/build_info.h"
 #include "base/feature_list.h"
 #include "base/functional/bind.h"
 #include "base/metrics/field_trial_params.h"
@@ -26,6 +27,10 @@ namespace midi {
 namespace {
 
 bool HasSystemFeatureMidi() {
+  // MIDI API was added at Android M.
+  DCHECK_GE(base::android::BuildInfo::GetInstance()->sdk_int(),
+            base::android::SDK_VERSION_MARSHMALLOW);
+
   // Check if the MIDI service actually runs on the system.
   return Java_MidiManagerAndroid_hasSystemFeatureMidi(
       base::android::AttachCurrentThread());
