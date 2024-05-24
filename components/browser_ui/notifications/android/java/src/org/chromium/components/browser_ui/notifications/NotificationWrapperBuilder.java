@@ -94,6 +94,8 @@ public interface NotificationWrapperBuilder {
 
     NotificationWrapperBuilder setSubText(CharSequence text);
 
+    NotificationWrapperBuilder setContentInfo(String info);
+
     NotificationWrapperBuilder setWhen(long time);
 
     NotificationWrapperBuilder setLargeIcon(Bitmap icon);

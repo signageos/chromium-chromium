@@ -217,6 +217,12 @@ public class NotificationWrapperCompatBuilder implements NotificationWrapperBuil
     }
 
     @Override
+    public NotificationWrapperBuilder setContentInfo(String info) {
+        mBuilder.setContentInfo(info);
+        return this;
+    }
+
+    @Override
     public NotificationWrapperBuilder setWhen(long time) {
         mBuilder.setWhen(time);
         return this;
