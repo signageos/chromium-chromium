@@ -14,11 +14,10 @@ import androidx.core.view.MotionEventCompat;
 
 import org.chromium.base.Callback;
 import org.chromium.base.ThreadUtils;
+import org.chromium.base.supplier.BooleanSupplier;
 import org.chromium.base.supplier.Supplier;
 import org.chromium.chrome.browser.customtabs.features.partialcustomtab.PartialCustomTabBottomSheetStrategy.HeightStatus;
 import org.chromium.chrome.browser.customtabs.features.toolbar.CustomTabToolbar;
-
-import java.util.function.BooleanSupplier;
 
 /**
  * Handling touch events for resizing the Window.
