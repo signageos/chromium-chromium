@@ -663,10 +663,12 @@ class MediaCodecUtil {
     /**
      * Sets the encryption pattern value if and only if CryptoInfo.setPattern method is
      * supported.
-     * Note that if platformSupportsCbcsEncryption returns true, then this function will set the
-     * pattern.
+     * This method was introduced in Android N. Note that if platformSupportsCbcsEncryption
+     * returns true, then this function will set the pattern.
      */
     static void setPatternIfSupported(CryptoInfo cryptoInfo, int encrypt, int skip) {
-        ApiHelperForN.setCryptoInfoPattern(cryptoInfo, encrypt, skip);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ApiHelperForN.setCryptoInfoPattern(cryptoInfo, encrypt, skip);
+        }
     }
 }
