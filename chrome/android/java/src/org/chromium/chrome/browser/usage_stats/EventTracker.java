@@ -4,6 +4,7 @@
 
 package org.chromium.chrome.browser.usage_stats;
 
+import org.chromium.base.Function;
 import org.chromium.base.Promise;
 import org.chromium.chrome.browser.usage_stats.WebsiteEventProtos.Timestamp;
 
@@ -12,7 +13,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * In-memory store of {@link org.chromium.chrome.browser.usage_stats.WebsiteEvent} objects.

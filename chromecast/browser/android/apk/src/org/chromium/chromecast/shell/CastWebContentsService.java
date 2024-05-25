@@ -16,14 +16,13 @@ import android.os.IBinder;
 
 import androidx.core.app.NotificationCompat;
 
+import org.chromium.base.Function;
 import org.chromium.base.Log;
 import org.chromium.chromecast.base.Controller;
 import org.chromium.chromecast.base.Observable;
 import org.chromium.chromecast.base.Observer;
 import org.chromium.content.browser.MediaSessionImpl;
 import org.chromium.content_public.browser.WebContents;
-
-import java.util.function.Function;
 
 /**
  * Service for "displaying" a WebContents in CastShell.

@@ -11,6 +11,7 @@ import android.content.pm.ResolveInfo;
 import androidx.annotation.Nullable;
 
 import org.chromium.base.Callback;
+import org.chromium.base.Function;
 import org.chromium.base.supplier.Supplier;
 import org.chromium.content_public.browser.WebContents;
 import org.chromium.ui.base.WindowAndroid;
