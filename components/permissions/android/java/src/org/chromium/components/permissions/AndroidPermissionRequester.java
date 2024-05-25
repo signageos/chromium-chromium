@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import org.chromium.base.BuildInfo;
 import org.chromium.base.CollectionUtil;
+import org.chromium.base.Consumer;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.components.content_settings.ContentSettingsType;
 import org.chromium.ui.base.WindowAndroid;
@@ -25,7 +26,6 @@ import org.chromium.ui.permissions.PermissionCallback;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Methods to handle requesting native permissions from Android when the user grants a website a
