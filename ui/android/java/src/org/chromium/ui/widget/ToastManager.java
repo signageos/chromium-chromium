@@ -35,7 +35,7 @@ public class ToastManager {
 
     // A queue for toasts waiting to be shown.
     private final PriorityQueue<Toast> mToastQueue =
-            new PriorityQueue<>((toast1, toast2) -> toast1.getPriority() - toast2.getPriority());
+            new PriorityQueue<>(11, (toast1, toast2) -> toast1.getPriority() - toast2.getPriority());
 
     // Handles toast events per SDK version.
     private interface ToastEvent {

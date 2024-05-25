@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
@@ -105,6 +106,7 @@ public class DragAndDropDelegateImpl implements DragAndDropDelegate, DragStateTr
      * @param dragObjRectWidth The width of the drag object.
      * @param dragObjRectHeight The height of the drag object.
      */
+    @RequiresApi(VERSION_CODES.N)
     @Override
     public boolean startDragAndDrop(@NonNull View containerView, @NonNull Bitmap shadowImage,
             @NonNull DropDataAndroid dropData, int cursorOffsetX, int cursorOffsetY,
@@ -376,7 +378,9 @@ public class DragAndDropDelegateImpl implements DragAndDropDelegate, DragStateTr
             return;
         }
         // TODO(shuyng): Read image data in background thread.
-        dragAndDropPermissions.release();
+        if (VERSION.SDK_INT >= VERSION_CODES.N) {
+            dragAndDropPermissions.release();
+        }
     }
 
     private void onDragEnd(DragEvent dragEndEvent) {

@@ -4,7 +4,9 @@
 
 package org.chromium.components.stylus_handwriting;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.view.PointerIcon;
 
 import androidx.annotation.Nullable;
@@ -40,6 +42,7 @@ public class StylusWritingController {
     /**
      * Creates a new instance of this class.
      */
+    @TargetApi(Build.VERSION_CODES.N)
     public StylusWritingController(Context context) {
         mContext = context;
         int iconType = getHandler().getStylusPointerIcon();

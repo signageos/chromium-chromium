@@ -366,7 +366,6 @@ class AndroidNetworkLibrary {
             ResettersForTesting.register(() -> sInstance = oldValue);
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         public boolean isCleartextTrafficPermitted(String host) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                 // No per-host configuration before N.
@@ -375,7 +374,6 @@ class AndroidNetworkLibrary {
             return ApiHelperForN.isCleartextTrafficPermitted(host);
         }
 
-        @RequiresApi(Build.VERSION_CODES.M)
         public boolean isCleartextTrafficPermitted() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 // Always true before M.

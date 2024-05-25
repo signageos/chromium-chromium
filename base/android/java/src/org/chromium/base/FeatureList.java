@@ -171,7 +171,9 @@ public class FeatureList {
             newTestValues.mFeatureFlags.putAll(testValuesToMerge.mFeatureFlags);
         } else {
             for (Map.Entry<String, Boolean> toMerge : testValuesToMerge.mFeatureFlags.entrySet()) {
-                newTestValues.mFeatureFlags.putIfAbsent(toMerge.getKey(), toMerge.getValue());
+                if (!newTestValues.mFeatureFlags.containsKey(toMerge.getKey())) {
+                    newTestValues.mFeatureFlags.put(toMerge.getKey(), toMerge.getValue());
+                }
             }
         }
 

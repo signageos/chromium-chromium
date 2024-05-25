@@ -245,6 +245,8 @@ public class ViewAndroidDelegate {
     @CalledByNative
     private boolean startDragAndDrop(Bitmap shadowImage, DropDataAndroid dropData,
             int cursorOffsetX, int cursorOffsetY, int dragObjRectWidth, int dragObjRectHeight) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return false;
+
         ViewGroup containerView = getContainerViewGroup();
         if (containerView == null) return false;
 

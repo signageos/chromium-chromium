@@ -5,6 +5,8 @@
 package org.chromium.ui.modelutil;
 
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.util.FloatProperty;
 
 import org.chromium.ui.modelutil.PropertyModel.WritableFloatPropertyKey;
@@ -28,6 +30,7 @@ public class PropertyModelAnimatorFactory {
         return ObjectAnimator.ofFloat(model, customProperty, targetValue);
     }
 
+    @TargetApi(Build.VERSION_CODES.N) // FloatProperty was @hide until Nougat.
     private static class PropertyModelFloatProp extends FloatProperty<PropertyModel> {
         final WritableFloatPropertyKey mKey;
 

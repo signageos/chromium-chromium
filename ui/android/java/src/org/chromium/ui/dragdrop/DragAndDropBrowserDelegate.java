@@ -5,8 +5,11 @@
 package org.chromium.ui.dragdrop;
 
 import android.content.Intent;
+import android.os.Build;
 import android.view.DragAndDropPermissions;
 import android.view.DragEvent;
+
+import androidx.annotation.ChecksSdkIntAtLeast;
 
 /**
  * Delegate for browser related functions used by Drag and Drop.
@@ -16,6 +19,7 @@ public interface DragAndDropBrowserDelegate {
     boolean getSupportDropInChrome();
 
     /** Get whether to support the image drag shadow animation. */
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
     boolean getSupportAnimatedImageDragShadow();
 
     /** Request DragAndDropPermissions. */

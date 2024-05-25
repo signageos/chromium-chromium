@@ -1473,11 +1473,11 @@ public class AwContentsTest {
         }
     }
 
-    private class FakePostDelayedTask implements BiFunction<Runnable, Long, Void> {
+    private class FakePostDelayedTask implements Function<Pair<Runnable, Long>, Void> {
         @Override
-        public Void apply(Runnable runnable, Long delay) {
-            long time = TimeUtils.uptimeMillis() + delay;
-            mTasks.add(new Pair<Runnable, Long>(runnable, time));
+        public Void apply(Pair<Runnable, Long> input) {
+            long time = TimeUtils.uptimeMillis() + input.second;
+            mTasks.add(new Pair<Runnable, Long>(input.first, time));
             return null;
         }
 

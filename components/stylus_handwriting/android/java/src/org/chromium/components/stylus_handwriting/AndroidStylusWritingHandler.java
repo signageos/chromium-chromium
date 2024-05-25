@@ -18,6 +18,7 @@ import android.view.inputmethod.EditorBoundsInfo;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Log;
@@ -37,6 +38,7 @@ public class AndroidStylusWritingHandler implements StylusWritingHandler, Stylus
     private final InputMethodManager mInputMethodManager;
     private View mTargetView;
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
     public static boolean isEnabled(Context context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false;
 

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.Nullable;
 
 import org.chromium.base.metrics.RecordHistogram;
@@ -30,6 +31,7 @@ public class DirectWritingSettingsHelper {
     private static final String HONEYBOARD_SERVICE_PKG_NAME =
             DirectWritingConstants.SERVICE_PKG_NAME + "/.service.HoneyBoardService";
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
     public static boolean isEnabled(Context context) {
         // Samsung keyboard supports handwriting in Chrome and Webview from Android S onwards.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return false;

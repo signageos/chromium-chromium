@@ -79,7 +79,9 @@ public class LegalMessageLine {
     @VisibleForTesting
     public LegalMessageLine(String text, List<Link> links) {
         this.text = text;
-        links.forEach(this::addLink);
+        for (Link link : links) {
+            addLink(link);
+        }
     }
 
     /**

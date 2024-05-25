@@ -7,6 +7,8 @@ package org.chromium.base.jank_tracker;
 import android.app.Activity;
 import android.os.Build;
 
+import androidx.annotation.RequiresApi;
+
 /**
  * Class for recording janky frame metrics for a specific Activity.
  *
@@ -14,6 +16,7 @@ import android.os.Build;
  * based on activity state. When the activity is being destroyed {@link #destroy()} should be called
  * to clear the activity state observer. All methods should be called from the UI thread.
  */
+@RequiresApi(Build.VERSION_CODES.N)
 public class JankTrackerImpl implements JankTracker {
     // We use the DEADLINE field in the Android FrameMetrics which was added in S.
     private static final boolean IS_TRACKING_ENABLED =

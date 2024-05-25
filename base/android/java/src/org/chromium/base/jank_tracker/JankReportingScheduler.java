@@ -4,10 +4,12 @@
 
 package org.chromium.base.jank_tracker;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * This class receives requests to start and stop jank scenario tracking and runs them in a
  * HandlerThread it creates. In addition it handles the recording of periodic jank metrics.
  */
+@RequiresApi(Build.VERSION_CODES.N)
 public class JankReportingScheduler {
     private static final long PERIODIC_METRIC_DELAY_MS = 5_000;
     private final FrameMetricsStore mFrameMetricsStore;

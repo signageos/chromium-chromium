@@ -377,8 +377,10 @@ class VideoAcceleratorUtil {
 
                         // We use kNoVideoCodecLevel -1 here so level == kNoVideoCodecLevel adds a
                         // supportedProfileLevels entry.
-                        int supportedLevel = supportedProfileLevels.getOrDefault(
-                                profile, kNoVideoCodecLevel - 1);
+                        Integer supportedLevel = supportedProfileLevels.get(profile);
+                        if (supportedLevel == null) {
+                            supportedLevel = kNoVideoCodecLevel - 1;
+                        }
                         if (level > supportedLevel) {
                             supportedProfileLevels.put(profile, level);
                         }

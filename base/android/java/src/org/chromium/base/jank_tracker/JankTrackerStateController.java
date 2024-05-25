@@ -4,7 +4,10 @@
 
 package org.chromium.base.jank_tracker;
 
+import android.os.Build;
 import android.view.Window;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Log;
 
@@ -14,6 +17,7 @@ import org.chromium.base.Log;
  * should be hooked up to some sort of listener to when to start/stop listening and periodic
  * metrics.
  */
+@RequiresApi(Build.VERSION_CODES.N)
 public class JankTrackerStateController {
     private static final String TAG = "JankTracker";
     protected final FrameMetricsListener mFrameMetricsListener;

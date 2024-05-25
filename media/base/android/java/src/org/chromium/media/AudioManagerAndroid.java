@@ -27,7 +27,7 @@ import org.chromium.base.annotations.JNINamespace;
 import org.chromium.base.annotations.NativeMethods;
 
 import java.lang.reflect.Method;
-import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @JNINamespace("media")
 class AudioManagerAndroid {
@@ -343,7 +343,7 @@ class AudioManagerAndroid {
 
     // Used for reflection of hidden method getOutputLatency.  Will be `null` before reflection, and
     // a (possibly empty) Optional after.
-    private static Optional<Method> sGetOutputLatency;
+    private static AtomicReference<Method> sGetOutputLatency;
 
     // Reflect |methodName(int)|, and return it.
     private static final Method reflectMethod(String methodName) {
@@ -366,11 +366,11 @@ class AudioManagerAndroid {
         if (sGetOutputLatency == null) {
             // It's okay if this assigns `null`; we won't call it, but we also won't try again to
             // reflect it.
-            sGetOutputLatency = Optional.ofNullable(reflectMethod("getOutputLatency"));
+            sGetOutputLatency = new AtomicReference(reflectMethod("getOutputLatency"));
         }
 
         int result = 0;
-        if (sGetOutputLatency.isPresent()) {
+        if (sGetOutputLatency.get() != null) {
             try {
                 result = (Integer) sGetOutputLatency.get().invoke(
                         mAudioManager, AudioManager.STREAM_MUSIC);

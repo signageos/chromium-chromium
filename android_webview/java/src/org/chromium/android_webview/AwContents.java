@@ -5,6 +5,7 @@
 package org.chromium.android_webview;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
@@ -50,6 +51,7 @@ import android.webkit.JavascriptInterface;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.android_webview.autofill.AndroidAutofillSafeModeAction;
@@ -70,6 +72,7 @@ import org.chromium.base.BaseFeatures;
 import org.chromium.base.Callback;
 import org.chromium.base.CommandLine;
 import org.chromium.base.ContextUtils;
+import org.chromium.base.Function;
 import org.chromium.base.LocaleUtils;
 import org.chromium.base.Log;
 import org.chromium.base.ObserverList;
@@ -152,7 +155,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
-import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -451,7 +453,7 @@ public class AwContents implements SmartClipProvider {
     private static final long CURRENTLY_VISIBLE = -1;
     private long mLastWindowVisibleTime = -1;
     private boolean mHasPendingReclaimTask;
-    private BiFunction<Runnable, Long, Void> mPostDelayedTaskForTesting;
+    private Function<Pair<Runnable, Long>, Void> mPostDelayedTaskForTesting;
     private static final long MEMORY_COLLECTION_INTERVAL_MS = 5 * 60 * 1000;
     private static long sLastCollectionTime = -MEMORY_COLLECTION_INTERVAL_MS;
     @VisibleForTesting
@@ -1070,12 +1072,14 @@ public class AwContents implements SmartClipProvider {
 
     // A Webview class that implements the listener part of the JankTracker requirement. It mirrors
     // JankActivityTracker in starting and stopping the listener and collection.
+    @TargetApi(Build.VERSION_CODES.N)
     private class AwFrameMetricsListener {
         private boolean mAttached;
         private JankTrackerStateController mController;
         private JankTracker mJankTracker;
         private WeakReference<Window> mWindow;
 
+        @RequiresApi(Build.VERSION_CODES.N)
         public AwFrameMetricsListener() {
             FrameMetricsStore metricsStore = new FrameMetricsStore();
             mController = new JankTrackerStateController(new FrameMetricsListener(metricsStore),
@@ -1249,7 +1253,8 @@ public class AwContents implements SmartClipProvider {
             onContainerViewChanged();
         }
 
-        if (AwFeatureMap.isEnabled(BaseFeatures.COLLECT_ANDROID_FRAME_TIMELINE_METRICS)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+                AwFeatureMap.isEnabled(BaseFeatures.COLLECT_ANDROID_FRAME_TIMELINE_METRICS)) {
             mAwFrameMetricsListener = new AwFrameMetricsListener();
         }
     }
@@ -3628,7 +3633,7 @@ public class AwContents implements SmartClipProvider {
     /* PostTask can be overridden for testing. */
     private void postDelayedTaskWithOverride(Runnable task, long delayMs) {
         if (mPostDelayedTaskForTesting != null) {
-            mPostDelayedTaskForTesting.apply(task, delayMs);
+            mPostDelayedTaskForTesting.apply(new Pair(task, delayMs));
         } else {
             PostTask.postDelayedTask(TaskTraits.UI_DEFAULT, task, delayMs);
         }
@@ -3639,7 +3644,7 @@ public class AwContents implements SmartClipProvider {
         return mDrawFunctor != null;
     }
 
-    public void setPostDelayedTaskForTesting(BiFunction<Runnable, Long, Void> fn) {
+    public void setPostDelayedTaskForTesting(Function<Pair<Runnable, Long>, Void> fn) {
         mPostDelayedTaskForTesting = fn;
     }
 

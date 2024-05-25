@@ -5,6 +5,7 @@
 package org.chromium.ui.dragdrop;
 
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -16,9 +17,11 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.media.ThumbnailUtils;
+import android.os.Build;
 import android.util.FloatProperty;
 import android.view.View;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 
 import org.chromium.ui.R;
@@ -28,6 +31,7 @@ import org.chromium.ui.R;
  * to the center of the touch point.
  * See go/animated-image-drag-shadow-corner-cases for known edge cases.
  */
+@TargetApi(Build.VERSION_CODES.N)
 class AnimatedImageDragShadowBuilder extends View.DragShadowBuilder {
     /**
      * Animatable progress for the drag shadow. When the progress is 0, the drag shadow is full
@@ -81,6 +85,7 @@ class AnimatedImageDragShadowBuilder extends View.DragShadowBuilder {
      *         image in the web.
      * @param dragShadowSpec The spec of the drag shadow including its size.
      */
+    @RequiresApi(Build.VERSION_CODES.N)
     public AnimatedImageDragShadowBuilder(View containerView, Bitmap bitmap, float startX,
             float startY, DragShadowSpec dragShadowSpec) {
         this.mContainerView = containerView;

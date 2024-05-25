@@ -4,7 +4,11 @@
 
 package org.chromium.content.browser.input;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.metrics.RecordHistogram;
@@ -18,6 +22,7 @@ import java.util.function.IntConsumer;
  * Stores data needed to process and record the result of a gesture, reporting it to Android.
  * Also records how long it took to process the gesture.
  */
+@TargetApi(Build.VERSION_CODES.N)
 class OngoingGesture {
     private static int sLastId;
 
@@ -27,6 +32,7 @@ class OngoingGesture {
     private final @Nullable IntConsumer mConsumer;
     private final long mCreationTimestamp;
 
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     OngoingGesture(@Nullable StylusWritingGestureData gestureData, @Nullable Executor executor,
             @Nullable IntConsumer consumer) {
         ThreadUtils.assertOnUiThread();

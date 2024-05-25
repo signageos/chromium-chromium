@@ -278,7 +278,12 @@ public class AutofillProfile {
 
     @CalledByNative
     private int[] getFieldTypes() {
-        return mFields.keySet().stream().mapToInt(i -> i).toArray();
+        final int[] out = new int[mFields.size()];
+        int i = 0;
+        for (int key : mFields.keySet()) {
+            out[i++] = key;
+        }
+        return out;
     }
 
     @CalledByNative

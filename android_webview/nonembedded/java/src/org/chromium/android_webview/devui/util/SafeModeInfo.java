@@ -15,10 +15,10 @@ import org.chromium.android_webview.common.SafeModeController;
 import org.chromium.android_webview.common.services.ISafeModeService;
 import org.chromium.android_webview.common.services.ServiceHelper;
 import org.chromium.android_webview.services.SafeModeService;
+import org.chromium.base.Consumer;
 import org.chromium.base.Log;
 
 import java.util.Set;
-import java.util.function.LongConsumer;
 
 /**
  * Expose information about SafeMode status needed for the UI.
@@ -40,7 +40,7 @@ public class SafeModeInfo {
         return SafeModeController.getInstance().queryActions(mWebViewPackageName);
     }
 
-    public void getActivationTimeForUI(LongConsumer callback) {
+    public void getActivationTimeForUI(Consumer<Long> callback) {
         ServiceConnection connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName className, IBinder service) {
