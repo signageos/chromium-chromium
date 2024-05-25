@@ -392,11 +392,14 @@ public class ClipboardImpl
     @Override
     public void setPassword(final String password) {
         ClipData clipData = ClipData.newPlainText("password", password);
-        PersistableBundle extras = new PersistableBundle();
-        // TODO(crbug.com/1334290): Replace to ClipDescription.EXTRA_IS_SENSITIVE once
-        // chromium import Android T SDK.
-        extras.putBoolean("android.content.extra.IS_SENSITIVE", true);
-        clipData.getDescription().setExtras(extras);
+        // ClipDescription#setExtras requires API level 24.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PersistableBundle extras = new PersistableBundle();
+            // TODO(crbug.com/1334290): Replace to ClipDescription.EXTRA_IS_SENSITIVE once
+            // chromium import Android T SDK.
+            extras.putBoolean("android.content.extra.IS_SENSITIVE", true);
+            clipData.getDescription().setExtras(extras);
+        }
         setPrimaryClipNoException(clipData);
     }
 
