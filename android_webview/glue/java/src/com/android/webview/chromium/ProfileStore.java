@@ -34,17 +34,26 @@ public class ProfileStore {
     @NonNull
     public Profile getOrCreateProfile(@NonNull String name) {
         ThreadUtils.checkUiThread();
-        return mProfiles.computeIfAbsent(name,
-                profileName -> new Profile(AwBrowserContext.getNamedContext(profileName, true)));
+        Profile profile = mProfiles.get(name);
+        if (profile == null) {
+            profile = new Profile(AwBrowserContext.getNamedContext(name, true));
+            mProfiles.put(name, profile);
+        }
+        return profile;
     }
 
     @Nullable
     public Profile getProfile(@NonNull String name) {
         ThreadUtils.checkUiThread();
-        return mProfiles.computeIfAbsent(name, profileName -> {
-            AwBrowserContext browserContext = AwBrowserContext.getNamedContext(profileName, false);
-            return browserContext != null ? new Profile(browserContext) : null;
-        });
+        Profile profile = mProfiles.get(name);
+        if (profile == null) {
+            AwBrowserContext browserContext = AwBrowserContext.getNamedContext(name, false);
+            if (browserContext != null) {
+                profile = new Profile(browserContext);
+                mProfiles.put(name, profile);
+            }
+        }
+        return profile;
     }
 
     @NonNull

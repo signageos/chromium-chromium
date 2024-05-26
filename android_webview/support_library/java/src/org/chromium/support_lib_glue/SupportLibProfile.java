@@ -6,12 +6,14 @@ package org.chromium.support_lib_glue;
 
 import static org.chromium.support_lib_glue.SupportLibWebViewChromiumFactory.recordApiCall;
 
+import android.os.Build;
 import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ServiceWorkerController;
 import android.webkit.WebStorage;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.android.webview.chromium.Profile;
 
@@ -58,6 +60,7 @@ public class SupportLibProfile implements ProfileBoundaryInterface {
         return mProfileImpl.getGeolocationPermissions();
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     @NonNull
     @Override
     public ServiceWorkerController getServiceWorkerController() {

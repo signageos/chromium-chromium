@@ -4,16 +4,20 @@
 
 package com.android.webview.chromium;
 
+import android.os.Build;
 import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.ServiceWorkerController;
 import android.webkit.WebStorage;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.android_webview.AwBrowserContext;
 import org.chromium.android_webview.common.Lifetime;
 import org.chromium.base.ThreadUtils;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An abstraction of {@link AwBrowserContext}, this class reflects
@@ -34,7 +38,8 @@ public class Profile {
     private final GeolocationPermissions mGeolocationPermissions;
 
     @NonNull
-    private final ServiceWorkerController mServiceWorkerController;
+    private final AtomicReference<ServiceWorkerController> mServiceWorkerController =
+            new AtomicReference<>();
 
     public Profile(@NonNull final AwBrowserContext browserContext) {
         assert ThreadUtils.runningOnUiThread();
@@ -45,14 +50,18 @@ public class Profile {
             mCookieManager = factory.getCookieManager();
             mWebStorage = factory.getWebStorage();
             mGeolocationPermissions = factory.getGeolocationPermissions();
-            mServiceWorkerController = factory.getServiceWorkerController();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mServiceWorkerController.set(factory.getServiceWorkerController());
+            }
         } else {
             mCookieManager = new CookieManagerAdapter(browserContext.getCookieManager());
             mWebStorage = new WebStorageAdapter(factory, browserContext.getQuotaManagerBridge());
             mGeolocationPermissions = new GeolocationPermissionsAdapter(
                     factory, browserContext.getGeolocationPermissions());
-            mServiceWorkerController =
-                    new ServiceWorkerControllerAdapter(browserContext.getServiceWorkerController());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mServiceWorkerController.set(
+                        new ServiceWorkerControllerAdapter(browserContext.getServiceWorkerController()));
+            }
         }
     }
 
@@ -76,8 +85,9 @@ public class Profile {
         return mGeolocationPermissions;
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     @NonNull
     public ServiceWorkerController getServiceWorkerController() {
-        return mServiceWorkerController;
+        return mServiceWorkerController.get();
     }
 }

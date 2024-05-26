@@ -6,6 +6,7 @@ package org.chromium.support_lib_glue;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
@@ -92,7 +93,7 @@ class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryBoundary
                     Features.REQUESTED_WITH_HEADER_ALLOW_LIST,
                     Features.IMAGE_DRAG_DROP,
                     Features.USER_AGENT_METADATA,
-                    Features.MULTI_PROFILE,
+                    Features.MULTI_PROFILE + suffixRequiresApi(Build.VERSION_CODES.N),
                     Features.ATTRIBUTION_BEHAVIOR,
                     // Add new features above. New features must include `+ Features.DEV_SUFFIX`
                     // when they're initially added (this can be removed in a future CL). The final
@@ -309,6 +310,10 @@ class SupportLibWebViewChromiumFactory implements WebViewProviderFactoryBoundary
         int COUNT = 97;
     }
     // clang-format on
+
+    private static String suffixRequiresApi(int api) {
+        return Build.VERSION.SDK_INT >= api ? "" : Features.DEV_SUFFIX;
+    }
 
     public static void recordApiCall(@ApiCall int apiCall) {
         RecordHistogram.recordEnumeratedHistogram(
