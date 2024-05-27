@@ -23,6 +23,9 @@
 #if BUILDFLAG(IS_WIN)
 #include "device/bluetooth/bluetooth_adapter_win.h"
 #endif
+#if defined(ANDROID)
+#include "base/android/build_info.h"
+#endif
 
 namespace device {
 
@@ -55,7 +58,10 @@ bool BluetoothAdapterFactory::IsLowEnergySupported() {
     return values_for_testing_->GetLESupported();
   }
 
-#if BUILDFLAG(IS_ANDROID) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
+#if BUILDFLAG(IS_ANDROID)
+  return base::android::BuildInfo::GetInstance()->sdk_int() >=
+         base::android::SDK_VERSION_MARSHMALLOW;
+#elif BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || \
     BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_WIN)
   return true;
 #else
