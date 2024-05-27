@@ -3346,6 +3346,7 @@ public class AwContents implements SmartClipProvider {
         return WebContentsAccessibility.fromWebContents(mWebContents);
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     public void onProvideVirtualStructure(ViewStructure structure) {
         if (TRACE) Log.i(TAG, "%s onProvideVirtualStructure", this);
         if (isDestroyed(WARN)) return;

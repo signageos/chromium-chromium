@@ -175,8 +175,7 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                 mSupportLibClient.onReceivedError(
                         mWebView, new WebResourceRequestAdapter(request), error);
             } else {
-                mWebViewClient.onReceivedError(mWebView, new WebResourceRequestAdapter(request),
-                        new WebResourceErrorAdapter(error));
+                GlueApiHelperForM.onReceivedError(mWebViewClient, mWebView, request, error);
             }
             // Otherwise, this is handled by {@link #onReceivedError}.
         }
@@ -216,9 +215,7 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                         new WebResourceRequestAdapter(request),
                         ImmutableWebResourceResponse.from(response));
             } else {
-                mWebViewClient.onReceivedHttpError(mWebView,
-                        new WebResourceRequestAdapter(request),
-                        ImmutableWebResourceResponse.from(response));
+                GlueApiHelperForM.onReceivedHttpError(mWebViewClient, mWebView, request, response);
             }
             // Otherwise, the API does not exist, so do nothing.
         }
