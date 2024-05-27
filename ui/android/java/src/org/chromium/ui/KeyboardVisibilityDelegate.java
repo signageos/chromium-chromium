@@ -6,6 +6,8 @@ package org.chromium.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.view.View;
@@ -31,6 +33,9 @@ public class KeyboardVisibilityDelegate {
 
     /** Waiting time between attempts to show the keyboard. */
     private static final long KEYBOARD_RETRY_DELAY_MS = 100;
+
+    /** The minimum size of the bottom margin below the app to detect a keyboard. */
+    private static final float KEYBOARD_DETECT_BOTTOM_THRESHOLD_DP = 100;
 
     /** The delegate to determine keyboard visibility. */
     private static KeyboardVisibilityDelegate sInstance = new KeyboardVisibilityDelegate();
@@ -141,16 +146,32 @@ public class KeyboardVisibilityDelegate {
      */
     public int calculateKeyboardHeight(View rootView) {
         try (TraceEvent te =
-                        TraceEvent.scoped("KeyboardVisibilityDelegate.calculateKeyboardHeight")) {
-            if (rootView == null || rootView.getRootWindowInsets() == null) return 0;
-            WindowInsetsCompat windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(
-                    rootView.getRootWindowInsets(), rootView);
-            int imeHeightIncludingNavigationBar =
-                    windowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom;
-            if (imeHeightIncludingNavigationBar == 0) return 0;
-            int navigationBarHeight =
-                    windowInsetsCompat.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
-            return imeHeightIncludingNavigationBar - navigationBarHeight;
+                     TraceEvent.scoped("KeyboardVisibilityDelegate.calculateKeyboardHeight")) {
+            if (rootView == null) return 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (rootView.getRootWindowInsets() == null) return 0;
+                WindowInsetsCompat windowInsetsCompat = WindowInsetsCompat.toWindowInsetsCompat(
+                        rootView.getRootWindowInsets(), rootView);
+                int imeHeightIncludingNavigationBar =
+                        windowInsetsCompat.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+                if (imeHeightIncludingNavigationBar == 0) return 0;
+                int navigationBarHeight =
+                        windowInsetsCompat.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+                return imeHeightIncludingNavigationBar - navigationBarHeight;
+            } else {
+                Rect appRect = new Rect();
+                rootView.getWindowVisibleDisplayFrame(appRect);
+
+                // Assume status bar is always at the top of the screen.
+                final int statusBarHeight = appRect.top;
+
+                int bottomMargin = rootView.getHeight() - (appRect.height() + statusBarHeight);
+
+                // If there is no bottom margin, the keyboard is not showing.
+                if (bottomMargin <= 0) return 0;
+
+                return bottomMargin; // This might include a bottom navigation.
+            }
         }
     }
 
@@ -162,6 +183,30 @@ public class KeyboardVisibilityDelegate {
      */
     public int calculateTotalKeyboardHeight(View rootView) {
         return calculateKeyboardHeight(rootView);
+    }
+
+    protected int calculateKeyboardDetectionThreshold(Context context, View rootView) {
+        // Since M, window insets provide a good keyboard height - no guessing the nav required.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) return 0;
+
+        Rect appRect = new Rect();
+        rootView.getWindowVisibleDisplayFrame(appRect);
+
+        // If the display frame width is < root view width, controls are on the side of
+        // the screen. The inverse is not necessarily true; i.e. if navControlsOnSide is
+        // false, it doesn't mean the controls are not on the side or that they _are_ at
+        // the bottom. It might just mean the app is not responsible for drawing their
+        // background.
+        boolean navControlsOnSide = appRect.width() != rootView.getWidth();
+        // If the Android nav controls are on the sides instead of at the bottom, its
+        // height is not needed.
+        if (navControlsOnSide) return 0;
+
+        // In the event we couldn't get the bottom nav height, use a best guess
+        // of the keyboard height. In certain cases this also means including
+        // the height of the Android navigation.
+        final float density = context.getResources().getDisplayMetrics().density;
+        return (int) (KEYBOARD_DETECT_BOTTOM_THRESHOLD_DP * density);
     }
 
     /**
@@ -184,7 +229,9 @@ public class KeyboardVisibilityDelegate {
      */
     protected boolean isAndroidSoftKeyboardShowing(Context context, View view) {
         View rootView = view.getRootView();
-        return rootView != null && calculateKeyboardHeight(rootView) > 0;
+        return rootView != null
+                && calculateKeyboardHeight(rootView)
+                > calculateKeyboardDetectionThreshold(context, rootView);
     }
 
     /**
