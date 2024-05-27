@@ -17,7 +17,10 @@ import android.media.audiofx.AcousticEchoCanceler;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Process;
 import android.provider.Settings;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.base.Log;
@@ -398,7 +401,8 @@ class AudioManagerAndroid {
 
     /** Checks if the process has as specified permission or not. */
     private boolean hasPermission(String permission) {
-        return ContextUtils.getApplicationContext().checkSelfPermission(permission)
+        return ContextUtils.getApplicationContext().checkPermission(
+                permission, Process.myPid(), Process.myUid())
                 == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -471,6 +475,7 @@ class AudioManagerAndroid {
     }
 
     /** Return the AudioDeviceInfo array as reported by the Android OS. */
+    @RequiresApi(Build.VERSION_CODES.M)
     private static AudioDeviceInfo[] getAudioDeviceInfo() {
         AudioManager audioManager =
                 (AudioManager) ContextUtils.getApplicationContext().getSystemService(
@@ -481,6 +486,10 @@ class AudioManagerAndroid {
     /** Returns whether an audio sink device is connected. */
     @CalledByNative
     private static boolean isAudioSinkConnected() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return false;
+        }
+
         for (AudioDeviceInfo deviceInfo : getAudioDeviceInfo()) {
             if (deviceInfo.isSink()) {
                 return true;
@@ -495,6 +504,10 @@ class AudioManagerAndroid {
      */
     @CalledByNative
     private static int getAudioEncodingFormatsSupported() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return 0;
+        }
+
         int intersection_mask = 0; // intersection of multiple device encoding arrays
         boolean first = true;
         for (AudioDeviceInfo deviceInfo : getAudioDeviceInfo()) {

@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.os.Process;
 
 import org.chromium.base.ContextUtils;
 
@@ -101,7 +102,8 @@ class AudioDeviceSelectorPreS extends AudioDeviceSelector {
 
     /** Checks if the process has as specified permission or not. */
     private boolean hasPermission(String permission) {
-        return ContextUtils.getApplicationContext().checkSelfPermission(permission)
+        return ContextUtils.getApplicationContext().checkPermission(
+                permission, Process.myPid(), Process.myUid())
                 == PackageManager.PERMISSION_GRANTED;
     }
 
