@@ -192,28 +192,13 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
             TraceEvent.begin("WebViewContentsClientAdapter.onReceivedHttpError");
             if (TRACE) Log.i(TAG, "onReceivedHttpError=" + request.url);
             if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_HTTP_ERROR)) {
-                // Note: we use the @SystemApi constructor here because it relaxes several
-                // requirements:
-                // * response.getReasonPhrase() may legitimately be empty because HTTP/2 removed
-                //   Reason-Phrase from the spec (https://crbug.com/925887).
-                // * response.getStatusCode() may be out of the valid range if the web server is not
-                //   obeying the HTTP spec (ex. http://b/235960500).
-                //
-                // Immutability is not strictly necessary, but apps should not not need to modify
-                // the WebResourceResponse received in this callback (they can always construct
-                // their own instance).
                 mSupportLibClient.onReceivedHttpError(mWebView,
                         new WebResourceRequestAdapter(request),
-                        new WebResourceResponse(/* immutable= */ true, response.getMimeType(),
-                                response.getCharset(), response.getStatusCode(),
-                                response.getReasonPhrase(), response.getResponseHeaders(),
-                                response.getData()));
+                        ImmutableWebResourceResponse.from(response));
             } else {
-                mWebViewClient.onReceivedHttpError(mWebView, new WebResourceRequestAdapter(request),
-                        new WebResourceResponse(/* immutable= */ true, response.getMimeType(),
-                                response.getCharset(), response.getStatusCode(),
-                                response.getReasonPhrase(), response.getResponseHeaders(),
-                                response.getData()));
+                mWebViewClient.onReceivedHttpError(mWebView,
+                        new WebResourceRequestAdapter(request),
+                        ImmutableWebResourceResponse.from(response));
             }
             // Otherwise, the API does not exist, so do nothing.
         } finally {
