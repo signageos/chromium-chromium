@@ -14,6 +14,8 @@ import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
+
 /**
  * Utils for Android notification tests.
  */
@@ -36,6 +38,7 @@ public class NotificationTestUtil {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M) // for Icon.loadDrawable()
     public static Bitmap getBitmapFromIcon(Context context, Icon icon) {
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
         return ((BitmapDrawable) icon.loadDrawable(context)).getBitmap();

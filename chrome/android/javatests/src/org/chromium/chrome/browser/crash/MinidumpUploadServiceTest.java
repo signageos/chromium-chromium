@@ -10,6 +10,7 @@ import android.app.job.JobScheduler;
 import android.app.job.JobWorkItem;
 import android.content.Context;
 
+import androidx.annotation.RequiresApi;
 import androidx.test.filters.SmallTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -209,6 +210,7 @@ public class MinidumpUploadServiceTest {
     /**
      * A JobScheduler wrapper that verifies that the expected properties are set correctly.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private static class TestJobScheduler extends JobScheduler {
         static final String SCHEDULE_JOB_FLAG = "scheduleJobFlag";
 

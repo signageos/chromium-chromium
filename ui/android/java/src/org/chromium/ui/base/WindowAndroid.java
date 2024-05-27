@@ -856,11 +856,13 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public void onCurrentModeChanged(Display.Mode currentMode) {
         recomputeSupportedRefreshRates();
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public void onDisplayModesChanged(List<Display.Mode> supportedModes) {
         recomputeSupportedRefreshRates();
     }
@@ -882,6 +884,8 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         ApiHelperForO.setColorMode(window, colorMode);
     }
 
+    // This should only be called if Display.Mode is available.
+    @RequiresApi(Build.VERSION_CODES.M)
     private void recomputeSupportedRefreshRates() {
         Display.Mode currentMode = mDisplayAndroid.getCurrentMode();
         List<Display.Mode> supportedModes = mDisplayAndroid.getSupportedModes();
@@ -923,8 +927,8 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         return mDisplayAndroid.getRefreshRate();
     }
 
-    @SuppressLint("NewApi")
     // mSupportedRefreshRateModes should only be set if Display.Mode is available.
+    @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
     private float[] getSupportedRefreshRates() {
         if (mSupportedRefreshRateModes == null || !mAllowChangeRefreshRate) return null;
@@ -956,8 +960,8 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         window.setAttributes(params);
     }
 
-    @SuppressLint("NewApi")
     // mSupportedRefreshRateModes should only be set if Display.Mode is available.
+    @RequiresApi(Build.VERSION_CODES.M)
     private int getPreferredModeId(float preferredRefreshRate) {
         if (preferredRefreshRate == 0) return 0;
 

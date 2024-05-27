@@ -21,6 +21,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ApiCompatibilityUtils;
@@ -221,6 +222,7 @@ public class WebApkServiceClient {
     }
 
     /** Finishes and removes the WebAPK's task. */
+    @RequiresApi(Build.VERSION_CODES.M)
     public void finishAndRemoveTaskSdk23(final Activity activity, WebApkExtras webApkExtras) {
         connect(webApkExtras.webApkPackageName, api -> {
             if (activity.isFinishing() || activity.isDestroyed()) return;

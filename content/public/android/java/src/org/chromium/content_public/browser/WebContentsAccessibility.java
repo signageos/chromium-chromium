@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 package org.chromium.content_public.browser;
 
+import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewStructure;
 import android.view.accessibility.AccessibilityNodeProvider;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.content.browser.accessibility.WebContentsAccessibilityImpl;
 
@@ -43,6 +46,7 @@ public interface WebContentsAccessibility {
     /**
      * @see View#onProvideVirtualStructure().
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     void onProvideVirtualStructure(ViewStructure structure, boolean ignoreScrollOffset);
 
     /**

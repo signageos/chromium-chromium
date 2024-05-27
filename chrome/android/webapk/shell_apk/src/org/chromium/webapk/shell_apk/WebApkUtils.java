@@ -33,6 +33,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.components.webapk.lib.common.WebApkMetaDataKeys;
 
 import java.util.ArrayList;
@@ -322,6 +324,7 @@ public class WebApkUtils {
 
     /** Returns the ComponentName for the top activity in {@link taskId}'s task stack. */
     @SuppressLint("NewApi") // See crbug.com/1081331 for context.
+    @RequiresApi(Build.VERSION_CODES.M)
     public static ComponentName fetchTopActivityComponent(Context context, int taskId) {
         ActivityManager manager =
                 (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

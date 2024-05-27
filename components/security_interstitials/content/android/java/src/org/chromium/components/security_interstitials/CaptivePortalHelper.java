@@ -9,6 +9,8 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.os.Build;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ContextUtils;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -55,6 +57,7 @@ public class CaptivePortalHelper {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
     private static void reportNetworkConnectivity() {
         // Call reportNetworkConnectivity on all networks, including the current network.

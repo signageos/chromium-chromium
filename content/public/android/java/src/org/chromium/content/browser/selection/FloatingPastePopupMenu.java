@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.content.R;
 import org.chromium.content.browser.selection.SelectActionMenuHelper.SelectActionMenuDelegate;
@@ -28,6 +29,7 @@ import java.util.PriorityQueue;
  * Paste popup implementation based on floating ActionModes.
  */
 // TODO(crbug.com/1468921): Merge this class with SelectionPopupControllerImpl and remove.
+@RequiresApi(Build.VERSION_CODES.M)
 public class FloatingPastePopupMenu implements PastePopupMenu {
     private final View mParent;
     private final PastePopupMenuDelegate mDelegate;

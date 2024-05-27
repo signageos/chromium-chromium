@@ -18,6 +18,7 @@ import android.os.Build;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 
+import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.filters.MediumTest;
@@ -317,6 +318,7 @@ public class ReengagementNotificationControllerIntegrationTest {
         Assert.assertFalse(hasNotifications());
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private static boolean findNotification(@StringRes int title, @StringRes int description) {
         Context context = ApplicationProvider.getApplicationContext();
         StatusBarNotification[] notifications =
@@ -340,6 +342,7 @@ public class ReengagementNotificationControllerIntegrationTest {
         return false;
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private static boolean hasNotifications() {
         Context context = ApplicationProvider.getApplicationContext();
         StatusBarNotification[] notifications =
@@ -356,6 +359,7 @@ public class ReengagementNotificationControllerIntegrationTest {
         return false;
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private static void closeReengagementNotifications() {
         if (!hasNotifications()) return;
 
