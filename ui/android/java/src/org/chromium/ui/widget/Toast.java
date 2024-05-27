@@ -23,6 +23,7 @@ import androidx.annotation.IntDef;
 import androidx.annotation.StringRes;
 import androidx.annotation.StyleRes;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.SysUtils;
 import org.chromium.ui.R;
 import org.chromium.ui.display.DisplayAndroid;
@@ -318,7 +319,7 @@ public class Toast {
                 textView.getBackground().setTint(mBackgroundColor);
             }
             if (mTextAppearance != null) {
-                textView.setTextAppearance(mTextAppearance);
+                ApiCompatibilityUtils.setTextAppearance(textView, mTextAppearance);
             }
             return textView;
         }
