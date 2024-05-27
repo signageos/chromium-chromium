@@ -4,7 +4,9 @@
 
 package org.chromium.ui.permissions;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.os.Build;
 
 import org.chromium.base.compat.ApiHelperForM;
 
@@ -13,6 +15,7 @@ import java.lang.ref.WeakReference;
 /**
  * AndroidPermissionDelegate implementation for Activity.
  */
+@TargetApi(Build.VERSION_CODES.M)
 public class ActivityAndroidPermissionDelegate extends AndroidPermissionDelegateWithRequester {
     private WeakReference<Activity> mActivity;
 

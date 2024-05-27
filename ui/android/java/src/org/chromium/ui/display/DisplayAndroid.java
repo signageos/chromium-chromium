@@ -76,7 +76,7 @@ public class DisplayAndroid {
     private int mBitsPerComponent;
     private int mRotation;
     private float mRefreshRate;
-    private Display.Mode mCurrentDisplayMode;
+    private /* Display.Mode */ Object mCurrentDisplayMode;
     private List<Display.Mode> mDisplayModes;
     private boolean mIsHdr;
     private float mHdrMaxLuminanceRatio = 1.0f;
@@ -219,7 +219,7 @@ public class DisplayAndroid {
      * @return Current Display.Mode for the display.
      */
     public Display.Mode getCurrentMode() {
-        return mCurrentDisplayMode;
+        return (Display.Mode) mCurrentDisplayMode;
     }
 
     /**
@@ -285,7 +285,7 @@ public class DisplayAndroid {
     @SuppressLint("NewApi")
     protected void update(Point size, Float dipScale, Integer bitsPerPixel,
             Integer bitsPerComponent, Integer rotation, Boolean isDisplayWideColorGamut,
-            Boolean isDisplayServerWideColorGamut, Float refreshRate, Display.Mode currentMode,
+            Boolean isDisplayServerWideColorGamut, Float refreshRate, /* Display.Mode */ Object currentMode,
             List<Display.Mode> supportedModes) {
         update(size, dipScale, null, null, bitsPerPixel, bitsPerComponent, rotation,
                 isDisplayWideColorGamut, isDisplayServerWideColorGamut, refreshRate, currentMode,
@@ -298,7 +298,7 @@ public class DisplayAndroid {
     @SuppressLint("NewApi")
     protected void update(Point size, Float dipScale, Float xdpi, Float ydpi, Integer bitsPerPixel,
             Integer bitsPerComponent, Integer rotation, Boolean isDisplayWideColorGamut,
-            Boolean isDisplayServerWideColorGamut, Float refreshRate, Display.Mode currentMode,
+            Boolean isDisplayServerWideColorGamut, Float refreshRate, /* Display.Mode */ Object currentMode,
             List<Display.Mode> supportedModes, Boolean isHdr, Float hdrMaxLuminanceRatio) {
         boolean sizeChanged = size != null && !mSize.equals(size);
         // Intentional comparison of floats: we assume that if scales differ, they differ
@@ -376,7 +376,7 @@ public class DisplayAndroid {
         if (currentModeChanged) {
             DisplayAndroidObserver[] observers = getObservers();
             for (DisplayAndroidObserver o : observers) {
-                o.onCurrentModeChanged(mCurrentDisplayMode);
+                o.onCurrentModeChanged((Display.Mode) mCurrentDisplayMode);
             }
         }
     }

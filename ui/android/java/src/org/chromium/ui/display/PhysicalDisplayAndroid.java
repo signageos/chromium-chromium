@@ -197,7 +197,8 @@ import java.util.function.Consumer;
 
     private void updateFromConfiguration() {
         Point size = new Point();
-        WindowManager windowManager = mWindowContext.getSystemService(WindowManager.class);
+        WindowManager windowManager =
+                (WindowManager) mWindowContext.getSystemService(Context.WINDOW_SERVICE);
         Rect rect = ApiHelperForR.getMaximumWindowMetricsBounds(windowManager);
         size.set(rect.width(), rect.height());
         DisplayMetrics displayMetrics = mWindowContext.getResources().getDisplayMetrics();
@@ -269,11 +270,14 @@ import java.util.function.Consumer;
 
         // Note: getMode() and getSupportedModes() can return null in some situations - see
         // crbug.com/1401322.
-        Display.Mode currentMode = display.getMode();
-        Display.Mode[] modes = display.getSupportedModes();
+        Object currentMode = null;
         List<Display.Mode> supportedModes = null;
-        if (modes != null && modes.length > 0) {
-            supportedModes = Arrays.asList(modes);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            currentMode = display.getMode();
+            Display.Mode[] modes = display.getSupportedModes();
+            if (modes != null && modes.length > 0) {
+                supportedModes = Arrays.asList(modes);
+            }
         }
 
         super.update(size, density, xdpi, ydpi, bitsPerPixel(pixelFormatId),
