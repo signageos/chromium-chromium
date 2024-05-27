@@ -161,6 +161,7 @@ public class ApiCompatibilityUtils {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     private static class ApisLmr1 {
         static void setAccessibilityTraversalBefore(View view, int viewFocusedAfter) {
             view.setAccessibilityTraversalBefore(viewFocusedAfter);

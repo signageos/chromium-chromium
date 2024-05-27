@@ -4,8 +4,11 @@
 
 package org.chromium.content.browser.accessibility;
 
+import android.os.Build;
 import android.view.View;
 import android.view.ViewStructure;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.content.browser.RenderCoordinatesImpl;
 import org.chromium.content.browser.webcontents.WebContentsImpl;
@@ -48,6 +51,7 @@ public class WebContentsAccessibilityDelegate implements AccessibilityDelegate {
         return mAccessibilityCoordinatesImpl;
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @Override
     public void requestAccessibilitySnapshot(ViewStructure root, Runnable doneCallback) {
         mWebContents.requestAccessibilitySnapshot(root, doneCallback);

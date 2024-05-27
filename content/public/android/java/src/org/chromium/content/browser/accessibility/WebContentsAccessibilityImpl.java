@@ -62,6 +62,7 @@ import android.content.IntentFilter;
 import android.content.ReceiverCallNotAllowedException;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.MotionEvent;
@@ -76,6 +77,7 @@ import android.view.accessibility.AccessibilityNodeProvider;
 import android.view.autofill.AutofillManager;
 import android.view.inputmethod.EditorInfo;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat;
 
@@ -1013,6 +1015,7 @@ public class WebContentsAccessibilityImpl extends AccessibilityNodeProviderCompa
         mIsAutoDisableAccessibilityCandidate = isAutoDisableAccessibilityCandidate;
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @Override
     public void onProvideVirtualStructure(
             final ViewStructure structure, final boolean ignoreScrollOffset) {

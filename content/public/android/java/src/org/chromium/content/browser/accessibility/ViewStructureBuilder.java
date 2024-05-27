@@ -15,14 +15,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.ViewStructure;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.content.browser.RenderCoordinatesImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- */
+@RequiresApi(Build.VERSION_CODES.M)
 public class ViewStructureBuilder {
     private RenderCoordinatesImpl mRenderCoordinates;
 

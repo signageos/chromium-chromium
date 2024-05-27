@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,6 +21,7 @@ import android.view.ViewStructure;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.JavaExceptionReporter;
 import org.chromium.base.Log;
@@ -805,6 +807,7 @@ public class WebContentsImpl implements WebContents, RenderFrameHostDelegate, Wi
      * @param callback The callback to be called when the snapshot is ready. The callback
      *                 cannot be null.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     public void requestAccessibilitySnapshot(ViewStructure root, Runnable doneCallback) {
         checkNotDestroyed();
         ViewStructureBuilder builder = ViewStructureBuilder.create(mRenderCoordinates);
