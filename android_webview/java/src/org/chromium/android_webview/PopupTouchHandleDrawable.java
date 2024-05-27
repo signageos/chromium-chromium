@@ -7,11 +7,12 @@ package org.chromium.android_webview;
 import static org.chromium.cc.mojom.RootScrollOffsetUpdateFrequency.ALL_UPDATES;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.SystemClock;
 import android.view.Gravity;
@@ -135,7 +136,7 @@ public class PopupTouchHandleDrawable extends View implements DisplayAndroidObse
 
         // The SUB_PANEL window layout type improves z-ordering with respect to
         // other popup-based elements.
-        mContainer.setWindowLayoutType(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
+        setWindowLayoutType(mContainer, WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
         mContainer.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         mContainer.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -192,6 +193,11 @@ public class PopupTouchHandleDrawable extends View implements DisplayAndroidObse
 
     public long getNativeDrawable() {
         return mNativeDrawable;
+    }
+
+    @TargetApi(Build.VERSION_CODES.M) // PopupWindow.setWindowLayoutType was @hide until Marshmallow.
+    private static void setWindowLayoutType(PopupWindow window, int layoutType) {
+        window.setWindowLayoutType(layoutType);
     }
 
     private static Drawable getHandleDrawable(Context context, int orientation) {
