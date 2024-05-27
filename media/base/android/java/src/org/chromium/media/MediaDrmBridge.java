@@ -270,7 +270,6 @@ public class MediaDrmBridge {
         return mSchemeUUID.equals(CLEARKEY_UUID);
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private MediaDrmBridge(UUID schemeUUID, boolean requiresMediaCrypto, long nativeMediaDrmBridge,
             long nativeMediaDrmStorageBridge) throws android.media.UnsupportedSchemeException {
         mSchemeUUID = schemeUUID;
@@ -1384,7 +1383,6 @@ public class MediaDrmBridge {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private void onSessionMessage(final SessionId sessionId, final MediaDrm.KeyRequest request) {
         if (!isNativeMediaDrmBridgeValid()) return;
 

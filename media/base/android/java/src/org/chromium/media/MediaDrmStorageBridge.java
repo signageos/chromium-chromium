@@ -20,7 +20,6 @@ import org.chromium.build.annotations.MainDex;
  */
 @JNINamespace("media")
 @MainDex
-@RequiresApi(Build.VERSION_CODES.M)
 class MediaDrmStorageBridge {
     private static final long INVALID_NATIVE_MEDIA_DRM_STORAGE_BRIDGE = -1;
 

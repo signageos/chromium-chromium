@@ -4,6 +4,7 @@
 
 package org.chromium.media;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -53,7 +54,7 @@ import java.util.List;
  * and their capabilities, using android.hardware.camera2.CameraManager.
  **/
 @JNINamespace("media")
-@RequiresApi(Build.VERSION_CODES.M)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class VideoCaptureCamera2 extends VideoCapture {
     // Inner class to extend a CameraDevice state change listener.
     private class CrStateListener extends CameraDevice.StateCallback {
@@ -570,6 +571,7 @@ public class VideoCaptureCamera2 extends VideoCapture {
                 }
             }
             try {
+                @SuppressLint("NewApi") // Introduced in API 23.
                 Boolean ae_lock_available =
                         cameraCharacteristics.get(CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE);
                 if (ae_lock_available != null && ae_lock_available.booleanValue()) {
@@ -619,6 +621,7 @@ public class VideoCaptureCamera2 extends VideoCapture {
                 }
             }
             try {
+                @SuppressLint("NewApi") // Introduced in API 23.
                 Boolean awb_lock_available =
                         cameraCharacteristics.get(CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE);
                 if (awb_lock_available != null && awb_lock_available.booleanValue()) {
