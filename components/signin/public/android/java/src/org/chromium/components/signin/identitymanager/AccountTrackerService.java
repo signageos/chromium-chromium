@@ -4,6 +4,8 @@
 
 package org.chromium.components.signin.identitymanager;
 
+import android.os.Build;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
@@ -21,6 +23,7 @@ import org.chromium.components.signin.base.CoreAccountInfo;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -74,7 +77,9 @@ public class AccountTrackerService implements AccountsChangeObserver {
     AccountTrackerService(long nativeAccountTrackerService) {
         mNativeAccountTrackerService = nativeAccountTrackerService;
         mAccountsSeedingStatus = AccountsSeedingStatus.NOT_STARTED;
-        mRunnablesWaitingForAccountsSeeding = new ConcurrentLinkedDeque<>();
+        mRunnablesWaitingForAccountsSeeding = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                ? new ConcurrentLinkedDeque<>()
+                : new ArrayDeque<>();
         mAccountManagerFacade = AccountManagerFacadeProvider.getInstance();
         mAccountManagerFacade.addObserver(this);
     }

@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.UserManager;
 
@@ -28,14 +29,16 @@ final class AccountRestrictionPatternReceiver {
     private static final String ACCOUNT_RESTRICTION_PATTERNS_KEY = "RestrictAccountsToPatterns";
 
     AccountRestrictionPatternReceiver(Callback<List<PatternMatcher>> onPatternsUpdated) {
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                getRestrictionPatternsAsync().then(onPatternsUpdated);
-            }
-        };
-        ContextUtils.registerProtectedBroadcastReceiver(ContextUtils.getApplicationContext(),
-                receiver, new IntentFilter(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED));
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    getRestrictionPatternsAsync().then(onPatternsUpdated);
+                }
+            };
+            ContextUtils.registerProtectedBroadcastReceiver(ContextUtils.getApplicationContext(),
+                    receiver, new IntentFilter(Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED));
+        }
         getRestrictionPatternsAsync().then(onPatternsUpdated);
     }
 
