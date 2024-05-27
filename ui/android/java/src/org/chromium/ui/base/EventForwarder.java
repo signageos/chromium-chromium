@@ -184,13 +184,14 @@ public class EventForwarder {
             // - A move w/o a button press, which represents a trackpad scroll. Real mouse moves w/o
             //   buttons goes to onHoverEvent.
             // TODO(mustaq): Look into the relevancy of this code path
+            final int apiVersion = Build.VERSION.SDK_INT;
             final boolean isTouchpadScroll = event.getButtonState() == 0
                     && (event.getActionMasked() == MotionEvent.ACTION_DOWN
                             || event.getActionMasked() == MotionEvent.ACTION_MOVE
                             || event.getActionMasked() == MotionEvent.ACTION_UP
                             || event.getActionMasked() == MotionEvent.ACTION_CANCEL);
 
-            if (!isTouchpadScroll) {
+            if (apiVersion >= android.os.Build.VERSION_CODES.M && !isTouchpadScroll) {
                 return onMouseEvent(event);
             }
         }
@@ -477,7 +478,7 @@ public class EventForwarder {
      * @param containerView A view on which the drag event is taking place.
      */
     public boolean onDragEvent(DragEvent event, View containerView) {
-        if (mNativeEventForwarder == 0) {
+        if (mNativeEventForwarder == 0 || Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
             return false;
         }
 

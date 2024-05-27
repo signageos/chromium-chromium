@@ -572,7 +572,11 @@ public class ProcessInitializationHandler {
                 if (minidumps.length > 0) {
                     Log.i(TAG, "Attempting to upload %d accumulated crash dumps.",
                             minidumps.length);
-                    MinidumpUploadServiceImpl.scheduleUploadJob();
+                    if (MinidumpUploadServiceImpl.shouldUseJobSchedulerForUploads()) {
+                        MinidumpUploadServiceImpl.scheduleUploadJob();
+                    } else {
+                        MinidumpUploadServiceImpl.tryUploadAllCrashDumps();
+                    }
                 }
 
                 // Finally, if there is a minidump that still needs logcat output to be attached, do

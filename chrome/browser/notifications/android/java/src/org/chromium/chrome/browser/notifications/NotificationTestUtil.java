@@ -37,6 +37,7 @@ public class NotificationTestUtil {
     }
 
     public static Bitmap getBitmapFromIcon(Context context, Icon icon) {
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
         return ((BitmapDrawable) icon.loadDrawable(context)).getBitmap();
     }
 

@@ -263,7 +263,8 @@ public class WebApkInfoTest {
         Assert.assertEquals(ICON_MURMUR2_HASH, info.iconUrlToMurmur2HashMap().get(ICON_URL));
 
         Assert.assertEquals(SOURCE, info.source());
-        Assert.assertTrue(info.isSplashProvidedByWebApk());
+        Assert.assertEquals(
+                (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M), info.isSplashProvidedByWebApk());
 
         Assert.assertEquals(PRIMARY_MASKABLE_ICON_ID, info.icon().resourceIdForTesting());
         Assert.assertEquals(true, info.isIconAdaptive());

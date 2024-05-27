@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -182,8 +183,10 @@ class AppMenu implements OnItemClickListener, OnKeyListener, AppMenuClickHandler
         mPopup.setFocusable(true);
         mPopup.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
 
-        // The window layout type affects the z-index of the popup window.
-        mPopup.setWindowLayoutType(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // The window layout type affects the z-index of the popup window on M+.
+            mPopup.setWindowLayoutType(WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL);
+        }
 
         mPopup.setOnDismissListener(() -> {
             recordTimeToTakeActionHistogram();
