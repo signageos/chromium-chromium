@@ -64,9 +64,8 @@ public class PlayerFrameCoordinator {
         PlayerFrameGestureDetectorDelegate gestureDelegate = new PlayerFrameGestureDetectorDelegate(
                 mScaleController, mScrollController, mMediator);
 
-        mView = new PlayerFrameView(
+        mView = PlayerFrameView.create(
                 context, canDetectZoom, mMediator, gestureDelegate, firstPaintListener);
-
         if (overscrollHandler != null) {
             mScrollController.setOverscrollHandler(overscrollHandler);
         }
