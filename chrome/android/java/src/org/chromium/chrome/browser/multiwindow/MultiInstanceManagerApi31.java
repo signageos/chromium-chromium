@@ -18,6 +18,7 @@ import android.util.SparseIntArray;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.ActivityState;
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.ApplicationStatus;
 import org.chromium.base.ApplicationStatus.ActivityStateListener;
 import org.chromium.base.ContextUtils;
@@ -671,7 +672,7 @@ class MultiInstanceManagerApi31 extends MultiInstanceManager implements Activity
         }
         mTabModelOrchestratorSupplier.get().cleanupInstance(instanceId);
         Activity activity = getActivityById(instanceId);
-        if (activity != null) activity.finishAndRemoveTask();
+        if (activity != null) ApiCompatibilityUtils.finishAndRemoveTask(activity);
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

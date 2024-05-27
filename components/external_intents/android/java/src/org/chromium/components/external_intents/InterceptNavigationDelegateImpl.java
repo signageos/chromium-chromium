@@ -8,6 +8,7 @@ import android.util.Pair;
 
 import androidx.annotation.IntDef;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.ContextUtils;
 import org.chromium.base.ResettersForTesting;
@@ -412,7 +413,7 @@ public class InterceptNavigationDelegateImpl extends InterceptNavigationDelegate
                         if (mClient.getOrCreateRedirectHandler().wasTaskStartedByExternalIntent()) {
                             // If Chrome was only launched to perform a redirect, don't keep its
                             // task in history.
-                            mClient.getActivity().finishAndRemoveTask();
+                            ApiCompatibilityUtils.finishAndRemoveTask(mClient.getActivity());
                         } else {
                             // Takes Chrome out of the back stack.
                             mClient.getActivity().moveTaskToBack(false);
