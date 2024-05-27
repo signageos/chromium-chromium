@@ -138,7 +138,7 @@ public class SslPreferencesTest {
         final OnReceivedSslErrorHelper onReceivedSslErrorHelper =
                 mContentsClient.getOnReceivedSslErrorHelper();
         int onSslErrorCallCount = onReceivedSslErrorHelper.getCallCount();
-        int errorCount = mContentsClient.getOnReceivedErrorHelper().getCallCount();
+        int errorCount = mContentsClient.getOnReceivedError2Helper().getCallCount();
         int httpErrorCount = mContentsClient.getOnReceivedHttpErrorHelper().getCallCount();
         // Load the page and cancel the SslError
         mContentsClient.setAllowSslError(false);
@@ -147,7 +147,7 @@ public class SslPreferencesTest {
         Assert.assertEquals("onReceivedSslError should be called once", onSslErrorCallCount + 1,
                 onReceivedSslErrorHelper.getCallCount());
         Assert.assertEquals("Canceled SslErrors should not trigger network errors", errorCount,
-                mContentsClient.getOnReceivedErrorHelper().getCallCount());
+                mContentsClient.getOnReceivedError2Helper().getCallCount());
         Assert.assertEquals("Canceled SslErrors should not trigger HTTP errors", httpErrorCount,
                 mContentsClient.getOnReceivedHttpErrorHelper().getCallCount());
         // Same thing, but allow the SslError this time
@@ -157,7 +157,7 @@ public class SslPreferencesTest {
         Assert.assertEquals("onReceivedSslError should be called a second time",
                 onSslErrorCallCount + 2, onReceivedSslErrorHelper.getCallCount());
         Assert.assertEquals("Allowed SslErrors should not trigger network errors", errorCount,
-                mContentsClient.getOnReceivedErrorHelper().getCallCount());
+                mContentsClient.getOnReceivedError2Helper().getCallCount());
         Assert.assertEquals("Allowed SslErrors should not trigger HTTP errors", httpErrorCount,
                 mContentsClient.getOnReceivedHttpErrorHelper().getCallCount());
     }

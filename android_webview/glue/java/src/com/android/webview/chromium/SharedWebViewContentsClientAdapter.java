@@ -138,7 +138,7 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
      * @see ContentViewClient#onReceivedError(AwWebResourceRequest,AwWebResourceError)
      */
     @Override
-    public void onReceivedError(AwWebResourceRequest request, AwWebResourceError error) {
+    public void onReceivedError2(AwWebResourceRequest request, AwWebResourceError error) {
         try (TraceEvent event = TraceEvent.scoped("WebViewContentsClientAdapter.onReceivedError")) {
             AwHistogramRecorder.recordCallbackInvocation(
                     AwHistogramRecorder.WebViewCallbackType.ON_RECEIVED_ERROR);

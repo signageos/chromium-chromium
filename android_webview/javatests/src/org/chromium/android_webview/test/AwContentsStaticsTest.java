@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
 import org.chromium.android_webview.AwContents;
 import org.chromium.android_webview.AwContentsStatics;
 import org.chromium.android_webview.WebviewErrorCode;
-import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedErrorHelper;
+import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedError2Helper;
 import org.chromium.base.test.util.CallbackHelper;
 import org.chromium.base.test.util.Feature;
 import org.chromium.net.AndroidNetworkLibraryTestUtil;
@@ -87,7 +87,7 @@ public class AwContentsStaticsTest {
         EmbeddedTestServer testServer = EmbeddedTestServer.createAndStartServer(
                 InstrumentationRegistry.getInstrumentation().getContext());
         String url = testServer.getURL("/android_webview/test/data/hello_world.html");
-        OnReceivedErrorHelper errorHelper = mContentsClient.getOnReceivedErrorHelper();
+        OnReceivedError2Helper errorHelper = mContentsClient.getOnReceivedError2Helper();
         int errorCount = errorHelper.getCallCount();
         mActivityTestRule.loadUrlSync(mAwContents, mContentsClient.getOnPageFinishedHelper(), url);
         Assert.assertEquals(
@@ -114,7 +114,7 @@ public class AwContentsStaticsTest {
         EmbeddedTestServer testServer = EmbeddedTestServer.createAndStartServer(
                 InstrumentationRegistry.getInstrumentation().getContext());
         String url = testServer.getURL("/android_webview/test/data/hello_world.html");
-        OnReceivedErrorHelper errorHelper = mContentsClient.getOnReceivedErrorHelper();
+        OnReceivedError2Helper errorHelper = mContentsClient.getOnReceivedError2Helper();
         int errorCount = errorHelper.getCallCount();
         mActivityTestRule.loadUrlSync(mAwContents, mContentsClient.getOnPageFinishedHelper(), url);
         Assert.assertEquals(

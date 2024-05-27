@@ -23,7 +23,7 @@ import org.chromium.android_webview.AwContentsClient;
 import org.chromium.android_webview.AwContentsClientCallbackHelper;
 import org.chromium.android_webview.test.TestAwContentsClient.OnDownloadStartHelper;
 import org.chromium.android_webview.test.TestAwContentsClient.OnLoadResourceHelper;
-import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedErrorHelper;
+import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedError2Helper;
 import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedLoginRequestHelper;
 import org.chromium.android_webview.test.TestAwContentsClient.PictureListenerHelper;
 import org.chromium.base.test.util.Batch;
@@ -192,9 +192,9 @@ public class AwContentsClientCallbackHelperTest {
     @Feature({"AndroidWebView"})
     @SmallTest
     public void testOnReceivedError() throws Exception {
-        OnReceivedErrorHelper receivedErrorHelper = mContentsClient.getOnReceivedErrorHelper();
+        OnReceivedError2Helper receivedErrorHelper = mContentsClient.getOnReceivedError2Helper();
 
-        int onReceivedErrorCount = receivedErrorHelper.getCallCount();
+        int onReceivedError2Count = receivedErrorHelper.getCallCount();
         AwContentsClient.AwWebResourceRequest request = new AwContentsClient.AwWebResourceRequest();
         request.url = TEST_URL;
         request.isOutermostMainFrame = true;
@@ -202,7 +202,7 @@ public class AwContentsClientCallbackHelperTest {
         error.errorCode = ERROR_CODE;
         error.description = ERROR_MESSAGE;
         mClientHelper.postOnReceivedError(request, error);
-        receivedErrorHelper.waitForCallback(onReceivedErrorCount);
+        receivedErrorHelper.waitForCallback(onReceivedError2Count);
         Assert.assertEquals(ERROR_CODE, receivedErrorHelper.getError().errorCode);
         Assert.assertEquals(ERROR_MESSAGE, receivedErrorHelper.getError().description);
         Assert.assertEquals(TEST_URL, receivedErrorHelper.getRequest().url);

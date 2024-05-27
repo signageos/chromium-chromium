@@ -44,7 +44,7 @@ public class TestAwContentsClient extends NullContentsClient {
     private final OnPageStartedHelper mOnPageStartedHelper;
     private final OnPageFinishedHelper mOnPageFinishedHelper;
     private final OnPageCommitVisibleHelper mOnPageCommitVisibleHelper;
-    private final OnReceivedErrorHelper mOnReceivedErrorHelper;
+    private final OnReceivedError2Helper mOnReceivedError2Helper;
     private final OnReceivedHttpErrorHelper mOnReceivedHttpErrorHelper;
     private final OnReceivedSslErrorHelper mOnReceivedSslErrorHelper;
     private final OnDownloadStartHelper mOnDownloadStartHelper;
@@ -70,7 +70,7 @@ public class TestAwContentsClient extends NullContentsClient {
         mOnPageStartedHelper = new OnPageStartedHelper();
         mOnPageFinishedHelper = new OnPageFinishedHelper();
         mOnPageCommitVisibleHelper = new OnPageCommitVisibleHelper();
-        mOnReceivedErrorHelper = new OnReceivedErrorHelper();
+        mOnReceivedError2Helper = new OnReceivedError2Helper();
         mOnReceivedHttpErrorHelper = new OnReceivedHttpErrorHelper();
         mOnReceivedSslErrorHelper = new OnReceivedSslErrorHelper();
         mOnDownloadStartHelper = new OnDownloadStartHelper();
@@ -105,8 +105,8 @@ public class TestAwContentsClient extends NullContentsClient {
         return mOnPageFinishedHelper;
     }
 
-    public OnReceivedErrorHelper getOnReceivedErrorHelper() {
-        return mOnReceivedErrorHelper;
+    public OnReceivedError2Helper getOnReceivedError2Helper() {
+        return mOnReceivedError2Helper;
     }
 
     public OnReceivedHttpErrorHelper getOnReceivedHttpErrorHelper() {
@@ -287,9 +287,9 @@ public class TestAwContentsClient extends NullContentsClient {
     }
 
     @Override
-    public void onReceivedError(AwWebResourceRequest request, AwWebResourceError error) {
-        if (TRACE) Log.i(TAG, "onReceivedError " + request.url);
-        mOnReceivedErrorHelper.notifyCalled(request, error);
+    public void onReceivedError2(AwWebResourceRequest request, AwWebResourceError error) {
+        if (TRACE) Log.i(TAG, "onReceivedError2 " + request.url);
+        mOnReceivedError2Helper.notifyCalled(request, error);
     }
 
     @Override
@@ -786,9 +786,9 @@ public class TestAwContentsClient extends NullContentsClient {
     }
 
     /**
-     * CallbackHelper for OnReceivedError.
+     * CallbackHelper for OnReceivedError2.
      */
-    public static class OnReceivedErrorHelper extends CallbackHelper {
+    public static class OnReceivedError2Helper extends CallbackHelper {
         private AwWebResourceRequest mRequest;
         private AwWebResourceError mError;
         public void notifyCalled(AwWebResourceRequest request, AwWebResourceError error) {
