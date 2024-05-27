@@ -35,10 +35,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Tests for the ContentViewClient.onReceivedError2() method. Historically, this test suite focused
- * on the new features added in the 2nd iteration of the callback added in M. Now chromium only
- * supports one version of the callback, so the distinction between this and
- * ClientOnReceivedErrorTest.java is no longer as significant.
+ * Tests for the ContentViewClient.onReceivedError2() method.
  */
 @RunWith(AwJUnit4ClassRunner.class)
 public class ClientOnReceivedError2Test {
@@ -144,10 +141,12 @@ public class ClientOnReceivedError2Test {
 
         TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
                 mContentsClient.getOnReceivedError2Helper();
-        int onReceivedError2Count = onReceivedError2Helper.getCallCount();
+        int onReceivedError2CallCount = onReceivedError2Helper.getCallCount();
         AwTestTouchUtils.simulateTouchCenterOfView(mTestContainerView);
-        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
-                /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        onReceivedError2Helper.waitForCallback(onReceivedError2CallCount,
+                1 /* numberOfCallsToWaitFor */,
+                WAIT_TIMEOUT_MS,
+                TimeUnit.MILLISECONDS);
         AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_HTML_URL, request.url);
@@ -207,10 +206,12 @@ public class ClientOnReceivedError2Test {
 
         TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
                 mContentsClient.getOnReceivedError2Helper();
-        int onReceivedError2Count = onReceivedError2Helper.getCallCount();
+        int onReceivedError2CallCount = onReceivedError2Helper.getCallCount();
         AwTestTouchUtils.simulateTouchCenterOfView(mTestContainerView);
-        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
-                /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        onReceivedError2Helper.waitForCallback(onReceivedError2CallCount,
+                1 /* numberOfCallsToWaitFor */,
+                WAIT_TIMEOUT_MS,
+                TimeUnit.MILLISECONDS);
         AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_HTML_URL, request.url);
@@ -392,11 +393,13 @@ public class ClientOnReceivedError2Test {
         // originating from the last attempt.
         TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
                 mContentsClient.getOnReceivedError2Helper();
-        final int onReceivedError2Count = onReceivedError2Helper.getCallCount();
+        final int onReceivedError2CallCount = onReceivedError2Helper.getCallCount();
         mActivityTestRule.loadUrlAsync(mAwContents, BAD_HTML_URL);
-        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
-                /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        Assert.assertEquals(onReceivedError2Count + 1, onReceivedError2Helper.getCallCount());
+        onReceivedError2Helper.waitForCallback(onReceivedError2CallCount,
+                1 /* numberOfCallsToWaitFor */,
+                WAIT_TIMEOUT_MS,
+                TimeUnit.MILLISECONDS);
+        Assert.assertEquals(onReceivedError2CallCount + 1, onReceivedError2Helper.getCallCount());
         Assert.assertEquals(BAD_HTML_URL, onReceivedError2Helper.getRequest().url);
     }
 
@@ -409,14 +412,14 @@ public class ClientOnReceivedError2Test {
 
         TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
                 mContentsClient.getOnReceivedError2Helper();
-        final int onReceivedError2Count = onReceivedError2Helper.getCallCount();
+        final int onReceivedError2CallCount = onReceivedError2Helper.getCallCount();
 
         mActivityTestRule.loadUrlSync(
                 mAwContents, mContentsClient.getOnPageFinishedHelper(), redirectUrl);
 
-        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
-                /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        Assert.assertEquals(onReceivedError2Count + 1, onReceivedError2Helper.getCallCount());
+        onReceivedError2Helper.waitForCallback(onReceivedError2CallCount,
+                1 /* numberOfCallsToWaitFor */, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        Assert.assertEquals(onReceivedError2CallCount + 1, onReceivedError2Helper.getCallCount());
         AwWebResourceError error = onReceivedError2Helper.getError();
         Assert.assertEquals("net::ERR_UNSAFE_REDIRECT", error.description);
     }

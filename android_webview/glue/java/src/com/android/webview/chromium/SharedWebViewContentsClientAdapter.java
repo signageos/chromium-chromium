@@ -135,6 +135,28 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
     }
 
     /**
+     * @see ContentViewClient#onReceivedError(int,String,String)
+     */
+    @Override
+    public final void onReceivedError(int errorCode, String description, String failingUrl) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) return;
+
+        // This event is handled by the support lib in {@link #onReceivedError2}.
+        if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_WEB_RESOURCE_ERROR)) return;
+
+        try (TraceEvent event = TraceEvent.scoped("WebViewContentsClientAdapter.onReceivedError")) {
+            if (description == null || description.isEmpty()) {
+                // ErrorStrings is @hidden, so we can't do this in AwContents.  Normally the net/
+                // layer will set a valid description, but for synthesized callbacks (like in the
+                // case for intercepted requests) AwContents will pass in null.
+                description = mWebViewDelegate.getErrorString(mContext, errorCode);
+            }
+            if (TRACE) Log.i(TAG, "onReceivedError=" + failingUrl);
+            mWebViewClient.onReceivedError(mWebView, errorCode, description, failingUrl);
+        }
+    }
+
+    /**
      * @see ContentViewClient#onReceivedError(AwWebResourceRequest,AwWebResourceError)
      */
     @Override
@@ -156,6 +178,7 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
                 mWebViewClient.onReceivedError(mWebView, new WebResourceRequestAdapter(request),
                         new WebResourceErrorAdapter(error));
             }
+            // Otherwise, this is handled by {@link #onReceivedError}.
         }
     }
 

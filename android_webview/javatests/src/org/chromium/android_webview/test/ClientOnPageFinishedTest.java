@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.chromium.android_webview.AwContents;
-import org.chromium.android_webview.test.TestAwContentsClient.OnReceivedError2Helper;
 import org.chromium.android_webview.test.util.CommonResources;
 import org.chromium.android_webview.test.util.JSUtils;
 import org.chromium.base.test.util.Feature;
@@ -78,14 +77,14 @@ public class ClientOnPageFinishedTest {
             private boolean mAllowAboutBlank;
 
             @Override
-            public void onReceivedError2(AwWebResourceRequest request, AwWebResourceError error) {
-                Assert.assertEquals("onReceivedError called twice for " + request.url, false,
+            public void onReceivedError(int errorCode, String description, String failingUrl) {
+                Assert.assertEquals("onReceivedError called twice for " + failingUrl, false,
                         mIsOnReceivedErrorCalled);
                 mIsOnReceivedErrorCalled = true;
                 Assert.assertEquals(
-                        "onPageFinished called before onReceivedError for " + request.url, false,
+                        "onPageFinished called before onReceivedError for " + failingUrl, false,
                         mIsOnPageFinishedCalled);
-                super.onReceivedError2(request, error);
+                super.onReceivedError(errorCode, description, failingUrl);
             }
 
             @Override
@@ -109,14 +108,15 @@ public class ClientOnPageFinishedTest {
         LocalTestClient testContentsClient = new LocalTestClient();
         setTestAwContentsClient(testContentsClient);
 
-        OnReceivedError2Helper onReceivedError2Helper = mContentsClient.getOnReceivedError2Helper();
+        TestCallbackHelperContainer.OnReceivedErrorHelper onReceivedErrorHelper =
+                mContentsClient.getOnReceivedErrorHelper();
         TestCallbackHelperContainer.OnPageFinishedHelper onPageFinishedHelper =
                 mContentsClient.getOnPageFinishedHelper();
 
         String invalidUrl = "http://localhost:7/non_existent";
         mActivityTestRule.loadUrlSync(mAwContents, onPageFinishedHelper, invalidUrl);
 
-        Assert.assertEquals(invalidUrl, onReceivedError2Helper.getRequest().url);
+        Assert.assertEquals(invalidUrl, onReceivedErrorHelper.getFailingUrl());
         Assert.assertEquals(invalidUrl, onPageFinishedHelper.getUrl());
 
         // Rather than wait a fixed time to see that another onPageFinished callback isn't issued
