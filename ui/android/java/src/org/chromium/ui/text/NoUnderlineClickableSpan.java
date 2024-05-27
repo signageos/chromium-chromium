@@ -11,6 +11,7 @@ import android.text.style.ClickableSpan;
 import android.view.View;
 
 import androidx.annotation.ColorRes;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import org.chromium.base.Callback;
 import org.chromium.ui.R;
@@ -28,7 +29,7 @@ public class NoUnderlineClickableSpan extends ClickableSpan {
      * @param onClickCallback The callback notified when the span is clicked.
      */
     public NoUnderlineClickableSpan(Context context, Callback<View> onClickCallback) {
-        mColor = AttrUtils.resolveColor(context.getTheme(), R.attr.globalClickableSpanColor,
+        mColor = AttrUtils.resolveColor(context, R.attr.globalClickableSpanColor,
                 R.color.default_text_color_link_baseline);
         mOnClick = onClickCallback;
     }
@@ -40,7 +41,7 @@ public class NoUnderlineClickableSpan extends ClickableSpan {
      */
     public NoUnderlineClickableSpan(
             Context context, @ColorRes int colorResId, Callback<View> onClickCallback) {
-        mColor = context.getColor(colorResId);
+        mColor = AppCompatResources.getColorStateList(context, colorResId).getDefaultColor();
         mOnClick = onClickCallback;
     }
 

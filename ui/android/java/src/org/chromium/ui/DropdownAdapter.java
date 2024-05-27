@@ -82,9 +82,11 @@ public class DropdownAdapter extends ArrayAdapter<DropdownItem> {
             divider.setHeight(dividerHeight);
             int dividerColor;
             if (mSeparators != null && mSeparators.contains(position)) {
-                dividerColor = mContext.getColor(R.color.dropdown_dark_divider_color);
+                dividerColor = AppCompatResources.getColorStateList(
+                        mContext, R.color.dropdown_dark_divider_color).getDefaultColor();
             } else {
-                dividerColor = mContext.getColor(R.color.dropdown_divider_color);
+                dividerColor = AppCompatResources.getColorStateList(
+                        mContext, R.color.dropdown_divider_color).getDefaultColor();
             }
             divider.setDividerColor(dividerColor);
         }
@@ -121,7 +123,8 @@ public class DropdownAdapter extends ArrayAdapter<DropdownItem> {
             labelView.setTypeface(null, Typeface.NORMAL);
         }
 
-        labelView.setTextColor(mContext.getColor(item.getLabelFontColorResId()));
+        labelView.setTextColor(AppCompatResources.getColorStateList(
+                mContext, item.getLabelFontColorResId()));
         labelView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 mContext.getResources().getDimension(R.dimen.text_size_large));
 

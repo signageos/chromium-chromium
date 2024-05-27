@@ -75,7 +75,8 @@ public class ButtonCompat extends AppCompatButton {
             // the theme, we'll use a fallback color based on the button color. A transparent color
             // means a text button, which should have a blue ripple while a filled button should
             // have a white ripple.
-            boolean isBgTransparent = getContext().getColor(buttonColorId) == Color.TRANSPARENT;
+            boolean isBgTransparent = AppCompatResources.getColorStateList(
+                    getContext(), buttonColorId).getDefaultColor() == Color.TRANSPARENT;
             rippleColorId = isBgTransparent ? R.color.text_button_ripple_color_list_baseline
                                             : R.color.filled_button_ripple_color;
         }
