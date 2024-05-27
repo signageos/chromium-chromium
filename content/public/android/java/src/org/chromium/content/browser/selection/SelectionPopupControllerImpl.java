@@ -25,11 +25,13 @@ import android.view.WindowManager;
 import android.view.textclassifier.SelectionEvent;
 import android.view.textclassifier.TextClassifier;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Px;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.Log;
@@ -45,6 +47,7 @@ import org.chromium.base.metrics.RecordUserAction;
 import org.chromium.base.supplier.ObservableSupplier;
 import org.chromium.base.supplier.ObservableSupplierImpl;
 import org.chromium.content.R;
+import org.chromium.content.browser.ContentApiHelperForM;
 import org.chromium.content.browser.GestureListenerManagerImpl;
 import org.chromium.content.browser.PopupController;
 import org.chromium.content.browser.PopupController.HideablePopup;
@@ -527,7 +530,8 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
                 MenuSourceType.MENU_SOURCE_TYPE_LAST + 1);
 
         int offsetBottom = bottom;
-        offsetBottom += handleHeight;
+        // Legacy action mode expects the selection rectangle not to include touch handle.
+        if (supportsFloatingActionMode()) offsetBottom += handleHeight;
         mXDip = xDip;
         mYDip = yDip;
         mSelectionRect.set(left, top, right, offsetBottom);
@@ -632,7 +636,8 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
         destroyActionModeAndKeepSelection();
 
         assert mWebContents != null;
-        ActionMode actionMode = mView.startActionMode(mCallback, ActionMode.TYPE_FLOATING);
+        ActionMode actionMode = supportsFloatingActionMode() ? startFloatingActionMode()
+                                                             : mView.startActionMode(mCallback);
         if (actionMode != null) {
             // This is to work around an LGE email issue. See crbug.com/651706 for more details.
             LGEmailActionModeWorkaroundImpl.runIfNecessary(mContext, actionMode);
@@ -641,6 +646,13 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
         mUnselectAllOnDismiss = true;
 
         if (!isActionModeValid()) clearSelection();
+    }
+
+    private ActionMode startFloatingActionMode() {
+        assert mView != null;
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+        ActionMode actionMode = ContentApiHelperForM.startActionMode(mView, this, mCallback.getCallback2());
+        return actionMode;
     }
 
     private void dismissTextHandles() {
@@ -659,6 +671,11 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
     protected void createAndShowPastePopup() {
         if (mView == null || mView.getParent() == null || mView.getVisibility() != View.VISIBLE
                 || getMenuType() != SelectionMenuType.PASTE) {
+            return;
+        }
+
+        if (!supportsFloatingActionMode() && !Clipboard.getInstance().canPaste()
+                && mNonSelectionAdditionalItemProvider == null) {
             return;
         }
 
@@ -703,8 +720,12 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
                 };
         Context windowContext = mWindowAndroid.getContext().get();
         if (windowContext == null) return;
-        mPastePopupMenu = new FloatingPastePopupMenu(
+        if (supportsFloatingActionMode()) {
+            mPastePopupMenu = new FloatingPastePopupMenu(
                 windowContext, mView, delegate, mNonSelectionAdditionalItemProvider);
+        } else {
+            mPastePopupMenu = new LegacyPastePopupMenu(windowContext, mView, delegate);
+        }
         showPastePopup();
     }
 
@@ -713,6 +734,12 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
             mPastePopupMenu.show(getSelectionRectRelativeToContainingView());
         } catch (WindowManager.BadTokenException e) {
         }
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
+    @Override
+    public boolean supportsFloatingActionMode() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
     private SelectionDropdownMenuDelegate.ItemClickListener getDropdownItemClickListener(
@@ -872,14 +899,16 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
      * @see ActionMode#invalidateContentRect()
      */
     public void invalidateContentRect() {
-        if (isActionModeValid()) ApiHelperForM.invalidateContentRectOnActionMode(mActionMode);
+        if (supportsFloatingActionMode() && isActionModeValid()) {
+            ApiHelperForM.invalidateContentRectOnActionMode(mActionMode);
+        }
     }
 
     // WindowEventObserver
 
     @Override
     public void onWindowFocusChanged(boolean gainFocus) {
-        if (isActionModeValid()) {
+        if (supportsFloatingActionMode() && isActionModeValid()) {
             ApiHelperForM.onWindowFocusChangedOnActionMode(mActionMode, gainFocus);
         }
     }
@@ -976,12 +1005,15 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
     }
 
     private boolean isFloatingActionMode() {
-        return isActionModeValid()
+        return supportsFloatingActionMode() && isActionModeValid()
                 && ApiHelperForM.getActionModeType(mActionMode) == ActionMode.TYPE_FLOATING;
     }
 
     private long getDefaultHideDuration() {
-        return ApiHelperForM.getDefaultActionModeHideDuration();
+        if (supportsFloatingActionMode()) {
+            return ApiHelperForM.getDefaultActionModeHideDuration();
+        }
+        return 2000;
     }
 
     // Default handlers for action mode callbacks.

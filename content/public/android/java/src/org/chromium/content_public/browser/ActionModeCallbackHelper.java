@@ -44,6 +44,14 @@ public abstract class ActionModeCallbackHelper {
     }
 
     /**
+     * Tell if the platform supports floating type action mode. Used not to repeatedly
+     * attempt the creation if the request fails once at the beginning. Also check
+     * platform version since the floating type is supported only on M or later version
+     * of Android platform.
+     */
+    public abstract boolean supportsFloatingActionMode();
+
+    /**
      * Empty {@link ActionMode.Callback} that does nothing. Used for {@link #EMPTY_CALLBACK}.
      */
     private static class EmptyActionCallback extends ActionModeCallback {
