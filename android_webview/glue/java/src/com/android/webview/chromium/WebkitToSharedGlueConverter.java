@@ -63,6 +63,7 @@ public class WebkitToSharedGlueConverter {
         return adapter.getAwResourceRequest();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     public static AwWebResourceError getAwWebResourceError(WebResourceError error) {
         return ((WebResourceErrorAdapter) error).getAwWebResourceError();
     }
@@ -73,6 +74,7 @@ public class WebkitToSharedGlueConverter {
         return ((SafeBrowsingResponseAdapter) response).getAwSafeBrowsingResponseCallback();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     public static MessagePort getMessagePort(WebMessagePort messagePort) {
         return ((WebMessagePortAdapter) messagePort).getPort();
     }
