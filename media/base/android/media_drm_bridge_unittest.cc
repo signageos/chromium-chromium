@@ -134,12 +134,15 @@ TEST_F(MediaDrmBridgeTest, IsKeySystemSupported_Widevine) {
       IsKeySystemSupportedWithType(kWidevineKeySystem, kVideoMp4),
       kWidevineKeySystem);
 
-  EXPECT_TRUE_IF_KEY_SYSTEM_AVAILABLE(
-      IsKeySystemSupportedWithType(kWidevineKeySystem, kAudioWebM),
-      kWidevineKeySystem);
-  EXPECT_TRUE_IF_KEY_SYSTEM_AVAILABLE(
-      IsKeySystemSupportedWithType(kWidevineKeySystem, kVideoWebM),
-      kWidevineKeySystem);
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <=
+      base::android::SDK_VERSION_KITKAT) {
+    EXPECT_TRUE_IF_KEY_SYSTEM_AVAILABLE(
+        IsKeySystemSupportedWithType(kWidevineKeySystem, kAudioWebM),
+        kWidevineKeySystem);
+    EXPECT_TRUE_IF_KEY_SYSTEM_AVAILABLE(
+        IsKeySystemSupportedWithType(kWidevineKeySystem, kVideoWebM),
+        kWidevineKeySystem);
+  }
 
   EXPECT_FALSE(IsKeySystemSupportedWithType(kWidevineKeySystem, "unknown"));
   EXPECT_FALSE(IsKeySystemSupportedWithType(kWidevineKeySystem, "video/avi"));
