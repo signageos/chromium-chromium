@@ -40,6 +40,7 @@
 #include "components/password_manager/core/browser/password_manager_driver.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/password_manager/core/browser/password_store_consumer.h"
+#include "components/password_manager/core/browser/password_sync_util.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -86,7 +87,7 @@ void UpdateMetadataForUsage(PasswordForm* credential) {
 }
 
 bool IsSyncingWithNormalEncryption(const syncer::SyncService* sync_service) {
-  return GetPasswordSyncState(sync_service) ==
+  return password_manager::sync_util::GetPasswordSyncState(sync_service) ==
          password_manager::SyncState::kSyncingNormalEncryption;
 }
 

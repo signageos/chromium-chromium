@@ -52,6 +52,10 @@
 #include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
+#if BUILDFLAG(IS_ANDROID)
+#include "base/android/build_info.h"
+#endif
+
 namespace password_manager {
 
 namespace {
@@ -184,8 +188,16 @@ void GetSuggestions(const autofill::PasswordFormFillData& fill_data,
             });
 }
 
-void MaybeAppendManagePasswordsEntry(
-    std::vector<autofill::Suggestion>* suggestions) {
+// Reauth doesn't work in Android L which prevents copying and revealing
+// credentials. Therefore, users have no benefit in visiting the settings page.
+void MaybeAppendManagePasswordsEntry(syncer::SyncService* sync_service,
+                                     std::vector<autofill::Suggestion>* suggestions) {
+#if defined(OS_ANDROID)
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <
+          base::android::SDK_VERSION_LOLLIPOP &&
+      !password_manager_util::IsSyncingWithNormalEncryption(sync_service))
+    return;
+#endif
   bool has_no_fillable_suggestions = base::ranges::none_of(
       *suggestions,
       [](autofill::PopupItemId id) {
@@ -770,7 +782,7 @@ std::vector<autofill::Suggestion> PasswordAutofillManager::BuildSuggestions(
     suggestions.push_back(CreateEntryToReSignin());
 
   // Add "Manage all passwords" link to settings.
-  MaybeAppendManagePasswordsEntry(&suggestions);
+  MaybeAppendManagePasswordsEntry(autofill_client_->GetSyncService(), &suggestions);
 
   return suggestions;
 }
