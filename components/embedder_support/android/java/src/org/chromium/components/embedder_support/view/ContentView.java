@@ -24,10 +24,12 @@ import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.ObserverList;
 import org.chromium.base.TraceEvent;
 import org.chromium.base.compat.ApiHelperForO;
+import org.chromium.base.supplier.Supplier;
 import org.chromium.content_public.browser.ImeAdapter;
 import org.chromium.content_public.browser.RenderCoordinates;
 import org.chromium.content_public.browser.SmartClipProvider;
@@ -38,8 +40,6 @@ import org.chromium.ui.accessibility.AccessibilityState;
 import org.chromium.ui.base.EventForwarder;
 import org.chromium.ui.base.EventOffsetHandler;
 import org.chromium.ui.dragdrop.DragEventDispatchHelper.DragEventDispatchDestination;
-
-import java.util.function.Supplier;
 
 /**
  * The containing view for {@link WebContents} that exists in the Android UI hierarchy and exposes
@@ -92,6 +92,9 @@ public class ContentView extends FrameLayout
      */
     public static ContentView createContentView(Context context,
             @Nullable EventOffsetHandler eventOffsetHandler, @Nullable WebContents webContents) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return new ContentViewApi24(context, eventOffsetHandler, webContents);
+        }
         return new ContentView(context, eventOffsetHandler, webContents);
     }
 
@@ -446,18 +449,6 @@ public class ContentView extends FrameLayout
         return forwarder != null ? forwarder.onGenericMotionEvent(event) : false;
     }
 
-    @Override
-    public PointerIcon onResolvePointerIcon(MotionEvent event, int pointerIndex) {
-        PointerIcon icon = null;
-        if (mStylusWritingIconSupplier != null) {
-            icon = mStylusWritingIconSupplier.get();
-        }
-        if (icon != null) {
-            return icon;
-        }
-        return super.onResolvePointerIcon(event, pointerIndex);
-    }
-
     @Nullable
     private EventForwarder getEventForwarder() {
         return webContentsAttached() ? mWebContents.getEventForwarder() : null;
@@ -637,5 +628,28 @@ public class ContentView extends FrameLayout
         boolean ret = super.dispatchDragEvent(event);
         mDragDropEventOffsetHandler.onPostDispatchDragEvent(event.getAction());
         return ret;
+    }
+
+    /**
+     * ContentView on Api24 to override onResolvePointerIcon.
+     */
+    @RequiresApi(Build.VERSION_CODES.N)
+    public static class ContentViewApi24 extends ContentView {
+        protected ContentViewApi24(
+                Context context, EventOffsetHandler eventOffsetHandler, WebContents webContents) {
+            super(context, eventOffsetHandler, webContents);
+        }
+
+        @Override
+        public PointerIcon onResolvePointerIcon(MotionEvent event, int pointerIndex) {
+            PointerIcon icon = null;
+            if (mStylusWritingIconSupplier != null) {
+                icon = mStylusWritingIconSupplier.get();
+            }
+            if (icon != null) {
+                return icon;
+            }
+            return super.onResolvePointerIcon(event, pointerIndex);
+        }
     }
 }
