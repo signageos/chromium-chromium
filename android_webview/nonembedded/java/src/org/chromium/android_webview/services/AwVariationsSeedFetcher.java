@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.PersistableBundle;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.android_webview.common.AwSwitches;
@@ -53,6 +54,7 @@ import java.util.concurrent.TimeUnit;
  * AsyncInitTaskRunner$FetchSeedTask.
  */
 // TODO(https://crbug.com/1328637): consider using BackgroundTaskScheduler instead of JobService
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class AwVariationsSeedFetcher extends JobService {
     @VisibleForTesting
     public static final String JOB_REQUEST_COUNT_KEY = "RequestCount";
