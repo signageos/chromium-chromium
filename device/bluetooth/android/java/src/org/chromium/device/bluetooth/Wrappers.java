@@ -6,6 +6,7 @@ package org.chromium.device.bluetooth;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -101,6 +102,7 @@ class Wrappers {
     /**
      * Wraps android.bluetooth.BluetoothAdapter.
      */
+    @TargetApi(Build.VERSION_CODES.M)
     static class BluetoothAdapterWrapper {
         private final BluetoothAdapter mAdapter;
         protected final Context mContext;
@@ -178,6 +180,9 @@ class Wrappers {
         }
 
         public BluetoothLeScannerWrapper getBluetoothLeScanner() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return null;
+            }
             BluetoothLeScanner scanner = mAdapter.getBluetoothLeScanner();
             if (scanner == null) {
                 return null;
@@ -212,6 +217,7 @@ class Wrappers {
     /**
      * Wraps android.bluetooth.BluetoothLeScanner.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     static class BluetoothLeScannerWrapper {
         protected final BluetoothLeScanner mScanner;
         private final HashMap<ScanCallbackWrapper, ForwardScanCallbackToWrapper> mCallbacks;
@@ -247,6 +253,7 @@ class Wrappers {
      * it extending from ScanCallback. Fakes must function even on Android
      * versions where ScanCallback class is not defined.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     static class ForwardScanCallbackToWrapper extends ScanCallback {
         final ScanCallbackWrapper mWrapperCallback;
 
@@ -278,6 +285,7 @@ class Wrappers {
     /**
      * Wraps android.bluetooth.le.ScanCallback, being called by ScanCallbackImpl.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     abstract static class ScanCallbackWrapper {
         public abstract void onBatchScanResult(List<ScanResultWrapper> results);
         public abstract void onScanResult(int callbackType, ScanResultWrapper result);
@@ -287,6 +295,7 @@ class Wrappers {
     /**
      * Wraps android.bluetooth.le.ScanResult.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     static class ScanResultWrapper {
         private final ScanResult mScanResult;
 
@@ -396,6 +405,7 @@ class Wrappers {
             mGatt.close();
         }
 
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         public boolean requestMtu(int mtu) {
             return mGatt.requestMtu(mtu);
         }
