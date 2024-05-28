@@ -87,6 +87,7 @@ class MediaCodecBridge {
     private static HandlerThread sCallbackHandlerThread;
     private static Handler sCallbackHandler;
 
+    @MainDex
     private static class DequeueInputResult {
         private final int mStatus;
         private final int mIndex;
@@ -107,6 +108,7 @@ class MediaCodecBridge {
         }
     }
 
+    @MainDex
     private static class DequeueOutputResult {
         private final int mStatus;
         private final int mIndex;
@@ -157,6 +159,7 @@ class MediaCodecBridge {
     }
 
     /** A wrapper around a MediaFormat. */
+    @MainDex
     private static class MediaFormatWrapper {
         private final MediaFormat mFormat;
 
@@ -227,6 +230,8 @@ class MediaCodecBridge {
     // Warning: This class may execute on an arbitrary thread for the lifetime
     // of the MediaCodec. The MediaCodecBridge methods it calls are synchronized
     // to avoid race conditions.
+    @RequiresApi(Build.VERSION_CODES.M)
+    @MainDex
     class MediaCodecCallback extends MediaCodec.Callback {
         private MediaCodecBridge mMediaCodecBridge;
         MediaCodecCallback(MediaCodecBridge bridge) {
