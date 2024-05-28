@@ -85,6 +85,11 @@ void UpdateMetadataForUsage(PasswordForm* credential) {
   credential->all_alternative_usernames.clear();
 }
 
+bool IsSyncingWithNormalEncryption(const syncer::SyncService* sync_service) {
+  return GetPasswordSyncState(sync_service) ==
+         password_manager::SyncState::kSyncingNormalEncryption;
+}
+
 void TrimUsernameOnlyCredentials(
     std::vector<std::unique_ptr<PasswordForm>>* android_credentials) {
   // Remove username-only credentials which are not federated.

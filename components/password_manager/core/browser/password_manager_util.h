@@ -53,6 +53,10 @@ enum class GetLoginMatchType {
 // Update |credential| to reflect usage.
 void UpdateMetadataForUsage(password_manager::PasswordForm* credential);
 
+// Reports whether passwords are synced with normal encryption, i.e. without a
+// custom passphrase.
+bool IsSyncingWithNormalEncryption(const syncer::SyncService* sync_service);
+
 // Removes Android username-only credentials from |android_credentials|.
 // Transforms federated credentials into non zero-click ones.
 void TrimUsernameOnlyCredentials(
