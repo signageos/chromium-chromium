@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
+import androidx.appcompat.content.res.AppCompatResources;
+
 /**
  * Generic builder for promo dialogs.
  */
@@ -102,7 +104,8 @@ public abstract class PromoDialog extends AlwaysDismissedDialog
      */
     protected void forceOpaqueBackground() {
         LayerDrawable background = new LayerDrawable(new Drawable[] {new ColorDrawable(Color.WHITE),
-                new ColorDrawable(getContext().getColor(R.color.modal_dialog_scrim_color))});
+                new ColorDrawable(AppCompatResources.getColorStateList(
+                        getContext(), R.color.modal_dialog_scrim_color).getDefaultColor())});
         mScrimView.setBackground(background);
     }
 
