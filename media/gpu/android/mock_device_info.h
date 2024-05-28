@@ -11,8 +11,6 @@
 
 namespace media {
 
-class MediaCodecBridge;
-
 // A mock DeviceInfo with reasonable defaults.
 class MockDeviceInfo : public DeviceInfo {
  public:
