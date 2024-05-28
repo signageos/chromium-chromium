@@ -10,7 +10,7 @@ import android.webkit.WebViewFactory;
  * Entry point to the WebView. The system framework talks to this class to get instances of the
  * implementation classes.
  */
-class WebViewChromiumFactoryProvider extends WebViewChromiumFactoryProviderBase {
+public class WebViewChromiumFactoryProvider extends WebViewChromiumFactoryProviderBase {
 
     /**
      * Entry point for newer versions of Android.
