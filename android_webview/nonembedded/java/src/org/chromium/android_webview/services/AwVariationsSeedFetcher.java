@@ -134,7 +134,7 @@ public class AwVariationsSeedFetcher extends JobService {
     private static boolean isFastModeJob(@Nullable PersistableBundle bundle) {
         if (bundle == null) return false;
         // Default to assume WebView is not in Fast Mode
-        return bundle.getBoolean(JOB_REQUEST_FAST_MODE);
+        return bundle.getInt(JOB_REQUEST_FAST_MODE) != 0;
     }
 
     /**
@@ -267,10 +267,10 @@ public class AwVariationsSeedFetcher extends JobService {
             JobScheduler scheduler, boolean requireFastMode, boolean requestPeriodicFastMode) {
         Context context = ContextUtils.getApplicationContext();
         ComponentName thisComponent = new ComponentName(context, AwVariationsSeedFetcher.class);
-        PersistableBundle extras = new PersistableBundle(/*capacity=*/2);
+        PersistableBundle extras = new PersistableBundle(/*capacity=*/3);
         extras.putInt(JOB_REQUEST_COUNT_KEY, 0);
-        extras.putBoolean(JOB_REQUEST_FAST_MODE, requireFastMode);
-        extras.putBoolean(PERIODIC_FAST_MODE, requestPeriodicFastMode);
+        extras.putInt(JOB_REQUEST_FAST_MODE, requireFastMode ? 1 : 0);
+        extras.putInt(PERIODIC_FAST_MODE, requestPeriodicFastMode ? 1 : 0);
         JobInfo.Builder builder =
                 new JobInfo.Builder(JOB_ID, thisComponent)
                         .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -454,7 +454,7 @@ public class AwVariationsSeedFetcher extends JobService {
         private boolean isPeriodicFastModeJob(@Nullable PersistableBundle bundle) {
             if (bundle == null) return false;
             // Default to assume WebView is not in Fast Mode
-            return bundle.getBoolean(PERIODIC_FAST_MODE);
+            return bundle.getInt(PERIODIC_FAST_MODE) != 0;
         }
     }
 
