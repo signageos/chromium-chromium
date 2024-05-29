@@ -6,6 +6,7 @@ package org.chromium.content.browser.selection;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ public class FloatingPastePopupMenu implements PastePopupMenu {
 
     public FloatingPastePopupMenu(Context context, View parent, PastePopupMenuDelegate delegate,
             @Nullable AdditionalSelectionMenuItemProvider additionalItemProvider) {
+        assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
         mParent = parent;
         mDelegate = delegate;
         mContext = context;

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -35,6 +36,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowLooper;
+import org.robolectric.util.ReflectionHelpers;
 
 import org.chromium.base.ThreadUtils;
 import org.chromium.base.test.BaseRobolectricTestRunner;
@@ -133,6 +135,12 @@ public class ThreadedInputConnectionFactoryTest {
 
     @Before
     public void setUp() {
+        // ThreadedInputConnectionFactory#initializeAndGet() logic is activated under N, so pretend
+        // that we're in L. Note that this is to workaround crbug.com/944476 that
+        // @Config(..., sdk = Build.VERSION_CODES.LOLLIPOP) doesn't work.
+        ReflectionHelpers.setStaticField(
+                Build.VERSION.class, "SDK_INT", Build.VERSION_CODES.LOLLIPOP);
+
         MockitoAnnotations.initMocks(this);
 
         mEditorInfo = new EditorInfo();
@@ -150,9 +158,6 @@ public class ThreadedInputConnectionFactoryTest {
 
         when(mContext.getSystemService(Context.INPUT_METHOD_SERVICE))
                 .thenReturn(mInputMethodManager);
-        // ThreadedInputConnectionFactory#initializeAndGet() logic is activated when the package is
-        // "com.htc.android.mail"
-        when(mContext.getPackageName()).thenReturn("com.htc.android.mail");
         when(mContainerView.getContext()).thenReturn(mContext);
         when(mContainerView.getHandler()).thenReturn(mUiHandler);
         when(mContainerView.hasFocus()).thenReturn(true);
@@ -243,6 +248,8 @@ public class ThreadedInputConnectionFactoryTest {
         mInOrder.verify(mProxyView).onWindowFocusChanged(true);
         mInOrder.verify(mInputMethodManager).isActive(mContainerView);
         mInOrder.verify(mProxyView).onCreateInputConnection(any(EditorInfo.class));
+        mInOrder.verify(mContainerView).getContext();  // BaseInputConnection#<init>
+        mInOrder.verifyNoMoreInteractions();
         assertNotNull(mInputConnection);
         assertTrue(ThreadedInputConnection.class.isInstance(mInputConnection));
 
@@ -344,6 +351,8 @@ public class ThreadedInputConnectionFactoryTest {
         mInOrder.verify(mProxyView).onWindowFocusChanged(true);
         mInOrder.verify(mInputMethodManager).isActive(mContainerView);
         mInOrder.verify(mProxyView).onCreateInputConnection(any(EditorInfo.class));
+        mInOrder.verify(mContainerView).getContext(); // BaseInputConnection#<init>
+        mInOrder.verifyNoMoreInteractions();
         assertNotNull(mInputConnection);
         assertTrue(ThreadedInputConnection.class.isInstance(mInputConnection));
 
