@@ -411,6 +411,17 @@ class MediaCodecUtil {
         // *** DO NOT ADD ANY NEW CODECS WITHOUT UPDATING MIME_UTIL. ***
         // *************************************************************
         if (mime.equals(MimeTypes.VIDEO_VP8)) {
+            if (Build.MANUFACTURER.toLowerCase(Locale.getDefault()).equals("samsung")) {
+                // Some Samsung devices cannot render VP8 video directly to the surface.
+
+                // Samsung Galaxy S4 Mini.
+                // Only GT-I9190 was tested with Android 4.4.2
+                // We block it and the popular GT-I9195 for all Android versions.
+                if (Build.MODEL.startsWith("GT-I9190") || Build.MODEL.startsWith("GT-I9195")) {
+                    return false;
+                }
+            }
+
             // MediaTek decoders do not work properly on vp8. See http://crbug.com/446974 and
             // http://crbug.com/597836.
             if (Build.HARDWARE.startsWith("mt")) {
@@ -440,6 +451,29 @@ class MediaCodecUtil {
     }
 
     /**
+     * Returns true if and only enabling adaptive playback is unsafe.  On some
+     * device / os combinations, enabling it causes decoded frames to be
+     * unusable.  For example, the S3 on 4.4.2 returns black and white, tiled
+     * frames when this is enabled.
+     */
+    private static boolean isAdaptivePlaybackDenied(String mime) {
+        if (!mime.equals("video/avc") && !mime.equals("video/avc1")) {
+            return false;
+        }
+
+        if (!Build.VERSION.RELEASE.equals("4.4.2")) {
+            return false;
+        }
+
+        if (!Build.MANUFACTURER.toLowerCase(Locale.getDefault()).equals("samsung")) {
+            return false;
+        }
+
+        return Build.MODEL.startsWith("GT-I9300") || // S3 (I9300 / I9300I)
+                Build.MODEL.startsWith("SCH-I535"); // S3
+    }
+
+    /**
      * Returns true if the given codec supports adaptive playback (dynamic resolution change).
      * @param mediaCodec the codec.
      * @param mime MIME type that corresponds to the codec creation.
@@ -452,6 +486,10 @@ class MediaCodecUtil {
         try {
             MediaCodecInfo info = mediaCodec.getCodecInfo();
             if (info.isEncoder()) {
+                return false;
+            }
+
+            if (isAdaptivePlaybackDenied(mime)) {
                 return false;
             }
 
