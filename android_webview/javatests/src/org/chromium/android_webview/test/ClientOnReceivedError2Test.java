@@ -35,7 +35,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Tests for the ContentViewClient.onReceivedError() method. Historically, this test suite focused
+ * Tests for the ContentViewClient.onReceivedError2() method. Historically, this test suite focused
  * on the new features added in the 2nd iteration of the callback added in M. Now chromium only
  * supports one version of the callback, so the distinction between this and
  * ClientOnReceivedErrorTest.java is no longer as significant.
@@ -45,7 +45,7 @@ public class ClientOnReceivedError2Test {
     @Rule
     public AwActivityTestRule mActivityTestRule = new AwActivityTestRule();
 
-    private VerifyOnReceivedErrorCallClient mContentsClient;
+    private VerifyOnReceivedError2CallClient mContentsClient;
     private AwTestContainerView mTestContainerView;
     private AwContents mAwContents;
     private TestWebServer mWebServer;
@@ -56,7 +56,7 @@ public class ClientOnReceivedError2Test {
 
     @Before
     public void setUp() {
-        mContentsClient = new VerifyOnReceivedErrorCallClient();
+        mContentsClient = new VerifyOnReceivedError2CallClient();
         mTestContainerView = mActivityTestRule.createAwTestContainerViewOnMainSync(mContentsClient);
         mAwContents = mTestContainerView.getAwContents();
     }
@@ -74,10 +74,10 @@ public class ClientOnReceivedError2Test {
         mContentsClient.enableBypass();
     }
 
-    private static class VerifyOnReceivedErrorCallClient extends TestAwContentsClient {
+    private static class VerifyOnReceivedError2CallClient extends TestAwContentsClient {
         private boolean mBypass;
         private boolean mIsOnPageFinishedCalled;
-        private boolean mIsOnReceivedErrorCalled;
+        private boolean mIsOnReceivedError2Called;
 
         void enableBypass() {
             mBypass = true;
@@ -89,20 +89,21 @@ public class ClientOnReceivedError2Test {
                 Assert.assertEquals(
                         "onPageFinished called twice for " + url, false, mIsOnPageFinishedCalled);
                 mIsOnPageFinishedCalled = true;
-                Assert.assertEquals("onReceivedError not called before onPageFinished for " + url,
-                        true, mIsOnReceivedErrorCalled);
+                Assert.assertEquals("onReceivedError2 not called before onPageFinished for " + url,
+                        true, mIsOnReceivedError2Called);
             }
             super.onPageFinished(url);
         }
 
         @Override
-        public void onReceivedError(AwWebResourceRequest request, AwWebResourceError error) {
+        public void onReceivedError2(AwWebResourceRequest request,
+                AwWebResourceError error) {
             if (!mBypass) {
-                Assert.assertEquals("onReceivedError called twice for " + request.url, false,
-                        mIsOnReceivedErrorCalled);
-                mIsOnReceivedErrorCalled = true;
+                Assert.assertEquals("onReceivedError2 called twice for " + request.url, false,
+                        mIsOnReceivedError2Called);
+                mIsOnReceivedError2Called = true;
             }
-            super.onReceivedError(request, error);
+            super.onReceivedError2(request, error);
         }
     }
 
@@ -113,9 +114,9 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.loadUrlSync(
                 mAwContents, mContentsClient.getOnPageFinishedHelper(), BAD_HTML_URL);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_HTML_URL, request.url);
         Assert.assertEquals("GET", request.method);
@@ -124,7 +125,7 @@ public class ClientOnReceivedError2Test {
         // in the network service code path they may e.g. contain user agent, crbug.com/893573.
         Assert.assertTrue(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         // The particular error code that is returned depends on the configuration of the device
         // (such as existence of a proxy) so we don't test for it.
         assertNotEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
@@ -141,13 +142,13 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.waitForPixelColorAtCenterOfView(
                 mAwContents, mTestContainerView, CommonResources.LINK_COLOR);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        int onReceivedErrorCount = onReceivedErrorHelper.getCallCount();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        int onReceivedError2Count = onReceivedError2Helper.getCallCount();
         AwTestTouchUtils.simulateTouchCenterOfView(mTestContainerView);
-        onReceivedErrorHelper.waitForCallback(onReceivedErrorCount,
+        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
                 /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_HTML_URL, request.url);
         Assert.assertEquals("GET", request.method);
@@ -156,7 +157,7 @@ public class ClientOnReceivedError2Test {
         // in the network service code path they may e.g. contain user agent, crbug.com/893573.
         Assert.assertTrue(request.isOutermostMainFrame);
         Assert.assertTrue(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         // The particular error code that is returned depends on the configuration of the device
         // (such as existence of a proxy) so we don't test for it.
         assertNotEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
@@ -172,9 +173,9 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.loadDataSync(mAwContents, mContentsClient.getOnPageFinishedHelper(),
                 pageHtml, "text/html", false);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_HTML_URL, request.url);
         Assert.assertEquals("GET", request.method);
@@ -183,7 +184,7 @@ public class ClientOnReceivedError2Test {
         // in the network service code path they may e.g. contain user agent, crbug.com/893573.
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         // The particular error code that is returned depends on the configuration of the device
         // (such as existence of a proxy) so we don't test for it.
         assertNotEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
@@ -204,13 +205,13 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.waitForPixelColorAtCenterOfView(
                 mAwContents, mTestContainerView, CommonResources.LINK_COLOR);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        int onReceivedErrorCount = onReceivedErrorHelper.getCallCount();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        int onReceivedError2Count = onReceivedError2Helper.getCallCount();
         AwTestTouchUtils.simulateTouchCenterOfView(mTestContainerView);
-        onReceivedErrorHelper.waitForCallback(onReceivedErrorCount,
+        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
                 /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_HTML_URL, request.url);
         Assert.assertEquals("GET", request.method);
@@ -219,7 +220,7 @@ public class ClientOnReceivedError2Test {
         // in the network service code path they may e.g. contain user agent, crbug.com/893573.
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertTrue(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         // The particular error code that is returned depends on the configuration of the device
         // (such as existence of a proxy) so we don't test for it.
         assertNotEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
@@ -235,9 +236,9 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.loadDataSync(mAwContents, mContentsClient.getOnPageFinishedHelper(),
                 pageHtml, "text/html", false);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(BAD_IMAGE_URL, request.url);
         Assert.assertEquals("GET", request.method);
@@ -246,7 +247,7 @@ public class ClientOnReceivedError2Test {
         // in the network service code path they may e.g. contain user agent, crbug.com/893573.
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         // The particular error code that is returned depends on the configuration of the device
         // (such as existence of a proxy) so we don't test for it.
         assertNotEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
@@ -263,9 +264,9 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.loadDataSync(mAwContents, mContentsClient.getOnPageFinishedHelper(),
                 pageHtml, "text/html", false);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(iframeUrl, request.url);
         Assert.assertEquals("GET", request.method);
@@ -273,7 +274,7 @@ public class ClientOnReceivedError2Test {
         Assert.assertFalse(request.requestHeaders.isEmpty());
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         Assert.assertEquals(WebviewErrorCode.ERROR_UNSUPPORTED_SCHEME, error.errorCode);
         Assert.assertNotNull(error.description);
     }
@@ -290,9 +291,9 @@ public class ClientOnReceivedError2Test {
                 mContentsClient.getOnPageFinishedHelper(), pageHtml, "text/html", false, baseUrl,
                 ContentUrlConstants.ABOUT_BLANK_DISPLAY_URL);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(iframeUrl, request.url);
         Assert.assertEquals("GET", request.method);
@@ -300,7 +301,7 @@ public class ClientOnReceivedError2Test {
         Assert.assertFalse(request.requestHeaders.isEmpty());
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         Assert.assertEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
         Assert.assertNotNull(error.description);
     }
@@ -317,9 +318,9 @@ public class ClientOnReceivedError2Test {
                 mContentsClient.getOnPageFinishedHelper(), pageHtml, "text/html", false, baseUrl,
                 ContentUrlConstants.ABOUT_BLANK_DISPLAY_URL);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(iframeUrl, request.url);
         Assert.assertEquals("GET", request.method);
@@ -327,7 +328,7 @@ public class ClientOnReceivedError2Test {
         Assert.assertFalse(request.requestHeaders.isEmpty());
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         Assert.assertEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
         Assert.assertNotNull(error.description);
     }
@@ -344,9 +345,9 @@ public class ClientOnReceivedError2Test {
         mActivityTestRule.loadDataSync(mAwContents, mContentsClient.getOnPageFinishedHelper(),
                 pageHtml, "text/html", false);
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        AwWebResourceRequest request = onReceivedErrorHelper.getRequest();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        AwWebResourceRequest request = onReceivedError2Helper.getRequest();
         Assert.assertNotNull(request);
         Assert.assertEquals(iframeUrl, request.url);
         Assert.assertEquals("GET", request.method);
@@ -354,7 +355,7 @@ public class ClientOnReceivedError2Test {
         Assert.assertFalse(request.requestHeaders.isEmpty());
         Assert.assertFalse(request.isOutermostMainFrame);
         Assert.assertFalse(request.hasUserGesture);
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        AwWebResourceError error = onReceivedError2Helper.getError();
         Assert.assertEquals(WebviewErrorCode.ERROR_UNKNOWN, error.errorCode);
         Assert.assertNotNull(error.description);
     }
@@ -386,17 +387,17 @@ public class ClientOnReceivedError2Test {
                 TimeUnit.MILLISECONDS);
         latch.countDown(); // Release the server.
 
-        // Instead of waiting for OnReceivedError not to be called, we schedule
+        // Instead of waiting for OnReceivedError2 not to be called, we schedule
         // a load that will result in a error, and check that we have only got one callback,
         // originating from the last attempt.
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        final int onReceivedErrorCount = onReceivedErrorHelper.getCallCount();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        final int onReceivedError2Count = onReceivedError2Helper.getCallCount();
         mActivityTestRule.loadUrlAsync(mAwContents, BAD_HTML_URL);
-        onReceivedErrorHelper.waitForCallback(onReceivedErrorCount,
+        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
                 /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        Assert.assertEquals(onReceivedErrorCount + 1, onReceivedErrorHelper.getCallCount());
-        Assert.assertEquals(BAD_HTML_URL, onReceivedErrorHelper.getRequest().url);
+        Assert.assertEquals(onReceivedError2Count + 1, onReceivedError2Helper.getCallCount());
+        Assert.assertEquals(BAD_HTML_URL, onReceivedError2Helper.getRequest().url);
     }
 
     @Test
@@ -406,17 +407,17 @@ public class ClientOnReceivedError2Test {
         startWebServer();
         final String redirectUrl = mWebServer.setRedirect("/302.html", "file:///foo");
 
-        TestAwContentsClient.OnReceivedErrorHelper onReceivedErrorHelper =
-                mContentsClient.getOnReceivedErrorHelper();
-        final int onReceivedErrorCount = onReceivedErrorHelper.getCallCount();
+        TestAwContentsClient.OnReceivedError2Helper onReceivedError2Helper =
+                mContentsClient.getOnReceivedError2Helper();
+        final int onReceivedError2Count = onReceivedError2Helper.getCallCount();
 
         mActivityTestRule.loadUrlSync(
                 mAwContents, mContentsClient.getOnPageFinishedHelper(), redirectUrl);
 
-        onReceivedErrorHelper.waitForCallback(onReceivedErrorCount,
+        onReceivedError2Helper.waitForCallback(onReceivedError2Count,
                 /* numberOfCallsToWaitFor= */ 1, WAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        Assert.assertEquals(onReceivedErrorCount + 1, onReceivedErrorHelper.getCallCount());
-        AwWebResourceError error = onReceivedErrorHelper.getError();
+        Assert.assertEquals(onReceivedError2Count + 1, onReceivedError2Helper.getCallCount());
+        AwWebResourceError error = onReceivedError2Helper.getError();
         Assert.assertEquals("net::ERR_UNSAFE_REDIRECT", error.description);
     }
 }

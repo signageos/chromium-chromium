@@ -142,7 +142,7 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
      * @see ContentViewClient#onReceivedError(AwWebResourceRequest,AwWebResourceError)
      */
     @Override
-    public void onReceivedError(AwWebResourceRequest request, AwWebResourceError error) {
+    public void onReceivedError2(AwWebResourceRequest request, AwWebResourceError error) {
         try {
             TraceEvent.begin("WebViewContentsClientAdapter.onReceivedError");
             if (error.description == null || error.description.isEmpty()) {
