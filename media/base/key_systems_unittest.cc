@@ -248,6 +248,18 @@ void AddContainerAndCodecMasksForTest() {
   is_test_masks_added = true;
 }
 
+bool CanRunExternalKeySystemTests() {
+#if defined(OS_ANDROID)
+  if (HasPlatformDecoderSupport())
+    return true;
+
+  EXPECT_FALSE(IsSupportedKeySystem(kExternal));
+  return false;
+#else
+  return true;
+#endif
+}
+
 class TestMediaClient : public MediaClient {
  public:
   TestMediaClient();
@@ -643,6 +655,9 @@ TEST_F(KeySystemsTest,
 //
 
 TEST_F(KeySystemsTest, Basic_ExternalDecryptor) {
+  if (!CanRunExternalKeySystemTests())
+    return;
+
   EXPECT_TRUE(IsSupportedKeySystem(kExternal));
   EXPECT_TRUE(IsSupportedKeySystemWithMediaMimeType(kVideoWebM, no_codecs(),
                                                     kExternal));
@@ -653,6 +668,9 @@ TEST_F(KeySystemsTest, Basic_ExternalDecryptor) {
 TEST_F(
     KeySystemsTest,
     IsSupportedKeySystemWithMediaMimeType_ExternalDecryptor_TypesContainer1) {
+  if (!CanRunExternalKeySystemTests())
+    return;
+
   // Valid video types.
   EXPECT_TRUE(IsSupportedKeySystemWithMediaMimeType(kVideoWebM, no_codecs(),
                                                     kExternal));
@@ -705,6 +723,9 @@ TEST_F(
 TEST_F(
     KeySystemsTest,
     IsSupportedKeySystemWithMediaMimeType_ExternalDecryptor_TypesContainer2) {
+  if (!CanRunExternalKeySystemTests())
+    return;
+
   // Valid video types.
   EXPECT_TRUE(
       IsSupportedKeySystemWithMediaMimeType(kVideoFoo, no_codecs(), kExternal));
@@ -752,6 +773,9 @@ TEST_F(
 
 TEST_F(KeySystemsTest,
        IsSupportedKeySystem_ExternalDecryptor_EncryptionSchemes) {
+  if (!CanRunExternalKeySystemTests())
+    return;
+
   auto supported = EmeConfig::SupportedRule();
   auto hw_secure_codecs_not_allowed =
       EmeConfig{.hw_secure_codecs = EmeConfigRuleState::kNotAllowed};
@@ -777,9 +801,11 @@ TEST_F(KeySystemsTest, KeySystemNameForUMA) {
   EXPECT_EQ("Unknown", GetKeySystemNameForUMA("Foo", true));
 
   // External Clear Key never has a UMA name.
-  EXPECT_EQ("Unknown", GetKeySystemNameForUMA(kExternalClearKey));
-  EXPECT_EQ("Unknown", GetKeySystemNameForUMA(kExternalClearKey, false));
-  EXPECT_EQ("Unknown", GetKeySystemNameForUMA(kExternalClearKey, true));
+  if (CanRunExternalKeySystemTests()) {
+    EXPECT_EQ("Unknown", GetKeySystemNameForUMA(kExternalClearKey));
+    EXPECT_EQ("Unknown", GetKeySystemNameForUMA(kExternalClearKey, false));
+    EXPECT_EQ("Unknown", GetKeySystemNameForUMA(kExternalClearKey, true));
+  }
 }
 
 TEST_F(KeySystemsTest, KeySystemsUpdate) {
@@ -787,19 +813,25 @@ TEST_F(KeySystemsTest, KeySystemsUpdate) {
   EXPECT_TRUE(
       IsSupportedKeySystemWithMediaMimeType(kVideoWebM, no_codecs(), kUsesAes));
 
-  EXPECT_TRUE(IsSupportedKeySystem(kExternal));
-  EXPECT_TRUE(IsSupportedKeySystemWithMediaMimeType(kVideoWebM, no_codecs(),
-                                                    kExternal));
+  if (CanRunExternalKeySystemTests()) {
+    EXPECT_TRUE(IsSupportedKeySystem(kExternal));
+    EXPECT_TRUE(IsSupportedKeySystemWithMediaMimeType(kVideoWebM, no_codecs(),
+                                                      kExternal));
+  }
 
   UpdateClientKeySystems();
 
   EXPECT_TRUE(IsSupportedKeySystem(kUsesAes));
   EXPECT_TRUE(
       IsSupportedKeySystemWithMediaMimeType(kVideoWebM, no_codecs(), kUsesAes));
-  EXPECT_FALSE(IsSupportedKeySystem(kExternal));
+  if (CanRunExternalKeySystemTests())
+    EXPECT_FALSE(IsSupportedKeySystem(kExternal));
 }
 
 TEST_F(KeySystemsTest, GetContentTypeConfigRule) {
+  if (!CanRunExternalKeySystemTests())
+    return;
+
   auto supported = EmeConfig::SupportedRule();
   auto not_supported = EmeConfig::UnsupportedRule();
   auto hw_secure_codecs_required =
@@ -811,6 +843,9 @@ TEST_F(KeySystemsTest, GetContentTypeConfigRule) {
 }
 
 TEST_F(KeySystemsTest, HardwareSecureCodecs) {
+  if (!CanRunExternalKeySystemTests())
+    return;
+
   auto supported = EmeConfig::SupportedRule();
   auto not_supported = EmeConfig::UnsupportedRule();
   auto hw_secure_codecs_required =

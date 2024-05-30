@@ -31,6 +31,18 @@ class MEDIA_EXPORT MediaCodecUtil {
                                             SampleFormat sample_format);
   static std::string CodecToAndroidMimeType(VideoCodec codec);
 
+  // Returns true if MediaCodec is available on the device.
+  // All other static methods check IsAvailable() internally. There's no need
+  // to check IsAvailable() explicitly before calling them.
+  static bool IsMediaCodecAvailable();
+
+  // Returns true if MediaCodec is available, with |sdk| as the sdk version and
+  // |model| as the model.  This is provided for unit tests; you probably want
+  // IsMediaCodecAvailable() otherwise.
+  // TODO(liberato): merge this with IsMediaCodecAvailable, and provide a way
+  // to mock BuildInfo instead.
+  static bool IsMediaCodecAvailableFor(int sdk, const char* model);
+
   // Returns true if MediaCodec supports CBCS Encryption.
   static bool PlatformSupportsCbcsEncryption(int sdk);
 
@@ -93,7 +105,7 @@ class MEDIA_EXPORT MediaCodecUtil {
   //
   // WARNING: This can't be used from the renderer process since it attempts to
   // access MediaCodecList (which requires permissions).
-  static void AddSupportedCodecProfileLevels(
+  static bool AddSupportedCodecProfileLevels(
       std::vector<CodecProfileLevel>* out);
 
   // Get a list of encoder supported color formats for |mime_type|.

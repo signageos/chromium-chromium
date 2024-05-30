@@ -147,6 +147,10 @@ static MimeUtil::ParsedCodecResult MakeDefaultParsedCodecResult() {
 
 MimeUtil::MimeUtil() {
 #if BUILDFLAG(IS_ANDROID)
+  // When the unified media pipeline is enabled, we need support for both GPU
+  // video decoders and MediaCodec; indicated by HasPlatformDecoderSupport().
+  // When the Android pipeline is used, we only need access to MediaCodec.
+  platform_info_.has_platform_decoders = HasPlatformDecoderSupport();
 #if BUILDFLAG(ENABLE_PLATFORM_DOLBY_VISION)
   platform_info_.has_platform_dv_decoder =
       MediaCodecUtil::IsDolbyVisionDecoderAvailable();
@@ -564,6 +568,10 @@ bool MimeUtil::IsCodecSupportedOnAndroid(
   DVLOG(3) << __func__;
   DCHECK_NE(mime_type_lower_case, "");
 
+  // Encrypted block support is never available without platform decoders.
+  if (is_encrypted && !platform_info.has_platform_decoders)
+    return false;
+
   // NOTE: We do not account for Media Source Extensions (MSE) within these
   // checks since it has its own isTypeSupported() which will handle platform
   // specific codec rejections.  See http://crbug.com/587303.
@@ -595,11 +603,14 @@ bool MimeUtil::IsCodecSupportedOnAndroid(
     case FLAC:
     case VORBIS:
       // These codecs are always supported; via a platform decoder (when used
-      // with MSE/EME) or with a software decoder (the unified pipeline).
+      // with MSE/EME), a software decoder (the unified pipeline), or with
+      // MediaPlayer.
+      DCHECK(!is_encrypted || platform_info.has_platform_decoders);
       return true;
 
     case MPEG4_XHE_AAC:
-      return true;
+      // xHE-AAC is only supported via MediaCodec.
+      return platform_info.has_platform_decoders;
 
     case MPEG_H_AUDIO:
       return false;
@@ -615,14 +626,18 @@ bool MimeUtil::IsCodecSupportedOnAndroid(
         return false;
       }
 
+      DCHECK(!is_encrypted || platform_info.has_platform_decoders);
       return true;
 
     case H264:
-      return true;
+      // When content is not encrypted we fall back to MediaPlayer, thus we
+      // always support H264. For EME we need MediaCodec.
+      return !is_encrypted || platform_info.has_platform_decoders;
 
     case HEVC:
 #if BUILDFLAG(ENABLE_PLATFORM_HEVC)
-      return platform_info.has_platform_hevc_decoder;
+      return platform_info.has_platform_decoders &&
+             platform_info.has_platform_hevc_decoder;
 #else
       return false;
 #endif  // BUILDFLAG(ENABLE_PLATFORM_HEVC)

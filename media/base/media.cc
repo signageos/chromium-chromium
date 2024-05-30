@@ -53,12 +53,26 @@ class MediaInitializer {
   MediaInitializer(const MediaInitializer&) = delete;
   MediaInitializer& operator=(const MediaInitializer&) = delete;
 
+#if defined(OS_ANDROID)
+  void enable_platform_decoder_support() {
+    has_platform_decoder_support_ = true;
+  }
+
+  bool has_platform_decoder_support() const {
+    return has_platform_decoder_support_;
+  }
+#endif  // defined(OS_ANDROID)
+
  private:
   ~MediaInitializer() = delete;
+
+#if defined(OS_ANDROID)
+  bool has_platform_decoder_support_ = false;
+#endif  // defined(OS_ANDROID)
 };
 
-static const MediaInitializer& GetMediaInstance() {
-  static const base::NoDestructor<MediaInitializer> instance;
+static MediaInitializer& GetMediaInstance() {
+  static base::NoDestructor<MediaInitializer> instance;
   return *instance;
 }
 
@@ -76,5 +90,15 @@ void InitializeMediaLibraryInSandbox(int64_t libyuv_cpu_flags,
 #endif
   GetMediaInstance();
 }
+
+#if defined(OS_ANDROID)
+void EnablePlatformDecoderSupport() {
+  GetMediaInstance().enable_platform_decoder_support();
+}
+
+bool HasPlatformDecoderSupport() {
+  return GetMediaInstance().has_platform_decoder_support();
+}
+#endif  // defined(OS_ANDROID)
 
 }  // namespace media
