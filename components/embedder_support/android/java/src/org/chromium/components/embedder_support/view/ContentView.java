@@ -84,6 +84,9 @@ public class ContentView extends FrameLayout
      */
     public static ContentView createContentView(Context context,
             @Nullable EventOffsetHandler eventOffsetHandler, @Nullable WebContents webContents) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return new ContentViewApi23(context, eventOffsetHandler, webContents);
+        }
         return new ContentView(context, eventOffsetHandler, webContents);
     }
 
@@ -537,12 +540,6 @@ public class ContentView extends FrameLayout
         }
     }
 
-    @Override
-    public void onProvideVirtualStructure(final ViewStructure structure) {
-        WebContentsAccessibility wcax = getWebContentsAccessibility();
-        if (wcax != null) wcax.onProvideVirtualStructure(structure, false);
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //              Start Implementation of ViewEventSink.InternalAccessDelegate                 //
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -572,5 +569,21 @@ public class ContentView extends FrameLayout
 
     private boolean webContentsAttached() {
         return hasValidWebContents() && mWebContents.getTopLevelNativeWindow() != null;
+    }
+
+    /**
+     * ContentView on Api23 to override onProvideVirtualStructure.
+     */
+    public static class ContentViewApi23 extends ContentView {
+        protected ContentViewApi23(
+                Context context, EventOffsetHandler eventOffsetHandler, WebContents webContents) {
+            super(context, eventOffsetHandler, webContents);
+        }
+
+        @Override
+        public void onProvideVirtualStructure(final ViewStructure structure) {
+            WebContentsAccessibility wcax = getWebContentsAccessibility();
+            if (wcax != null) wcax.onProvideVirtualStructure(structure, false);
+        }
     }
 }
