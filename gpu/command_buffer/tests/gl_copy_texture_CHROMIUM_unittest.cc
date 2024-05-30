@@ -591,7 +591,13 @@ class GLCopyTextureCHROMIUMES3Test : public GLCopyTextureCHROMIUMTest {
     GLManager::Options options;
     options.context_type = CONTEXT_TYPE_OPENGLES3;
     options.size = gfx::Size(64, 64);
-    gl_.Initialize(options);
+    GpuDriverBugWorkarounds workarounds;
+#if defined(OS_MAC)
+    // Sampling of seamless integer cube map texture has bug on Intel GEN7 gpus
+    // on Mac OSX, see crbug.com/658930.
+    workarounds.disable_texture_cube_map_seamless = true;
+#endif
+    gl_.InitializeWithWorkarounds(options, workarounds);
 
     width_ = 8;
     height_ = 8;

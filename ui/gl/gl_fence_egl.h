@@ -13,6 +13,8 @@ namespace gl {
 
 class GL_EXPORT GLFenceEGL : public GLFence {
  public:
+  static void SetIgnoreFailures();
+
   GLFenceEGL(const GLFenceEGL&) = delete;
   GLFenceEGL& operator=(const GLFenceEGL&) = delete;
 

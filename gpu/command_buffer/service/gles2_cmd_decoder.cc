@@ -3917,7 +3917,8 @@ gpu::ContextResult GLES2DecoderImpl::Initialize(
   // always enabled and there is no way to disable it.
   // Therefore, it seems OK to also always enable it on top of Desktop GL for
   // both ES2 and ES3 contexts.
-  if (gl_version_info().IsAtLeastGL(3, 2)) {
+  if (!workarounds().disable_texture_cube_map_seamless &&
+      gl_version_info().IsAtLeastGL(3, 2)) {
     api()->glEnableFn(GL_TEXTURE_CUBE_MAP_SEAMLESS);
   }
 
