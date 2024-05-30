@@ -969,6 +969,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public void insertVisualStateCallback(
             final long requestId, final VisualStateCallback callback) {
         recordWebViewApiCall(ApiCall.INSERT_VISUAL_STATE_CALLBACK);
@@ -1627,6 +1628,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.M)
     public void postMessageToMainFrame(final WebMessage message, final Uri targetOrigin) {
         recordWebViewApiCall(ApiCall.POST_MESSAGE_TO_MAIN_FRAME);
         // Create MessagePayload from AOSP WebMessage, MessagePayload is not directly supported by
@@ -1885,6 +1887,7 @@ class WebViewChromium implements WebViewProvider, WebViewProvider.ScrollDelegate
         return mAwContents.getAccessibilityNodeProvider();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     @Override
     public void onProvideVirtualStructure(final ViewStructure structure) {
         mFactory.startYourEngines(false);
