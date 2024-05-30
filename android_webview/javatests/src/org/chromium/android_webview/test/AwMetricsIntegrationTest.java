@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import static org.chromium.android_webview.test.OnlyRunIn.ProcessMode.MULTI_PROCESS;
 
+import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 
 import androidx.test.filters.MediumTest;
@@ -150,7 +151,10 @@ public class AwMetricsIntegrationTest {
         // some reason).
         assertTrue("Should have some application_locale", systemProfile.hasApplicationLocale());
 
-        assertEquals(ApiHelperForM.isProcess64Bit(), systemProfile.getAppVersion().contains("-64"));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            assertEquals(
+                    ApiHelperForM.isProcess64Bit(), systemProfile.getAppVersion().contains("-64"));
+        }
         assertTrue("Should have some low_entropy_source", systemProfile.hasLowEntropySource());
         assertTrue(
                 "Should have some old_low_entropy_source", systemProfile.hasOldLowEntropySource());
