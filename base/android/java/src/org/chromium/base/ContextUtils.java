@@ -188,11 +188,13 @@ public class ContextUtils {
     public static boolean isProcess64Bit() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return ApiHelperForM.isProcess64Bit();
-        } else {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // Android sets CPU_ABI to the first supported ABI for the current process bitness
             // (for compat reasons), so we can use this to infer our bitness.
             return Build.SUPPORTED_64_BIT_ABIS.length > 0
                     && Build.SUPPORTED_64_BIT_ABIS[0].equals(Build.CPU_ABI);
+        } else {
+            return false;
         }
     }
 

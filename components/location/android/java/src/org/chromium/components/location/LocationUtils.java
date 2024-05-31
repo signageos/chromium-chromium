@@ -14,6 +14,8 @@ import android.os.Process;
 import android.os.UserManager;
 import android.provider.Settings;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.ContextUtils;
@@ -76,7 +78,7 @@ public class LocationUtils {
         Context context = ContextUtils.getApplicationContext();
 
         UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-        if (userManager.hasUserRestriction(UserManager.DISALLOW_SHARE_LOCATION)) {
+        if (hasUserRestrictionCompat(userManager, UserManager.DISALLOW_SHARE_LOCATION)) {
             return false;
         }
 
@@ -89,6 +91,13 @@ public class LocationUtils {
         return Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE,
                        Settings.Secure.LOCATION_MODE_OFF)
                 != Settings.Secure.LOCATION_MODE_OFF;
+    }
+
+    private static boolean hasUserRestrictionCompat(UserManager userManager, String restrictionKey) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return Api21.hasUserRestriction(userManager, restrictionKey);
+        }
+        return false;
     }
 
     /**
@@ -141,5 +150,16 @@ public class LocationUtils {
     public static void setFactory(Factory factory) {
         sFactory = factory;
         sInstance = null;
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static class Api21 {
+
+        static boolean hasUserRestriction(UserManager userManager, String restrictionKey) {
+            return userManager.hasUserRestriction(restrictionKey);
+        }
+
+        private Api21() {
+        }
     }
 }

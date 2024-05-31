@@ -369,6 +369,7 @@ public class ApiCompatibilityUtils {
         return intent;
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static class FinishAndRemoveTaskWithRetry implements Runnable {
         private static final long RETRY_DELAY_MS = 500;
         private static final long MAX_TRY_COUNT = 3;
@@ -463,7 +464,11 @@ public class ApiCompatibilityUtils {
     }
 
     public static void setImageTintList(ImageView view, @Nullable ColorStateList tintList) {
-        ApisL.setImageTintList(view, tintList);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ApisL.setImageTintList(view, tintList);
+        } else {
+            ImageViewCompat.setImageTintList(view, tintList);
+        }
     }
 
     /**
