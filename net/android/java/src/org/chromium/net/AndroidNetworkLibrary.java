@@ -184,7 +184,6 @@ class AndroidNetworkLibrary {
      * status can't be determined. Requires ACCESS_NETWORK_STATE permission. Only available on
      * Android Marshmallow and later versions. Returns false on earlier versions.
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
     private static boolean getIsCaptivePortal() {
         // NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL is only available on Marshmallow and
@@ -354,7 +353,6 @@ class AndroidNetworkLibrary {
             sInstance = networkSecurityPolicyProxy;
         }
 
-        @RequiresApi(Build.VERSION_CODES.N)
         public boolean isCleartextTrafficPermitted(String host) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                 // No per-host configuration before N.
@@ -363,7 +361,6 @@ class AndroidNetworkLibrary {
             return ApiHelperForN.isCleartextTrafficPermitted(host);
         }
 
-        @RequiresApi(Build.VERSION_CODES.M)
         public boolean isCleartextTrafficPermitted() {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 // Always true before M.
@@ -480,7 +477,6 @@ class AndroidNetworkLibrary {
     /**
      * Reports a connectivity issue with the device's current default network.
      */
-    @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
     private static boolean reportBadDefaultNetwork() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false;

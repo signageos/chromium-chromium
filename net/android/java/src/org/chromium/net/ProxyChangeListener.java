@@ -249,6 +249,7 @@ public class ProxyChangeListener {
         return ProxyConfig.fromProxyInfo(proxyInfo);
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     /* package */ void updateProxyConfigFromConnectivityManager(Intent intent) {
         runOnThread(() -> proxySettingsChanged(getProxyConfig(intent)));
     }
