@@ -42,9 +42,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.DeprecatedSinceApi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
 import java.io.IOException;
@@ -154,6 +156,7 @@ public class ApiCompatibilityUtils {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     private static class ApisLmr1 {
         static void setAccessibilityTraversalBefore(View view, int viewFocusedAfter) {
             view.setAccessibilityTraversalBefore(viewFocusedAfter);
@@ -361,6 +364,14 @@ public class ApiCompatibilityUtils {
     @SuppressWarnings("deprecation")
     public static int getColor(Resources res, int id) throws NotFoundException {
         return res.getColor(id);
+    }
+
+    /**
+     * @see androidx.core.content.ContextCompat#getColorStateList(int id).
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static int getColor(Context context, int id) throws NotFoundException {
+        return ContextCompat.getColorStateList(context, id).getDefaultColor();
     }
 
     /**

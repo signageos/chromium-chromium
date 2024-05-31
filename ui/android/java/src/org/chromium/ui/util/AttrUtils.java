@@ -4,12 +4,18 @@
 
 package org.chromium.ui.util;
 
+import android.content.Context;
 import android.content.res.Resources.Theme;
+import android.os.Build;
 import android.util.TypedValue;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorRes;
+import androidx.annotation.DeprecatedSinceApi;
+import androidx.annotation.RequiresApi;
+
+import org.chromium.base.ApiCompatibilityUtils;
 
 /** Helper functions for working with attributes. */
 public final class AttrUtils {
@@ -24,6 +30,7 @@ public final class AttrUtils {
     }
 
     /** Returns the given color attribute from the theme. */
+    @RequiresApi(Build.VERSION_CODES.M)
     public static @ColorInt int resolveColor(Theme theme, @AttrRes int attrRes) {
         TypedValue typedValue = new TypedValue();
         theme.resolveAttribute(attrRes, typedValue, /*resolveRefs=*/true);
@@ -34,6 +41,7 @@ public final class AttrUtils {
      * Returns the given color attribute from the theme or resolves and returns the given default
      * resource if the attribute is not set in the theme.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     public static @ColorInt int resolveColor(
             Theme theme, @AttrRes int attrRes, @ColorRes int defaultColorRes) {
         TypedValue typedValue = new TypedValue();
@@ -41,6 +49,29 @@ public final class AttrUtils {
             return typedValue.data;
         } else {
             return theme.getResources().getColor(defaultColorRes, theme);
+        }
+    }
+
+    /** Returns the given color attribute from the theme. */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static @ColorInt int resolveColor(Context context, @AttrRes int attrRes) {
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(attrRes, typedValue, /*resolveRefs=*/true);
+        return ApiCompatibilityUtils.getColor(context, typedValue.resourceId);
+    }
+
+    /**
+     * Returns the given color attribute from the theme or resolves and returns the given default
+     * resource if the attribute is not set in the theme.
+     */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static @ColorInt int resolveColor(
+            Context context, @AttrRes int attrRes, @ColorRes int defaultColorRes) {
+        TypedValue typedValue = new TypedValue();
+        if (context.getTheme().resolveAttribute(attrRes, typedValue, /*resolveRefs=*/true)) {
+            return ApiCompatibilityUtils.getColor(context, typedValue.resourceId);
+        } else {
+            return ApiCompatibilityUtils.getColor(context, defaultColorRes);
         }
     }
 }
