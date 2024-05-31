@@ -56,6 +56,7 @@ public class WebkitToSharedGlueConverter {
         return adapter.getAwSettings();
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static AwWebResourceRequest getWebResourceRequest(WebResourceRequest request) {
         WebResourceRequestAdapter adapter = (WebResourceRequestAdapter) request;
         return adapter.getAwResourceRequest();

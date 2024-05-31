@@ -45,6 +45,7 @@ class SupportLibWebkitToCompatConverterAdapter implements WebkitToCompatConverte
 
     // WebResourceRequestBoundaryInterface
     @Override
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public InvocationHandler convertWebResourceRequest(WebResourceRequest request) {
         return BoundaryInterfaceReflectionUtil.createInvocationHandlerFor(
                 new SupportLibWebResourceRequest(
