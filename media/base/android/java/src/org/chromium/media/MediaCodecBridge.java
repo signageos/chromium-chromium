@@ -17,6 +17,9 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.view.Surface;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.Log;
 import org.chromium.base.annotations.CalledByNative;
 import org.chromium.base.annotations.JNINamespace;
@@ -68,6 +71,7 @@ class MediaCodecBridge {
     // Once the callback has been set on MediaCodec, these variables must only
     // be accessed from synchronized(this) blocks since MediaCodecCallback may
     // execute on an arbitrary thread.
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     private boolean mUseAsyncApi;
     private Queue<MediaFormatWrapper> mPendingFormat;
     private MediaFormatWrapper mCurrentFormat;
@@ -266,6 +270,7 @@ class MediaCodecBridge {
         prepareAsyncApiForRestart();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private void enableAsyncApi() {
         mPendingError = false;
         mPendingFormat = new LinkedList<MediaFormatWrapper>();
@@ -714,6 +719,7 @@ class MediaCodecBridge {
     }
 
     @CalledByNative
+    @RequiresApi(Build.VERSION_CODES.M)
     private boolean setSurface(Surface surface) {
         try {
             mMediaCodec.setOutputSurface(surface);
