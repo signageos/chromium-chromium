@@ -511,11 +511,13 @@ class MediaCodecBridge {
 
     @CalledByNative
     private MediaFormatWrapper getInputFormat() {
-        try {
-            MediaFormat format = mMediaCodec.getInputFormat();
-            if (format != null) return new MediaFormatWrapper(format);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Failed to get input format", e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                MediaFormat format = mMediaCodec.getInputFormat();
+                if (format != null) return new MediaFormatWrapper(format);
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Failed to get input format", e);
+            }
         }
         return null;
     }
