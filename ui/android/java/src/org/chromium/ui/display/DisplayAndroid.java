@@ -7,8 +7,11 @@ package org.chromium.ui.display;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Build;
 import android.view.Display;
 import android.view.Surface;
+
+import androidx.annotation.RequiresApi;
 
 import java.util.List;
 import java.util.WeakHashMap;
@@ -76,7 +79,7 @@ public class DisplayAndroid {
     private int mBitsPerComponent;
     private int mRotation;
     private float mRefreshRate;
-    private Display.Mode mCurrentDisplayMode;
+    private /* Display.Mode */ Object mCurrentDisplayMode;
     private List<Display.Mode> mDisplayModes;
     protected boolean mIsDisplayWideColorGamut;
     protected boolean mIsDisplayServerWideColorGamut;
@@ -226,17 +229,30 @@ public class DisplayAndroid {
         return mRefreshRate;
     }
 
-    /*
+    /**
      * @return Display.Modes supported by this Display.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     public List<Display.Mode> getSupportedModes() {
         return mDisplayModes;
     }
 
-    /*
+    /**
      * @return Current Display.Mode for the display.
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     public Display.Mode getCurrentMode() {
+        return (Display.Mode) mCurrentDisplayMode;
+    }
+
+    protected List getSupportedModesUnsafe() {
+        return mDisplayModes;
+    }
+
+    /**
+     * @return Current Display.Mode for the display.
+     */
+    protected Object getCurrentModeUnsafe() {
         return mCurrentDisplayMode;
     }
 
@@ -274,11 +290,10 @@ public class DisplayAndroid {
     /**
      * Update the display to the provided parameters. Null values leave the parameter unchanged.
      */
-    @SuppressLint("NewApi")
     protected void update(Point size, Float dipScale, Integer bitsPerPixel,
             Integer bitsPerComponent, Integer rotation, Boolean isDisplayWideColorGamut,
-            Boolean isDisplayServerWideColorGamut, Float refreshRate, Display.Mode currentMode,
-            List<Display.Mode> supportedModes) {
+            Boolean isDisplayServerWideColorGamut, Float refreshRate, /* Display.Mode */ Object currentMode,
+            /* List<Display.Mode> */ List supportedModes) {
         update(size, dipScale, null, null, bitsPerPixel, bitsPerComponent, rotation,
                 isDisplayWideColorGamut, isDisplayServerWideColorGamut, refreshRate, currentMode,
                 supportedModes);
@@ -287,11 +302,10 @@ public class DisplayAndroid {
     /**
      * Update the display to the provided parameters. Null values leave the parameter unchanged.
      */
-    @SuppressLint("NewApi")
     protected void update(Point size, Float dipScale, Float xdpi, Float ydpi, Integer bitsPerPixel,
             Integer bitsPerComponent, Integer rotation, Boolean isDisplayWideColorGamut,
-            Boolean isDisplayServerWideColorGamut, Float refreshRate, Display.Mode currentMode,
-            List<Display.Mode> supportedModes) {
+            Boolean isDisplayServerWideColorGamut, Float refreshRate, /* Display.Mode */ Object currentMode,
+            /* List<Display.Mode> */ List supportedModes) {
         boolean sizeChanged = size != null && !mSize.equals(size);
         // Intentional comparison of floats: we assume that if scales differ, they differ
         // significantly.
@@ -361,7 +375,9 @@ public class DisplayAndroid {
         if (currentModeChanged) {
             DisplayAndroidObserver[] observers = getObservers();
             for (DisplayAndroidObserver o : observers) {
-                o.onCurrentModeChanged(mCurrentDisplayMode);
+                @SuppressLint("NewApi")
+                var currentDisplayMode = (Display.Mode) mCurrentDisplayMode;
+                o.onCurrentModeChanged(currentDisplayMode);
             }
         }
     }

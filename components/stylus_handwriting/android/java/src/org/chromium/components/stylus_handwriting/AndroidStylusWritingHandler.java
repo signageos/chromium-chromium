@@ -76,7 +76,8 @@ public class AndroidStylusWritingHandler implements StylusWritingHandler, Stylus
     }
 
     AndroidStylusWritingHandler(Context context) {
-        mInputMethodManager = context.getSystemService(InputMethodManager.class);
+        mInputMethodManager = (InputMethodManager) context.getSystemService(
+                Context.INPUT_METHOD_SERVICE);
     }
 
     @Override

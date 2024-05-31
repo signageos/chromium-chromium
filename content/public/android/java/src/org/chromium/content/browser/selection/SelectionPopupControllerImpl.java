@@ -500,6 +500,7 @@ public class SelectionPopupControllerImpl extends ActionModeCallbackHelper
         if (!isActionModeValid()) clearSelection();
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private ActionMode startFloatingActionMode() {
         assert mView != null;
         assert Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;

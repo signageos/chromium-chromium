@@ -162,7 +162,8 @@ import java.util.List;
 
     private void updateFromConfiguration() {
         Point size = new Point();
-        WindowManager windowManager = mWindowContext.getSystemService(WindowManager.class);
+        WindowManager windowManager =
+                (WindowManager) mWindowContext.getSystemService(Context.WINDOW_SERVICE);
         Rect rect = ApiHelperForR.getMaximumWindowMetricsBounds(windowManager);
         size.set(rect.width(), rect.height());
         DisplayMetrics displayMetrics = mWindowContext.getResources().getDisplayMetrics();
@@ -212,14 +213,16 @@ import java.util.List;
                 ? display.getPixelFormat()
                 : PixelFormat.RGBA_8888;
 
-        Display.Mode currentMode = null;
+        // Note: getMode() and getSupportedModes() can return null in some situations - see
+        // crbug.com/1401322.
+        Object currentMode = null;
         List<Display.Mode> supportedModes = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             currentMode = ApiHelperForM.getDisplayMode(display);
-            supportedModes = Arrays.asList(ApiHelperForM.getDisplaySupportedModes(display));
-            assert currentMode != null;
-            assert supportedModes != null;
-            assert supportedModes.size() > 0;
+            Display.Mode[] modes = ApiHelperForM.getDisplaySupportedModes(display);
+            if (modes != null && modes.length > 0) {
+                supportedModes = Arrays.asList(modes);
+            }
         }
 
         super.update(size, density, xdpi, ydpi, bitsPerPixel(pixelFormatId),

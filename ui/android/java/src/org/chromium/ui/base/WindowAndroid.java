@@ -7,6 +7,7 @@ package org.chromium.ui.base;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.UiModeManager;
@@ -933,7 +934,7 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         ApiHelperForO.setColorMode(window, colorMode);
     }
 
-    @SuppressLint("NewApi") // This should only be called if Display.Mode is available.
+    // This should only be called if Display.Mode is available.
     @RequiresApi(Build.VERSION_CODES.M)
     private void recomputeSupportedRefreshRates() {
         Display.Mode currentMode = mDisplayAndroid.getCurrentMode();
@@ -975,7 +976,6 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         return mDisplayAndroid.getRefreshRate();
     }
 
-    @SuppressLint("NewApi")
     // mSupportedRefreshRateModes should only be set if Display.Mode is available.
     @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
@@ -989,13 +989,14 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         return supportedRefreshRates;
     }
 
-    @SuppressLint("NewApi")
     @CalledByNative
     private void setPreferredRefreshRate(float preferredRefreshRate) {
         mRefreshRate = preferredRefreshRate;
         if (mHasFocus) doSetPreferredRefreshRate(preferredRefreshRate);
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
+    // mSupportedRefreshRateModes should only be set if Display.Mode is available.
     private void doSetPreferredRefreshRate(float preferredRefreshRate) {
         if (mSupportedRefreshRateModes == null || !mAllowChangeRefreshRate) return;
 
@@ -1009,7 +1010,6 @@ public class WindowAndroid implements AndroidPermissionDelegate, DisplayAndroidO
         window.setAttributes(params);
     }
 
-    @SuppressLint("NewApi")
     // mSupportedRefreshRateModes should only be set if Display.Mode is available.
     @RequiresApi(Build.VERSION_CODES.M)
     private int getPreferredModeId(float preferredRefreshRate) {
