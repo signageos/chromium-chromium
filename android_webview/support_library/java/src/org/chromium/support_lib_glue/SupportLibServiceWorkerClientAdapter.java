@@ -4,6 +4,7 @@
 
 package org.chromium.support_lib_glue;
 
+import android.os.Build;
 import android.webkit.WebResourceResponse;
 
 import com.android.webview.chromium.ServiceWorkerClientAdapter;
@@ -28,6 +29,10 @@ class SupportLibServiceWorkerClientAdapter extends AwServiceWorkerClient {
 
     @Override
     public AwWebResourceResponse shouldInterceptRequest(AwWebResourceRequest request) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // WebResourceRequest isn't available on Kitkat.
+            return null;
+        }
         if (!BoundaryInterfaceReflectionUtil.containsFeature(mImpl.getSupportedFeatures(),
                     Features.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST)) {
             // If the shouldInterceptRequest callback isn't supported, return null;

@@ -8,6 +8,7 @@ import android.app.job.JobInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
@@ -31,6 +32,11 @@ public final class CrashUploadUtil {
      * Schedule a MinidumpUploadJobService to attempt uploading all ready crash minidumps.
      */
     public static void scheduleNewJob(@NonNull Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            // TODO
+            return;
+        }
+
         JobInfo.Builder builder = new JobInfo.Builder(TaskIds.WEBVIEW_MINIDUMP_UPLOADING_JOB_ID,
                 new ComponentName(context, ServiceNames.AW_MINIDUMP_UPLOAD_JOB_SERVICE));
         MinidumpUploadJobService.scheduleUpload(builder);

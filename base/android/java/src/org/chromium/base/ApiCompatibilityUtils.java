@@ -470,7 +470,11 @@ public class ApiCompatibilityUtils {
     }
 
     public static void setImageTintList(ImageView view, @Nullable ColorStateList tintList) {
-        ApisL.setImageTintList(view, tintList);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ApisL.setImageTintList(view, tintList);
+        } else {
+            ImageViewCompat.setImageTintList(view, tintList);
+        }
     }
 
     /**

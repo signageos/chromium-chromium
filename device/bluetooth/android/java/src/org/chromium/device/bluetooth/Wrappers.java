@@ -171,6 +171,9 @@ class Wrappers {
         }
 
         public BluetoothLeScannerWrapper getBluetoothLeScanner() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                return null;
+            }
             BluetoothLeScanner scanner = mAdapter.getBluetoothLeScanner();
             if (scanner == null) {
                 return null;
