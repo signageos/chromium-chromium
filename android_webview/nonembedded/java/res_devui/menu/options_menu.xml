@@ -5,32 +5,33 @@
   LICENSE file.
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/nav_menu_group">
         <!--suppress HardcodedText -->
         <item
              android:id="@+id/options_menu_switch_provider"
              android:title="Change WebView Provider"
-             android:showAsAction="never"/>
+             app:showAsAction="never"/>
         <!--suppress HardcodedText -->
         <item
              android:id="@+id/options_menu_report_bug"
              android:title="Report WebView Bug"
-             android:showAsAction="never"/>
+             app:showAsAction="never"/>
         <!--suppress HardcodedText -->
         <item
              android:id="@+id/options_menu_check_updates"
              android:title="Check for WebView updates"
-             android:showAsAction="never"/>
+             app:showAsAction="never"/>
               <!--suppress HardcodedText -->
         <item
              android:id="@+id/options_menu_components"
              android:title="Components"
-             android:showAsAction="never"/>
+             app:showAsAction="never"/>
         <!--suppress HardcodedText -->
         <item
              android:id="@+id/options_menu_about_devui"
              android:title="About WebView DevTools"
-             android:showAsAction="never"/>
+             app:showAsAction="never"/>
     </group>
 </menu>

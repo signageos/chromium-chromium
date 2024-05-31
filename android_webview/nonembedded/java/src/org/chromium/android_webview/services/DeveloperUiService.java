@@ -262,12 +262,14 @@ public final class DeveloperUiService extends Service {
                 createNotificationBuilder()
                         .setContentTitle(NOTIFICATION_TITLE)
                         .setContentText(NOTIFICATION_CONTENT)
-                        .setSmallIcon(org.chromium.android_webview.devui.R.drawable.ic_flag)
+                        .setSmallIcon(org.chromium.android_webview.devui.R.drawable.ic_notif_flag)
                         .setContentIntent(pendingIntent)
                         .setOngoing(true)
-                        .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setTicker(NOTIFICATION_TICKER);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             builder = builder
                               // No sound, vibration, or lights.

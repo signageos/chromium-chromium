@@ -42,6 +42,7 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.content.res.AppCompatResources;
 
 import org.chromium.android_webview.common.DeveloperModeUtils;
 import org.chromium.android_webview.common.Flag;
@@ -175,7 +176,7 @@ public class FlagsFragment extends DevUiBaseFragment {
 
     private void setClearTextButtonEnabled(EditText editText, boolean enabled) {
         int iconColor = getResources().getColor(R.color.navigation_unselected);
-        Drawable clearTextIcon = getContext().getDrawable(R.drawable.ic_clear_text);
+        Drawable clearTextIcon = AppCompatResources.getDrawable(getContext(), R.drawable.ic_clear_text);
         clearTextIcon.mutate();
         clearTextIcon.setColorFilter(new PorterDuffColorFilter(iconColor, PorterDuff.Mode.SRC_IN));
 
