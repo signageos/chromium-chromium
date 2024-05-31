@@ -20,6 +20,7 @@ import android.graphics.Color;
 import android.graphics.ImageDecoder;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.Build;
@@ -153,6 +154,10 @@ public class ApiCompatibilityUtils {
                 systemUiVisibility &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             }
             rootView.setSystemUiVisibility(systemUiVisibility);
+        }
+
+        static void setDrawable(LayerDrawable layerDrawable, int index, Drawable drawable) {
+            layerDrawable.setDrawable(index, drawable);
         }
     }
 
@@ -530,5 +535,20 @@ public class ApiCompatibilityUtils {
             return ApisP.getBitmapByUri(cr, uri);
         }
         return MediaStore.Images.Media.getBitmap(cr, uri);
+    }
+
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static void setDrawable(LayerDrawable layerDrawable, int index, Drawable drawable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ApisM.setDrawable(layerDrawable, index, drawable);
+            return;
+        }
+
+        int id = layerDrawable.getId(index);
+        if (id == View.NO_ID) {
+            id = View.generateViewId();
+            layerDrawable.setId(index, id);
+        }
+        layerDrawable.setDrawableByLayerId(id, drawable);
     }
 }

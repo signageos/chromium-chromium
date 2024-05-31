@@ -24,6 +24,7 @@ import androidx.annotation.Px;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.ColorUtils;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.ui.R;
 
 /**
@@ -210,7 +211,8 @@ public class RippleBackgroundHelper {
         // This works around an issue before Android O where the drawable is drawn in the wrong
         // default state.
         if (VERSION.SDK_INT < VERSION_CODES.O) {
-            mBackgroundLayerDrawable.setDrawable(/* index */ 0, mBackgroundGradient);
+            ApiCompatibilityUtils.setDrawable(
+                    mBackgroundLayerDrawable, /* index */ 0, mBackgroundGradient);
         }
         mBackgroundGradient.setColor(color);
     }
@@ -226,7 +228,8 @@ public class RippleBackgroundHelper {
         // This works around an issue before Android O where the drawable is drawn in the wrong
         // default state.
         if (VERSION.SDK_INT < VERSION_CODES.O) {
-            mBackgroundLayerDrawable.setDrawable(/* index */ 1, mStateLayerGradient);
+            ApiCompatibilityUtils.setDrawable(
+                    mBackgroundLayerDrawable, /* index */ 1, mStateLayerGradient);
         }
         mStateLayerGradient.setColor(color);
     }
