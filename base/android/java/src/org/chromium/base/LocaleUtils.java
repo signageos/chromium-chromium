@@ -59,6 +59,7 @@ public class LocaleUtils {
      * @return a locale with updated language codes for Chromium, with translated modern language
      *         codes used by Chromium.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @VisibleForTesting
     public static Locale getUpdatedLocaleForChromium(Locale locale) {
         String language = locale.getLanguage();
@@ -92,6 +93,7 @@ public class LocaleUtils {
      * @return a locale with updated language codes for Android, from translated modern language
      *         codes used by Chromium.
      */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @VisibleForTesting
     public static Locale getUpdatedLocaleForAndroid(Locale locale) {
         String language = locale.getLanguage();
@@ -242,7 +244,7 @@ public class LocaleUtils {
     @SuppressWarnings("deprecation")
     public static String getConfigurationLanguage(Configuration config) {
         Locale locale = config.locale;
-        return (locale != null) ? locale.toLanguageTag() : "";
+        return (locale != null) ? toLanguageTag(locale) : "";
     }
 
     /**
@@ -264,7 +266,7 @@ public class LocaleUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             ApisN.setConfigLocales(base, config, languageTag);
         } else {
-            config.setLocale(Locale.forLanguageTag(languageTag));
+            config.setLocale(forLanguageTag(languageTag));
         }
     }
 
