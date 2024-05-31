@@ -8,9 +8,11 @@ import android.app.job.JobInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.net.ConnectivityManager;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.android_webview.common.services.ServiceNames;
@@ -44,12 +46,12 @@ public final class CrashUploadUtil {
         boolean isNetworkUnmetered(@NonNull Context context);
     }
 
-    private static CrashUploadDelegate sDelegate = new CrashUploadDelegate() {
+    private static CrashUploadDelegate sDelegate;
+
+    private static class BaseDelegate implements CrashUploadDelegate {
         @Override
         public void scheduleNewJob(@NonNull Context context) {
-            JobInfo.Builder builder = new JobInfo.Builder(TaskIds.WEBVIEW_MINIDUMP_UPLOADING_JOB_ID,
-                    new ComponentName(context, ServiceNames.AW_MINIDUMP_UPLOAD_JOB_SERVICE));
-            MinidumpUploadJobService.scheduleUpload(builder);
+            // TODO
         }
 
         @Override
@@ -59,7 +61,25 @@ public final class CrashUploadUtil {
                             Context.CONNECTIVITY_SERVICE);
             return NetworkPermissionUtil.isNetworkUnmetered(connectivityManager);
         }
-    };
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static class LollipopDelegate extends BaseDelegate {
+        @Override
+        public void scheduleNewJob(@NonNull Context context) {
+            JobInfo.Builder builder = new JobInfo.Builder(TaskIds.WEBVIEW_MINIDUMP_UPLOADING_JOB_ID,
+                    new ComponentName(context, ServiceNames.AW_MINIDUMP_UPLOAD_JOB_SERVICE));
+            MinidumpUploadJobService.scheduleUpload(builder);
+        }
+    }
+
+    static {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            sDelegate = new LollipopDelegate();
+        } else {
+            sDelegate = new BaseDelegate();
+        }
+    }
 
     /**
      * Schedule a MinidumpUploadJobService to attempt uploading all ready crash minidumps.
