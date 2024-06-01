@@ -22,7 +22,6 @@ import("//printing/buildflags/buildflags.gni")
 import("//tools/grit/repack.gni")
 import("//tools/resources/generate_resource_allowlist.gni")
 import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
-import("//weblayer/variables.gni")
 
 if (android_64bit_target_cpu && skip_secondary_abi_for_cq) {
   assert(current_toolchain != android_secondary_abi_toolchain)
@@ -73,7 +72,6 @@ if (android_64bit_target_cpu && skip_secondary_abi_for_cq) {
 # It's used to define the allowlist of resources to be pulled out of language
 # splits. See |shared_resources_allowlist_target|.
 standalone_system_webview_apk_tmpl("system_webview_no_weblayer_apk") {
-  exclude_weblayer_java = true
   apk_name = "SystemWebViewNoWebLayer"
 
   # Don't include any code to speed up compilation. This is used only for the
@@ -475,10 +473,6 @@ java_group("android_webview_no_weblayer_java") {
 # Contains all Java dependencies used by WebView.
 java_group("android_webview_java") {
   deps = [ ":android_webview_no_weblayer_java" ]
-
-  if (webview_includes_weblayer) {
-    deps += [ "//weblayer/browser/java" ]
-  }
 }
 
 # An empty group included in //BUILD.gn to make this and other WebView build
@@ -915,18 +909,6 @@ repack("repack_pack") {
     repack_allowlist = system_webview_pak_allowlist
     deps += [ ":system_webview_pak_allowlist" ]
   }
-
-  if (webview_includes_weblayer) {
-    sources += [ "$root_gen_dir/weblayer/weblayer_resources.pak" ]
-    deps += [ "//weblayer:resources" ]
-
-    # These resources are primarily useful for developers. To avoid increasing
-    # the size of WebView they are only included in non-stable channels.
-    if (android_channel != "stable") {
-      sources += [ "$root_gen_dir/content/dev_ui_content_resources.pak" ]
-      deps += [ "//content:dev_ui_content_resources" ]
-    }
-  }
 }
 
 repack("repack_100_percent") {
@@ -943,10 +925,6 @@ repack("repack_100_percent") {
   if (enable_resource_allowlist_generation) {
     repack_allowlist = system_webview_pak_allowlist
     deps += [ ":system_webview_pak_allowlist" ]
-  }
-  if (webview_includes_weblayer) {
-    sources += [ "$target_gen_dir/components_resources_100_percent.pak" ]
-    deps += [ ":generate_components_scaled_resources" ]
   }
 }
 
@@ -1098,10 +1076,6 @@ action("concatenate_resources_allowlists") {
   script = "//mojo/public/tools/bindings/concatenate-files.py"
   inputs = [ "//android_webview/ui/grit_resources_allowlist.txt" ]
 
-  if (webview_includes_weblayer) {
-    inputs += [ "//weblayer/grit_resources_allowlist.txt" ]
-  }
-
   outputs = [ "$target_gen_dir/grit_resources_allowlist.txt" ]
   args =
       rebase_path(inputs, root_build_dir) + rebase_path(outputs, root_build_dir)
@@ -1148,29 +1122,6 @@ grit("generate_components_resources") {
       "//components/safe_browsing/content/resources:make_file_types_protobuf",
     ]
   }
-}
-
-grit("generate_components_scaled_resources") {
-  source = "../components/resources/components_scaled_resources.grd"
-
-  # See :generate_webui_resources for an explanation of the allowlist
-  _allowlist = rebase_path("$target_gen_dir/grit_resources_allowlist.txt",
-                           root_build_dir)
-
-  grit_flags = [
-    "-w",
-    _allowlist,
-  ]
-  outputs = [
-    "grit/components_scaled_resources.h",
-    "grit/components_scaled_resources_map.cc",
-    "grit/components_scaled_resources_map.h",
-    "components_resources_100_percent.pak",
-    "components_resources_200_percent.pak",
-    "components_resources_300_percent.pak",
-  ]
-
-  deps = [ ":concatenate_resources_allowlists" ]
 }
 
 grit("generate_components_strings") {

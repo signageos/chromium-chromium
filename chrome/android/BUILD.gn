@@ -36,7 +36,6 @@ import("//third_party/icu/config.gni")
 import("//third_party/protobuf/proto_library.gni")
 import("//tools/resources/generate_resource_allowlist.gni")
 import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
-import("//weblayer/variables.gni")
 import("channel.gni")
 import("java_sources.gni")
 import("static_initializers.gni")
@@ -2360,13 +2359,6 @@ if (current_toolchain == default_toolchain) {
       deps = []
 
       additional_extra_paks = []
-      if (_is_monochrome) {
-        if (webview_includes_weblayer) {
-          additional_extra_paks +=
-              [ "$root_gen_dir/weblayer/weblayer_resources.pak" ]
-          deps += [ "//weblayer:resources" ]
-        }
-      }
       if (!dfmify_dev_ui || !_is_bundle_module) {
         additional_extra_paks += [ "$root_gen_dir/chrome/dev_ui_resources.pak" ]
         deps += [ "//chrome/browser/resources:dev_ui_paks" ]
@@ -2412,9 +2404,6 @@ if (current_toolchain == default_toolchain) {
       ]
       if (_is_monochrome) {
         deps += [ "//android_webview:locale_pak_assets" ]
-        if (webview_includes_weblayer && !_is_bundle_module) {
-          deps += [ "//weblayer:locale_pak_assets" ]
-        }
       }
     }
   }
@@ -2453,11 +2442,6 @@ template("libmonochrome_apk_or_bundle_tmpl") {
     ]
     if (defined(invoker.deps)) {
       deps += invoker.deps
-    }
-
-    if (webview_includes_weblayer) {
-      defines = [ "WEBVIEW_INCLUDES_WEBLAYER" ]
-      deps += [ "//weblayer:weblayer_lib" ]
     }
 
     if (enable_vr) {
@@ -2729,9 +2713,6 @@ android_library("base_monochrome_module_java") {
     "//components/version_info/android:version_constants_java",
     "//content/public/android:content_java",
   ]
-  if (webview_includes_weblayer) {
-    deps += [ "//weblayer/browser/java:base_module_java" ]
-  }
 }
 
 # Target for classes which should be in the base module, even when //chrome code
@@ -2979,9 +2960,6 @@ template("monochrome_public_apk_or_module_tmpl") {
       ]
       if (!_is_bundle) {
         deps += [ ":monochrome_java" ]
-      }
-      if (webview_includes_weblayer) {
-        deps += [ "//weblayer/browser/java:upstream_java" ]
       }
     }
   }
@@ -3237,10 +3215,6 @@ template("monochrome_test_apk_tmpl") {
              "//third_party/android_sdk:android_test_runner_java",
              "//third_party/android_support_test_runner:runner_java",
            ]
-
-    if (webview_includes_weblayer) {
-      deps += [ "//weblayer/browser/java:upstream_java" ]
-    }
 
     additional_apks = [ "//net/android:net_test_support_apk" ]
     if (defined(invoker.additional_apks)) {

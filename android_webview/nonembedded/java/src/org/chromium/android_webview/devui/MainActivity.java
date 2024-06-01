@@ -24,9 +24,9 @@ import android.widget.TextView;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -43,7 +43,7 @@ import java.util.Map;
  * Dev UI main activity.
  * It shows persistent errors and helps to navigate to WebView developer tools.
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
     private PersistentErrorView mErrorView;
     private WebViewPackageError mDifferentPackageError;
     private boolean mDifferentPackageErrorVisible;

@@ -27,6 +27,7 @@ import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 
+import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.ui.R;
 
 /**
@@ -228,8 +229,8 @@ public class RippleBackgroundHelper {
      * @return The {@link GradientDrawable}/{@link LayerDrawable} to be used as ripple background.
      */
     private Drawable createBackgroundDrawable(ColorStateList rippleColorList,
-                                              ColorStateList borderColorList, @Px int borderSize, @Px int cornerRadius,
-                                              @Px int verticalInset) {
+            ColorStateList borderColorList, @Px int borderSize, @Px int cornerRadius,
+            @Px int verticalInset) {
         return createBackgroundDrawable(rippleColorList, borderColorList, borderSize,
                 new float[] {cornerRadius, cornerRadius, cornerRadius, cornerRadius, cornerRadius,
                         cornerRadius, cornerRadius, cornerRadius},
@@ -371,16 +372,7 @@ public class RippleBackgroundHelper {
     @DeprecatedSinceApi(api = Build.VERSION_CODES.O)
     private static void resetDrawable(LayerDrawable ld, int i) {
         Drawable d = ld.getDrawable(i);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            int id = ld.getId(i);
-            if (id == View.NO_ID) {
-                id = View.generateViewId();
-                ld.setId(i, id);
-            }
-            ld.setDrawableByLayerId(id, d);
-        } else {
-            ld.setDrawable(i, d);
-        }
+        ApiCompatibilityUtils.setDrawable(ld, i, d);
     }
 
     private static int indexOf(LayerDrawable ld, Drawable d) {

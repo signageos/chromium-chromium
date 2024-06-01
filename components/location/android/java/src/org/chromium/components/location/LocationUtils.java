@@ -14,6 +14,8 @@ import android.os.Process;
 import android.os.UserManager;
 import android.provider.Settings;
 
+import androidx.annotation.RequiresApi;
+
 import org.chromium.base.ApiCompatibilityUtils;
 import org.chromium.base.Callback;
 import org.chromium.base.ContextUtils;
@@ -77,7 +79,7 @@ public class LocationUtils {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             UserManager userManager = (UserManager) context.getSystemService(Context.USER_SERVICE);
-            if (userManager.hasUserRestriction(UserManager.DISALLOW_SHARE_LOCATION)) {
+            if (Api21.hasUserRestriction(userManager, UserManager.DISALLOW_SHARE_LOCATION)) {
                 return false;
             }
         }
@@ -143,5 +145,16 @@ public class LocationUtils {
     public static void setFactory(Factory factory) {
         sFactory = factory;
         sInstance = null;
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static class Api21 {
+
+        static boolean hasUserRestriction(UserManager userManager, String restrictionKey) {
+            return userManager.hasUserRestriction(restrictionKey);
+        }
+
+        private Api21() {
+        }
     }
 }

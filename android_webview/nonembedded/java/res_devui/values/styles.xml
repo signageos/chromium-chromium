@@ -6,7 +6,7 @@
 -->
 
 <resources>
-    <style name="Theme.DevUi.DayNight" parent="@android:style/Theme.DeviceDefault.Light.DarkActionBar" />
+    <style name="Theme.DevUi.DayNight" parent="@style/Theme.AppCompat.DayNight.DarkActionBar" />
     <style name="SelectedNavigationButton">
         <item name="android:textColor">@color/navigation_selected</item>
     </style>

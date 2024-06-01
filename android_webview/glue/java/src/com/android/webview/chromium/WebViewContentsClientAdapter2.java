@@ -777,7 +777,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
         }
     }
 
-    @RequiresApi(21)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private static class ClientCertRequestImpl extends ClientCertRequest {
         private final AwContentsClientBridge.ClientCertificateRequestCallback mCallback;
         private final String[] mKeyTypes;
@@ -1091,7 +1091,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
     /**
      * Type adaptation class for PermissionRequest.
      */
-    @RequiresApi(21)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static class PermissionRequestAdapter extends PermissionRequest {
 
         private static long toAwPermissionResources(String[] resources) {
@@ -1163,7 +1163,7 @@ class WebViewContentsClientAdapter2 extends SharedWebViewContentsClientAdapter {
         }
     }
 
-    @RequiresApi(21)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static WebChromeClient.FileChooserParams fromAwFileChooserParams(
             final AwContentsClient.FileChooserParamsImpl value) {
         if (value == null) {

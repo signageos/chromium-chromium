@@ -188,7 +188,6 @@ std::unique_ptr<MediaCodecBridge> MediaCodecBridgeImpl::CreateAudioDecoder(
 
   const std::string mime = MediaCodecUtil::CodecToAndroidMimeType(
       config.codec(), config.target_output_sample_format());
-
   if (mime.empty())
     return nullptr;
 

@@ -5,12 +5,13 @@
   LICENSE file.
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/components_menu">
         <!--suppress HardcodedText -->
         <item
             android:id="@+id/options_menu_update"
             android:title="Update"
-            android:showAsAction="ifRoom" />
+            app:showAsAction="ifRoom" />
     </group>
 </menu>

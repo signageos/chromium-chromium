@@ -262,7 +262,7 @@ public final class DeveloperUiService extends Service {
                 createNotificationBuilder()
                         .setContentTitle(NOTIFICATION_TITLE)
                         .setContentText(NOTIFICATION_CONTENT)
-                        .setSmallIcon(org.chromium.android_webview.devui.R.drawable.ic_flag)
+                        .setSmallIcon(org.chromium.android_webview.devui.R.drawable.ic_notif_flag)
                         .setContentIntent(pendingIntent)
                         .setOngoing(true)
                         .setTicker(NOTIFICATION_TICKER);

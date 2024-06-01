@@ -97,7 +97,8 @@ public class ContentView extends FrameLayout
      *                access the current theme, resources, etc.
      * @param webContents A pointer to the WebContents managing this content view.
      */
-    ContentView(Context context, EventOffsetHandler eventOffsetHandler, WebContents webContents) {
+    protected ContentView(
+            Context context, EventOffsetHandler eventOffsetHandler, WebContents webContents) {
         super(context, null, android.R.attr.webViewStyle);
 
         if (getScrollBarStyle() == View.SCROLLBARS_INSIDE_OVERLAY) {
@@ -574,16 +575,14 @@ public class ContentView extends FrameLayout
     /**
      * ContentView on Api23 to override onProvideVirtualStructure.
      */
-    public static class ContentViewApi23 extends ContentView {
-
-        @RequiresApi(Build.VERSION_CODES.M)
+    @RequiresApi(Build.VERSION_CODES.M)
+    private static class ContentViewApi23 extends ContentView {
         protected ContentViewApi23(
                 Context context, EventOffsetHandler eventOffsetHandler, WebContents webContents) {
             super(context, eventOffsetHandler, webContents);
         }
 
         @Override
-        @RequiresApi(Build.VERSION_CODES.M)
         public void onProvideVirtualStructure(final ViewStructure structure) {
             WebContentsAccessibility wcax = getWebContentsAccessibility();
             if (wcax != null) wcax.onProvideVirtualStructure(structure, false);

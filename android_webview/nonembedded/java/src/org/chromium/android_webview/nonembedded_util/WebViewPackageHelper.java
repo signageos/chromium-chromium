@@ -41,6 +41,12 @@ public final class WebViewPackageHelper {
         if (sWebViewCurrentPackage != null) {
             return sWebViewCurrentPackage;
         }
+        // There was no WebView Package before Lollipop, the WebView code was part of the framework
+        // back then.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            return null;
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             return WebView.getCurrentWebViewPackage();
         } else { // L-N
@@ -81,7 +87,8 @@ public final class WebViewPackageHelper {
     private static PackageInfo getNotYetLoadedWebViewPackageInfo(Context context) {
         String webviewPackageName;
         try {
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) {
                 Class<?> webViewFactoryClass = Class.forName("android.webkit.WebViewFactory");
 
                 webviewPackageName = (String) webViewFactoryClass.getMethod("getWebViewPackageName")

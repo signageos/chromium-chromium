@@ -52,6 +52,14 @@ public final class AttrUtils {
         }
     }
 
+    /** Returns the given color attribute from the theme. */
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static @ColorInt int resolveColor(Context context, @AttrRes int attrRes) {
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(attrRes, typedValue, /*resolveRefs=*/true);
+        return ApiCompatibilityUtils.getColor(context, typedValue.resourceId);
+    }
+
     /**
      * Returns the given color attribute from the theme or resolves and returns the given default
      * resource if the attribute is not set in the theme.

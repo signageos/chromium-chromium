@@ -92,6 +92,7 @@ android_library("devui_java") {
     "//components/version_info/android:version_constants_java",
     "//third_party/androidx:androidx_activity_activity_java",
     "//third_party/androidx:androidx_annotation_annotation_java",
+    "//third_party/androidx:androidx_appcompat_appcompat_java",
     "//third_party/androidx:androidx_appcompat_appcompat_resources_java",
     "//third_party/androidx:androidx_core_core_java",
     "//third_party/androidx:androidx_fragment_fragment_java",
@@ -240,6 +241,13 @@ android_resources("devui_resources") {
     "java/res_devui/drawable/ic_delete.xml",
     "java/res_devui/drawable/ic_devui_search.xml",
     "java/res_devui/drawable/ic_flag.xml",
+    "java/res_devui/drawable-anydpi-v21/ic_notif_flag.xml",
+    "java/res_devui/drawable-hdpi/ic_notif_flag.png",
+    "java/res_devui/drawable-ldpi/ic_notif_flag.png",
+    "java/res_devui/drawable-mdpi/ic_notif_flag.png",
+    "java/res_devui/drawable-xhdpi/ic_notif_flag.png",
+    "java/res_devui/drawable-xxhdpi/ic_notif_flag.png",
+    "java/res_devui/drawable-xxxhdpi/ic_notif_flag.png",
     "java/res_devui/layout/activity_main.xml",
     "java/res_devui/layout/components_list_item.xml",
     "java/res_devui/layout/crashes_list_item_body.xml",
@@ -258,7 +266,6 @@ android_resources("devui_resources") {
     "java/res_devui/menu/crashes_options_menu.xml",
     "java/res_devui/menu/options_menu.xml",
     "java/res_devui/values-night/colors.xml",
-    "java/res_devui/values-night/styles.xml",
     "java/res_devui/values/colors.xml",
     "java/res_devui/values/strings.xml",
     "java/res_devui/values/styles.xml",
@@ -275,27 +282,21 @@ android_resources("monochrome_devui_launcher_icon_resources") {
   android_manifest = "java/MonochromeDeveloperUiLauncherManifest.xml"
 }
 
-_webview_jinja_variables = [ "manifest_package=$system_webview_package_name" ] +
-                           webview_jinja_variables
+_webview_jinja_variables = [ "manifest_package=$system_webview_package_name" ]
+if (defined(webview_icon_resource_id)) {
+  _webview_jinja_variables += [ "icon_resource_id=$webview_icon_resource_id" ]
+}
+if (defined(webview_application_label)) {
+  _webview_jinja_variables += [ "application_label=$webview_application_label" ]
+}
 
 jinja_template("system_webview_manifest") {
-  if (defined(system_webview_library_name)) {
-    _library = "lib$system_webview_library_name.so"
-  }
-  if (defined(system_webview_label)) {
-    _application_label = system_webview_label
-  }
-  if (defined(webview_icon_resource_id)) {
-    _icon_resource_id = webview_icon_resource_id
-  }
-
   input = "java/AndroidManifest.xml"
   output = system_webview_android_manifest
-  variables = _webview_jinja_variables + [
-                "library=$_library",
-                "application_label=$_application_label",
-                "icon_resource_id=$_icon_resource_id",
-              ]
+  variables = _webview_jinja_variables
+  if (defined(system_webview_library_name)) {
+    variables += [ "library=lib$system_webview_library_name.so" ]
+  }
 }
 
 jinja_template("trichrome_webview_manifest") {
@@ -309,24 +310,14 @@ jinja_template("trichrome_webview_manifest") {
 
 if (android_64bit_target_cpu) {
   jinja_template("system_webview_64_manifest") {
-    if (defined(system_webview_library_name)) {
-      _library = "lib$system_webview_library_name.so"
-    }
-    if (defined(system_webview_label)) {
-      _application_label = system_webview_label
-    }
-    if (defined(webview_icon_resource_id)) {
-      _icon_resource_id = webview_icon_resource_id
-    }
-
     input = "java/AndroidManifest.xml"
     output = system_webview_64_android_manifest
     variables = _webview_jinja_variables + [
                   "use32bitAbi=",
-                  "library=$_library",
-                  "application_label=$_application_label",
-                  "icon_resource_id=$_icon_resource_id",
                 ]
+    if (defined(system_webview_library_name)) {
+      variables += [ "library=lib$system_webview_library_name.so" ]
+    }
   }
 
   jinja_template("trichrome_webview_64_manifest") {

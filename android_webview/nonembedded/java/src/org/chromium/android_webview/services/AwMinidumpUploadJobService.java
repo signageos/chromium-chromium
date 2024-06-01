@@ -5,6 +5,9 @@
 package org.chromium.android_webview.services;
 
 import android.os.PersistableBundle;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.android_webview.services.ServicesStatsHelper.NonembeddedService;
 import org.chromium.components.minidump_uploader.MinidumpUploadJob;
@@ -15,6 +18,7 @@ import org.chromium.components.minidump_uploader.MinidumpUploadJobService;
  * Class that interacts with the Android JobScheduler to upload Minidumps at appropriate times.
  */
 // OBS: This class needs to be public to be started from android.app.ActivityThread.
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class AwMinidumpUploadJobService extends MinidumpUploadJobService {
     @Override
     public void onCreate() {

@@ -268,9 +268,9 @@ std::string GetSecurityLevelString(
 }
 
 bool AreMediaDrmApisAvailable() {
-  if (base::android::BuildInfo::GetInstance()->sdk_int() <
-      base::android::SDK_VERSION_KITKAT)
-    return false;
+  if (base::android::BuildInfo::GetInstance()->sdk_int() >=
+      base::android::SDK_VERSION_LOLLIPOP)
+    return true;
 
   int32_t os_major_version = 0;
   int32_t os_minor_version = 0;

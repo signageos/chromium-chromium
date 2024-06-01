@@ -91,7 +91,7 @@ class MediaCodecLoopTest : public testing::Test {
   }
 
   void ConstructCodecLoop() {
-    int sdk_int = base::android::SDK_VERSION_LOLLIPOP
+    int sdk_int = base::android::SDK_VERSION_LOLLIPOP;
     auto codec = std::make_unique<MockMediaCodecBridge>();
     // Since we're providing a codec, we do not expect an error.
     EXPECT_CALL(*client_, OnCodecLoopError()).Times(0);

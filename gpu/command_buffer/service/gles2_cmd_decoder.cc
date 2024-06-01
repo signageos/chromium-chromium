@@ -6408,18 +6408,12 @@ void GLES2DecoderImpl::OnUseFramebuffer() const {
                         state_.viewport_width, state_.viewport_height);
   }
 
-  if (workarounds().restore_scissor_on_fbo_change || supports_dc_layers_) {
+  if (supports_dc_layers_) {
     // The driver forgets the correct scissor when modifying the FBO binding.
     gfx::Vector2d scissor_offset = GetBoundFramebufferDrawOffset();
     api()->glScissorFn(state_.scissor_x + scissor_offset.x(),
                        state_.scissor_y + scissor_offset.y(),
                        state_.scissor_width, state_.scissor_height);
-  }
-
-  if (workarounds().restore_scissor_on_fbo_change) {
-    // crbug.com/222018 - Also on QualComm, the flush here avoids flicker,
-    // it's unclear how this bug works.
-    api()->glFlushFn();
   }
 
   if (workarounds().force_update_scissor_state_when_binding_fbo0 &&

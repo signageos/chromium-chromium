@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  * AsyncInitTaskRunner$FetchSeedTask.
  */
 // TODO(https://crbug.com/1328637): consider using BackgroundTaskScheduler instead of JobService
-@RequiresApi(Build.VERSION_CODES.LOLLIPOP) // for JobService
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class AwVariationsSeedFetcher extends JobService {
     @VisibleForTesting
     public static final String JOB_REQUEST_COUNT_KEY = "RequestCount";

@@ -757,13 +757,13 @@ void VideoCaptureDeviceTest::RunTakePhotoTestCase() {
   const gfx::Size frame_size =
       device_info->supported_formats.front().frame_size;
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // TODO(mcasas): fails on Lollipop devices, reconnect https://crbug.com/646840
   if (base::android::BuildInfo::GetInstance()->sdk_int() <
       base::android::SDK_VERSION_MARSHMALLOW) {
     return;
   }
-#endif
+#endif  // BUILDFLAG(IS_ANDROID)
 
   VideoCaptureErrorOrDevice device_status =
       video_capture_device_factory_->CreateDevice(device_info->descriptor);
@@ -809,13 +809,13 @@ void VideoCaptureDeviceTest::RunGetPhotoStateTestCase() {
   const gfx::Size frame_size =
       device_info->supported_formats.front().frame_size;
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
   // TODO(mcasas): fails on Lollipop devices, reconnect https://crbug.com/646840
   if (base::android::BuildInfo::GetInstance()->sdk_int() <
       base::android::SDK_VERSION_MARSHMALLOW) {
     return;
   }
-#endif
+#endif  // BUILDFLAG(IS_ANDROID)
 
   VideoCaptureErrorOrDevice device_status =
       video_capture_device_factory_->CreateDevice(device_info->descriptor);

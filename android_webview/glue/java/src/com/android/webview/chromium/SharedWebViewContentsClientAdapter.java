@@ -181,7 +181,6 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
             if (TRACE) Log.i(TAG, "onReceivedError=" + request.url);
             if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_WEB_RESOURCE_ERROR)
                     && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // Note: we must pass AwWebResourceError, since this class was introduced after L.
                 mSupportLibClient.onReceivedError(
                         mWebView, new WebResourceRequestAdapter(request), error);
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -223,23 +222,9 @@ abstract class SharedWebViewContentsClientAdapter extends AwContentsClient {
             if (TRACE) Log.i(TAG, "onReceivedHttpError=" + request.url);
             if (mSupportLibClient.isFeatureAvailable(Features.RECEIVE_HTTP_ERROR)
                     && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                String reasonPhrase = response.getReasonPhrase();
-                if (reasonPhrase == null || reasonPhrase.isEmpty()) {
-                    // We cannot pass a null or empty reasonPhrase, because this version of the
-                    // WebResourceResponse constructor will throw. But we may legitimately not
-                    // receive a reasonPhrase in the HTTP response, since HTTP/2 removed
-                    // Reason-Phrase from the spec (and discourages it). Instead, assign some dummy
-                    // value to avoid the crash. See http://crbug.com/925887.
-                    reasonPhrase = "UNKNOWN";
-                }
-
-                // Note: we do not create an immutable instance here, because that constructor is
-                // not available on L.
                 mSupportLibClient.onReceivedHttpError(mWebView,
                         new WebResourceRequestAdapter(request),
-                        new WebResourceResponse(response.getMimeType(), response.getCharset(),
-                                response.getStatusCode(), reasonPhrase,
-                                response.getResponseHeaders(), response.getData()));
+                        ImmutableWebResourceResponse.from(response));
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 GlueApiHelperForM.onReceivedHttpError(mWebViewClient, mWebView, request, response);
             }

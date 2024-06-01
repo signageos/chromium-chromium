@@ -364,7 +364,7 @@ void MediaFactory::SetupMojo() {
   }
 }
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
 // Returns true if the MediaPlayerRenderer should be used for playback, false
 // if the default renderer should be used instead.
 //
@@ -388,7 +388,7 @@ bool UseMediaPlayerRenderer(const GURL& url) {
   // Otherwise, use the default renderer.
   return false;
 }
-#endif  // defined(OS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
 blink::WebMediaPlayer* MediaFactory::CreateMediaPlayer(
     const blink::WebMediaPlayerSource& source,
@@ -608,9 +608,9 @@ MediaFactory::CreateRendererFactorySelector(
 
 #if BUILDFLAG(IS_ANDROID)
   use_media_player_renderer = UseMediaPlayerRenderer(url);
-#endif  // BUILDFLAG(IS_ANDROID)
+#endif  // defined(OS_ANDROID)
 
-#if BUILDFLAG(IS_ANDROID)
+#if defined(OS_ANDROID)
   DCHECK(interface_broker_);
 
   // MediaPlayerRendererClientFactory setup. It is used for HLS playback.

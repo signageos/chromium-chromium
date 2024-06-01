@@ -4,8 +4,9 @@
 
 package org.chromium.device.bluetooth;
 
-import android.annotation.TargetApi;
 import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Log;
 import org.chromium.base.annotations.CalledByNative;
@@ -19,7 +20,7 @@ import org.chromium.base.annotations.NativeMethods;
  *
  * Lifetime is controlled by device::BluetoothRemoteGattDescriptorAndroid.
  */
-@TargetApi(Build.VERSION_CODES.M)
+@RequiresApi(Build.VERSION_CODES.M)
 @JNINamespace("device")
 @JNIAdditionalImport(Wrappers.class)
 final class ChromeBluetoothRemoteGattDescriptor {

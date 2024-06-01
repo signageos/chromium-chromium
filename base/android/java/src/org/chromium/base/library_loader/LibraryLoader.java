@@ -804,7 +804,7 @@ public class LibraryLoader {
     }
 
     @GuardedBy("mLock")
-    @SuppressLint("UnsafeDynamicallyLoadedCode")
+    @SuppressLint({"UnsafeDynamicallyLoadedCode", "NewApi"})
     private void loadWithSystemLinkerAlreadyLocked(ApplicationInfo appInfo, boolean inZygote) {
         setEnvForNative();
         preloadAlreadyLocked(appInfo.packageName, inZygote);

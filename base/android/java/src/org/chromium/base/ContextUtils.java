@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.annotations.JNINamespace;
+import org.chromium.base.annotations.MainDex;
 import org.chromium.base.compat.ApiHelperForM;
 import org.chromium.base.compat.ApiHelperForO;
 import org.chromium.build.BuildConfig;
@@ -29,6 +30,7 @@ import org.chromium.build.BuildConfig;
 /**
  * This class provides Android application context related utility methods.
  */
+@MainDex
 @JNINamespace("base::android")
 public class ContextUtils {
     private static final String TAG = "ContextUtils";

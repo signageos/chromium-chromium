@@ -12,8 +12,6 @@ import("//chrome/android/trichrome.gni")
 import("//chrome/version.gni")
 import("//device/vr/buildflags/buildflags.gni")
 import("//tools/v8_context_snapshot/v8_context_snapshot.gni")
-import("//weblayer/variables.gni")
-import("//weblayer/weblayer_resource_exclusions.gni")
 
 declare_args() {
   # Android package name to use when compiling the system_webview_apk and
@@ -26,13 +24,9 @@ declare_args() {
   enable_webview_bundles = true
 
   target_sdk_version = android_sdk_version
+  max_sdk_version = android_sdk_version
   enable_lint = false
   system_webview_library_name = "webviewchromium"
-  system_webview_label = ""
-}
-
-declare_args() {
-  max_sdk_version = target_sdk_version
 }
 
 template("system_webview_apk_or_module_tmpl") {
@@ -43,8 +37,6 @@ template("system_webview_apk_or_module_tmpl") {
     _is_bundle_module = invoker.target_type == "android_app_bundle_module"
     _target_type = invoker.target_type
   }
-  _exclude_weblayer_java =
-      defined(invoker.exclude_weblayer_java) && invoker.exclude_weblayer_java
   target(_target_type, target_name) {
     forward_variables_from(invoker,
                            "*",
@@ -61,49 +53,10 @@ template("system_webview_apk_or_module_tmpl") {
       "//android_webview:pak_file_assets",
     ]
 
-    if (_exclude_weblayer_java) {
-      deps += [ "//android_webview:android_webview_no_weblayer_java" ]
-    } else {
-      if (_is_bundle_module && weblayer_in_split && webview_includes_weblayer) {
-        deps += [
-          # TODO(crbug.com/1105096): WebLayer resources are added to the base
-          # module for now because of bugs with shared resources in splits.
-          ":${target_name}__all_weblayer_resources",
-          "//android_webview:android_webview_no_weblayer_java",
-          "//weblayer/browser/java:base_module_java",
-        ]
-        if (defined(invoker.expected_android_manifest)) {
-          _bundle_target_gen_dir =
-              get_label_info(invoker.bundle_target, "target_gen_dir")
-          _bundle_name = get_label_info(invoker.bundle_target, "name")
-          extra_verification_manifest = "${_bundle_target_gen_dir}/${_bundle_name}__weblayer_bundle_module/AndroidManifest.merged.xml"
-          extra_verification_manifest_dep = "${invoker.bundle_target}__weblayer_bundle_module__merge_manifests"
-        }
-      } else {
-        deps += [ "//android_webview:android_webview_java" ]
-      }
-
-      # Resources from this target will be kept in the base bundle module
-      # instead of in language splits.
-      if (!defined(invoker.shared_resources_allowlist_target)) {
-        shared_resources_allowlist_target =
-            "//android_webview:system_webview_no_weblayer_apk"
-      }
-    }
+    deps += [ "//android_webview:android_webview_no_weblayer_java" ]
 
     if (!_omit_dex) {
       product_config_java_packages = [ webview_product_config_java_package ]
-    }
-
-    if (webview_includes_weblayer) {
-      if (_is_bundle_module) {
-        deps += [ "//weblayer:bundle_locale_pak_assets" ]
-      } else {
-        deps += [ "//weblayer:locale_pak_assets" ]
-      }
-      if (!_omit_dex) {
-        product_config_java_packages += [ weblayer_product_config_java_package ]
-      }
     }
 
     if (!defined(alternative_android_sdk_dep)) {
@@ -206,25 +159,12 @@ template("system_webview_apk_or_module_tmpl") {
                          "target_out_dir") + "/com_google_ar_core_java/jni"
     not_needed([ "_libarcore_dir" ])
 
-    _include_arcore =
-        webview_includes_weblayer && enable_arcore && !_exclude_weblayer_java &&
-        (_include_secondary_support || _include_primary_support)
-
     if (_include_primary_support) {
       deps += [
         "//android_webview:webview_primary_abi_assets",
         "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline",
       ]
       loadable_modules = [ "$root_out_dir/libcrashpad_handler_trampoline.so" ]
-      if (webview_includes_weblayer) {
-        deps += [ "//base/android/linker:chromium_android_linker" ]
-        loadable_modules +=
-            [ "$root_out_dir/libchromium_android_linker$shlib_extension" ]
-      }
-      if (_include_arcore) {
-        loadable_modules +=
-            [ "$_libarcore_dir/$android_app_abi/libarcore_sdk_c.so" ]
-      }
     }
     if (_include_secondary_support) {
       _trampoline = "//third_party/crashpad/crashpad/handler:crashpad_handler_trampoline($android_secondary_abi_toolchain)"
@@ -235,34 +175,12 @@ template("system_webview_apk_or_module_tmpl") {
       _secondary_out_dir = get_label_info(_trampoline, "root_out_dir")
       secondary_abi_loadable_modules =
           [ "$_secondary_out_dir/libcrashpad_handler_trampoline.so" ]
-      if (webview_includes_weblayer) {
-        deps += [ "//base/android/linker:chromium_android_linker($android_secondary_abi_toolchain)" ]
-        secondary_abi_loadable_modules +=
-            [ "$_secondary_out_dir/libchromium_android_linker$shlib_extension" ]
-      }
-      if (_include_arcore) {
-        secondary_abi_loadable_modules +=
-            [ "$_libarcore_dir/$android_app_secondary_abi/libarcore_sdk_c.so" ]
-      }
-    }
-
-    if (_include_arcore) {
-      deps += [ "//third_party/arcore-android-sdk-client:com_google_ar_core_J__unpack_aar" ]
     }
 
     aapt_locale_allowlist = platform_pak_locales
 
     resource_exclusion_regex = common_resource_exclusion_regex
     resource_exclusion_exceptions = common_resource_exclusion_exceptions
-
-    if (webview_includes_weblayer) {
-      resource_values_filter_rules = weblayer_resource_values_filter_rules
-      resource_exclusion_exceptions += weblayer_resource_exclusion_exceptions
-
-      # Note: WebLayer's resource exclusion regex deliberately does not start
-      # with "|".
-      resource_exclusion_regex += "|" + weblayer_resource_exclusion_regex
-    }
 
     # We only optimize resources for bundles since APKs are not shipped.
     # Resources only live in the base module atm as such we only need to set

@@ -30,14 +30,14 @@ public class VirtualDisplayAndroid extends DisplayAndroid {
         update(new Point(other.getDisplayWidth(), other.getDisplayHeight()), other.getDipScale(),
                 other.getBitsPerPixel(), other.getBitsPerComponent(), other.getRotation(),
                 other.mIsDisplayWideColorGamut, other.mIsDisplayServerWideColorGamut,
-                other.getRefreshRate(), other.getCurrentMode(), other.getSupportedModes());
+                other.getRefreshRate(), other.getCurrentModeUnsafe(), other.getSupportedModesUnsafe());
         mAndroidUiScalingFactor = other.getAndroidUIScaling();
     }
 
     public void update(Point size, Float dipScale, Float androidUiScalingFactor,
             Integer bitsPerPixel, Integer bitsPerComponent, Integer rotation,
             Boolean isDisplayWideColorGamut, Boolean isDisplayServerWideColorGamut,
-            Float refreshRate, Display.Mode currentMode, List<Display.Mode> supportedModes) {
+            Float refreshRate, /* Display.Mode */ Object currentMode, /* List<Display.Mode> */ List supportedModes) {
         super.update(size, dipScale, bitsPerPixel, bitsPerComponent, rotation,
                 isDisplayWideColorGamut, isDisplayServerWideColorGamut, refreshRate, currentMode,
                 supportedModes);

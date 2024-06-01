@@ -7,7 +7,6 @@ package org.chromium.media;
 import android.media.MediaFormat;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 
 import org.chromium.base.Log;
@@ -51,7 +50,6 @@ class HdrMetadata {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     public void addMetadataToFormat(MediaFormat format) {
         synchronized (mLock) {
             assert mNativeJniHdrMetadata != 0;

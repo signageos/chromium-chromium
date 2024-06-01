@@ -8,13 +8,14 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.os.Build;
 import android.provider.Settings;
+import android.os.Build;
 import android.view.View;
 import android.view.inputmethod.CursorAnchorInfo;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.RequiresApi;
 
 import org.chromium.base.BuildInfo;
@@ -31,15 +32,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Allows stylus handwriting using the Android stylus writing APIs introduced in Android T.
  */
-// TODO(peconn): Comment out once we have that build code.
-// @RequiresApi(Build.VERSION_CODES.T)
-@RequiresApi(Build.VERSION_CODES.S_V2)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 public class AndroidStylusWritingHandler implements StylusWritingHandler, StylusApiOption {
     private static final String TAG = "AndroidStylus";
 
     private final InputMethodManager mInputMethodManager;
     private View mTargetView;
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
     public static boolean isEnabled(Context context) {
         if (!BuildInfo.isAtLeastT()) return false;
 
@@ -80,7 +80,8 @@ public class AndroidStylusWritingHandler implements StylusWritingHandler, Stylus
     }
 
     AndroidStylusWritingHandler(Context context) {
-        mInputMethodManager = context.getSystemService(InputMethodManager.class);
+        mInputMethodManager = (InputMethodManager) context.getSystemService(
+                Context.INPUT_METHOD_SERVICE);
     }
 
     @Override

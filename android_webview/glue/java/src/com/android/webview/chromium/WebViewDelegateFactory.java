@@ -11,8 +11,11 @@ import android.content.pm.PackageInfo;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.util.SparseArray;
 import android.view.View;
+
+import androidx.annotation.RequiresApi;
 
 import org.chromium.android_webview.gfx.AwDrawFnImpl;
 
@@ -142,6 +145,7 @@ class WebViewDelegateFactory {
             mDelegate.callDrawGlFunction(canvas, nativeDrawGLFunctor);
         }
 
+        @RequiresApi(Build.VERSION_CODES.N)
         @Override
         public void callDrawGlFunction(
                 Canvas canvas, long nativeDrawGLFunctor, Runnable releasedRunnable) {

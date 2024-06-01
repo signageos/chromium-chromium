@@ -165,8 +165,8 @@ class AudioDecoderTest
 
  protected:
   bool IsSupported() const {
-#if defined(OS_ANDROID)
-    if (decoder_type_ == AudioDecoderType::kMediaCodec) {
+#if BUILDFLAG(IS_ANDROID)
+    if (decoder_type_ == MEDIA_CODEC) {
       if (!MediaCodecUtil::IsMediaCodecAvailable()) {
         VLOG(0) << "Could not run test - no MediaCodec on device.";
         return false;

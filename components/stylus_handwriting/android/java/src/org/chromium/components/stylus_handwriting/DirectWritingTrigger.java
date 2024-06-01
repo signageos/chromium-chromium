@@ -294,9 +294,9 @@ class DirectWritingTrigger
         return false;
     }
 
-    public final boolean isButtonPressedCompat(MotionEvent me, int button) {
+    private static boolean isButtonPressedCompat(MotionEvent me, int button) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return me.isButtonPressed(button);
+            return Api21.isButtonPressed(me, button);
         }
         if (button == 0) {
             return false;
@@ -452,5 +452,16 @@ class DirectWritingTrigger
                 currentView.getContext(), DirectWritingConstants.STYLUS_WRITING_ICON_VALUE);
         ApiHelperForN.setPointerIcon(currentView, icon);
         return true;
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private static class Api21 {
+
+        static boolean isButtonPressed(MotionEvent event, int button) {
+            return event.isButtonPressed(button);
+        }
+
+        private Api21() {
+        }
     }
 }

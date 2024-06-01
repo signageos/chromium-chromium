@@ -1597,7 +1597,7 @@ void FeatureInfo::InitializeFeatures() {
   if (workarounds_.ignore_egl_sync_failures) {
     gl::GLFenceEGL::SetIgnoreFailures();
   }
-#endif
+#endif  // !BUILDFLAG(IS_MAC)
 
   if (gl_version_info_->IsLowerThanGL(4, 3)) {
     // crbug.com/481184.

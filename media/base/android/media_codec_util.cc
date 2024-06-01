@@ -366,7 +366,7 @@ bool MediaCodecUtil::CanDecode(AudioCodec codec) {
 }
 
 // static
-bool MediaCodecUtil::IsH264EncoderAvailable(bool use_codec_list) {
+bool MediaCodecUtil::IsH264EncoderAvailable() {
   if (!IsMediaCodecAvailable())
     return false;
 
@@ -380,11 +380,7 @@ bool MediaCodecUtil::IsH264EncoderAvailable(bool use_codec_list) {
     }
   }
 
-  if (use_codec_list)
-    return IsEncoderSupportedByDevice(kAvcMimeType);
-
-  // Assume support since Chrome only supports Lollipop+.
-  return true;
+  return IsEncoderSupportedByDevice(kAvcMimeType);
 }
 
 // static

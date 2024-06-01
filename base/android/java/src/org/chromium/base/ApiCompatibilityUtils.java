@@ -49,8 +49,6 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
 import androidx.annotation.DeprecatedSinceApi;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -163,6 +161,10 @@ public class ApiCompatibilityUtils {
             }
             rootView.setSystemUiVisibility(systemUiVisibility);
         }
+
+        static void setDrawable(LayerDrawable layerDrawable, int index, Drawable drawable) {
+            layerDrawable.setDrawable(index, drawable);
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP_MR1)
@@ -215,11 +217,6 @@ public class ApiCompatibilityUtils {
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             }
             window.setStatusBarColor(statusBarColor);
-        }
-
-        @ColorInt
-        static int getStatusBarColor(Window window) {
-            return window.getStatusBarColor();
         }
 
         static Drawable getDrawableForDensity(Resources res, int id, int density) {
@@ -445,17 +442,6 @@ public class ApiCompatibilityUtils {
     }
 
     /**
-     * @see android.view.Window#getStatusBarColor().
-     */
-    @ColorInt
-    public static int getStatusBarColor(Window window) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return ApisL.getStatusBarColor(window);
-        }
-        return Color.BLACK;
-    }
-
-    /**
      * Sets the status bar icons to dark or light. Note that this is only valid for
      * Android M+.
      *
@@ -548,11 +534,10 @@ public class ApiCompatibilityUtils {
     }
 
     /**
-     * @see androidx.core.content.ContextCompat#getColorStateList(android.content.Content context, int id).
+     * @see androidx.core.content.ContextCompat#getColorStateList(int id).
      */
-    @ColorInt
     @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
-    public static int getColor(@NonNull Context context, @ColorRes int id) throws NotFoundException {
+    public static int getColor(Context context, int id) throws NotFoundException {
         return ContextCompat.getColorStateList(context, id).getDefaultColor();
     }
 
@@ -839,5 +824,20 @@ public class ApiCompatibilityUtils {
             return ApisP.getBitmapByUri(cr, uri);
         }
         return MediaStore.Images.Media.getBitmap(cr, uri);
+    }
+
+    @DeprecatedSinceApi(api = Build.VERSION_CODES.M)
+    public static void setDrawable(LayerDrawable layerDrawable, int index, Drawable drawable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ApisM.setDrawable(layerDrawable, index, drawable);
+            return;
+        }
+
+        int id = layerDrawable.getId(index);
+        if (id == View.NO_ID) {
+            id = View.generateViewId();
+            layerDrawable.setId(index, id);
+        }
+        layerDrawable.setDrawableByLayerId(id, drawable);
     }
 }

@@ -531,9 +531,9 @@ public abstract class AwContentsClient {
         //                           New (M+) glue         /      New (M+) android.webkit API
         //                             onReceivedError    /     ->  onReceviedError <new>
         //   "->X" = "do nothing"        if (!<M API>) ---     /      if (isOutermostMainFrame) -\
-        //                               else ->X             /       else ->X          |
-        //                             onReceivedError2      /                          V
-        //                               if (<M API>) -------       onReceivedError <old>
+        //                               else ->X             /       else ->X                   |
+        //                             onReceivedError2      /                                   V
+        //                               if (<M API>) -------                onReceivedError <old>
         //                               else ->X
         if (request.isOutermostMainFrame) {
             onReceivedError(error.errorCode, error.description, request.url);

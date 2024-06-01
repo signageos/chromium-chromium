@@ -7,6 +7,7 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/crashes_list_activity_layout"
     android:background="@color/warning_yellow"
     android:orientation="vertical"
@@ -23,7 +24,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         style="?android:attr/textAppearanceMedium"
-        android:drawableStart="@drawable/ic_alert_error"
+        app:drawableStartCompat="@drawable/ic_alert_error"
         android:drawablePadding="15dp"
         android:paddingTop="15dp"
         android:paddingBottom="10dp"

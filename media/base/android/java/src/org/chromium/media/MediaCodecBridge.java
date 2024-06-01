@@ -17,6 +17,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.view.Surface;
 
+import androidx.annotation.ChecksSdkIntAtLeast;
 import androidx.annotation.RequiresApi;
 
 import org.chromium.base.Log;
@@ -74,6 +75,7 @@ class MediaCodecBridge {
     // Once the callback has been set on MediaCodec, these variables must only
     // be accessed from synchronized(this) blocks since MediaCodecCallback may
     // execute on an arbitrary thread.
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
     private boolean mUseAsyncApi;
     private Queue<MediaFormatWrapper> mPendingFormat;
     private MediaFormatWrapper mCurrentFormat;
@@ -89,6 +91,7 @@ class MediaCodecBridge {
     private static HandlerThread sCallbackHandlerThread;
     private static Handler sCallbackHandler;
 
+    @MainDex
     private static class DequeueInputResult {
         private final int mStatus;
         private final int mIndex;
@@ -109,6 +112,7 @@ class MediaCodecBridge {
         }
     }
 
+    @MainDex
     private static class DequeueOutputResult {
         private final int mStatus;
         private final int mIndex;
@@ -159,6 +163,7 @@ class MediaCodecBridge {
     }
 
     /** A wrapper around a MediaFormat. */
+    @MainDex
     private static class MediaFormatWrapper {
         private final MediaFormat mFormat;
 
@@ -230,6 +235,7 @@ class MediaCodecBridge {
     // of the MediaCodec. The MediaCodecBridge methods it calls are synchronized
     // to avoid race conditions.
     @RequiresApi(Build.VERSION_CODES.M)
+    @MainDex
     class MediaCodecCallback extends MediaCodec.Callback {
         private MediaCodecBridge mMediaCodecBridge;
         MediaCodecCallback(MediaCodecBridge bridge) {
@@ -260,7 +266,6 @@ class MediaCodecBridge {
         }
     };
 
-    @SuppressLint("NewApi")
     MediaCodecBridge(
             MediaCodec mediaCodec, @BitrateAdjuster.Type int bitrateAdjuster, boolean useAsyncApi) {
         assert mediaCodec != null;
@@ -504,14 +509,15 @@ class MediaCodecBridge {
         return null;
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
     @CalledByNative
     private MediaFormatWrapper getInputFormat() {
-        try {
-            MediaFormat format = mMediaCodec.getInputFormat();
-            if (format != null) return new MediaFormatWrapper(format);
-        } catch (IllegalStateException e) {
-            Log.e(TAG, "Failed to get input format", e);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                MediaFormat format = mMediaCodec.getInputFormat();
+                if (format != null) return new MediaFormatWrapper(format);
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "Failed to get input format", e);
+            }
         }
         return null;
     }
@@ -734,8 +740,8 @@ class MediaCodecBridge {
         return false;
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     @CalledByNative
+    @RequiresApi(Build.VERSION_CODES.M)
     private boolean setSurface(Surface surface) {
         try {
             mMediaCodec.setOutputSurface(surface);

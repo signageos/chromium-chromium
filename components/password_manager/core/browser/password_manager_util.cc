@@ -39,6 +39,7 @@
 #include "components/password_manager/core/browser/password_manager_features_util.h"
 #include "components/password_manager/core/browser/password_manager_metrics_util.h"
 #include "components/password_manager/core/browser/password_store_consumer.h"
+#include "components/password_manager/core/browser/password_sync_util.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/password_manager/core/common/password_manager_pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -99,6 +100,11 @@ password_manager::SyncState GetPasswordSyncState(
   // the moment. Data types won't become active for non-sync users with custom
   // passphrase.
   return password_manager::SyncState::kAccountPasswordsActiveNormalEncryption;
+}
+
+bool IsSyncingWithNormalEncryption(const syncer::SyncService* sync_service) {
+  return GetPasswordSyncState(sync_service) ==
+         password_manager::SyncState::kSyncingNormalEncryption;
 }
 
 void TrimUsernameOnlyCredentials(

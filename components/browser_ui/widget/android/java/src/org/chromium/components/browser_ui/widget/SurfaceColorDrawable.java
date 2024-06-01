@@ -4,7 +4,6 @@
 
 package org.chromium.components.browser_ui.widget;
 
-import android.annotation.SuppressLint;
 import android.content.res.Resources;
 import android.content.res.Resources.Theme;
 import android.content.res.TypedArray;

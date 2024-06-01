@@ -523,14 +523,14 @@ void KeySystemsImpl::ProcessSupportedKeySystems(
     DCHECK(!key_system_properties_map_.count(base_key_system_name))
         << "Key system '" << base_key_system_name << "' already registered";
 
-#if defined(OS_ANDROID)
+#if BUILDFLAG(IS_ANDROID)
     // Ensure that the renderer can access the decoders necessary to use the
     // key system.
     if (!properties->UseAesDecryptor() && !HasPlatformDecoderSupport()) {
       DLOG(WARNING) << base_key_system_name << " not registered";
       continue;
     }
-#endif  // defined(OS_ANDROID)
+#endif  // BUILDFLAG(IS_ANDROID)
 
     DVLOG(1) << __func__ << ": Adding key system " << base_key_system_name;
     key_system_properties_map_[base_key_system_name] = std::move(properties);
