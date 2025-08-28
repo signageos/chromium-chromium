@@ -47,7 +47,7 @@
             android:id="@+id/navigation_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:drawableTop="@drawable/ic_action_home"
+            app:drawableTopCompat="@drawable/ic_action_home"
             android:text="Home"
             android:gravity="center_horizontal"
             android:layout_weight="1">
@@ -57,7 +57,7 @@
             android:id="@+id/navigation_crash_ui"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:drawableTop="@drawable/ic_alert_error"
+            app:drawableTopCompat="@drawable/ic_alert_error"
             android:text="Crashes"
             android:gravity="center_horizontal"
             android:layout_weight="1">
@@ -67,7 +67,7 @@
             android:id="@+id/navigation_flags_ui"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:drawableTop="@drawable/ic_flag"
+            app:drawableTopCompat="@drawable/ic_flag"
             android:text="Flags"
             android:gravity="center_horizontal"
             android:layout_weight="1">

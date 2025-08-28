@@ -228,9 +228,11 @@ public final class DeveloperUiService extends Service {
                         .setSmallIcon(android.R.drawable.stat_notify_error)
                         .setContentIntent(pendingIntent)
                         .setOngoing(true)
-                        .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setTicker("Experimental WebView features enabled");
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             builder = builder
                               // No sound, vibration, or lights.
