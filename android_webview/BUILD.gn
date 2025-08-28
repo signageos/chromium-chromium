@@ -38,7 +38,7 @@ template("standalone_system_webview_apk_tmpl") {
     android_manifest_dep =
         "//android_webview/nonembedded:system_webview_manifest"
     deps = upstream_only_webview_deps
-    min_sdk_version = 21
+    min_sdk_version = default_min_sdk_version
   }
 }
 
@@ -69,7 +69,7 @@ if (enable_webview_bundles) {
   system_webview_bundle("system_webview_bundle") {
     base_module_target = ":system_webview_base_bundle_module"
     bundle_name = "SystemWebView"
-    min_sdk_version = 21
+    min_sdk_version = default_min_sdk_version
     compress_shared_libraries = true
   }
 
@@ -107,7 +107,7 @@ if (android_64bit_target_cpu) {
       base_module_target = ":system_webview_32_base_bundle_module"
       bundle_name = "SystemWebView32"
       include_64_bit_webview = false
-      min_sdk_version = 21
+      min_sdk_version = default_min_sdk_version
       compress_shared_libraries = true
     }
   }
