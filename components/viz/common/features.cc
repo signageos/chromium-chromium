@@ -85,6 +85,14 @@ bool IsVizHitTestingDebugEnabled() {
 }
 
 bool IsUsingSkiaForGLReadback() {
+#if defined(OS_ANDROID)
+  // We don't support KitKat. Check for it before looking at the feature flag
+  // so that KitKat doesn't show up in Control or Enabled experiment group.
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <=
+      base::android::SDK_VERSION_KITKAT)
+    return false;
+#endif
+
   // Viz for webview requires Skia Readback.
   if (IsUsingVizForWebView())
     return true;
@@ -123,6 +131,14 @@ bool IsDynamicColorGamutEnabled() {
 #endif
 
 bool IsUsingVizForWebView() {
+#if defined(OS_ANDROID)
+  // We don't support KitKat. Check for it before looking at the feature flag
+  // so that KitKat doesn't show up in Control or Enabled experiment group.
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <=
+      base::android::SDK_VERSION_KITKAT)
+    return false;
+#endif
+
   // Viz for WebView requires shared images to be enabled.
   if (!base::FeatureList::IsEnabled(kEnableSharedImageForWebview))
     return false;
@@ -131,6 +147,14 @@ bool IsUsingVizForWebView() {
 }
 
 bool IsUsingVizFrameSubmissionForWebView() {
+#if defined(OS_ANDROID)
+  // We don't support KitKat. Check for it before looking at the feature flag
+  // so that KitKat doesn't show up in Control or Enabled experiment group.
+  if (base::android::BuildInfo::GetInstance()->sdk_int() <=
+      base::android::SDK_VERSION_KITKAT)
+    return false;
+#endif
+
   if (base::FeatureList::IsEnabled(kVizFrameSubmissionForWebView)) {
     DCHECK(IsUsingVizForWebView())
         << "kVizFrameSubmissionForWebView requires kVizForWebView";
